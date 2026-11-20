@@ -1,0 +1,52 @@
+# Changelog
+
+Perubahan penting dicatat mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Bagian **Unreleased** berisi pekerjaan yang belum dirilis, bukan janji tanggal rilis.
+Versi paket saat ini `0.1.0`; belum ada riwayat rilis terverifikasi di dokumen ini.
+
+## [Unreleased]
+
+### Added
+
+- Validasi state tersimpan dan registry migrasi eksplisit, pemeriksaan kontrak,
+  diagnostik, serta pemeriksaan kesehatan paket.
+- `py.typed`, mypy strict bertahap, gate coverage per berkas dan gate performa CI.
+- Empat contoh runnable dengan tes integrasi subprocess: NPC+dunia,
+  dialog bergaya+HUD, save/load+migrasi, dan kawanan 100 NPC dengan LOD.
+- Panduan kontribusi dan gate changelog untuk perubahan implementasi `from_dict`.
+- R5.4: 64 alias publik malas dari subpaket ke root `pycos`, termasuk
+  `EversiTD`, `Perencana`, `ModelKausal`, dan `GrafAsosiasi`. API lama tetap
+  tersedia; `demo` dan fungsi `dukungan.sumber_daya` tetap di jalur subpaket
+  agar entry point showcase dan nama modul data tidak bertabrakan.
+- Kebijakan ekspor pada `docs/API_PUBLIK.md` serta tes klasifikasi seluruh
+  nama subpaket, identitas alias, star import, cache, dan impor malas.
+
+- R5.5: adapter snapshot `pycos.konektor.observasi`/`aksi`, CLI JSON satu
+  request, contoh Node Godot dan HTML HUD inspector lokal. Tidak mengubah
+  schema save atau lifecycle NPC host.
+
+### Changed
+
+- Implementasi mesin, state, ekstensi, dan demo inti dipisahkan dari fasad
+  `naluri`; runtime patch dicatat secara eksplisit.
+- Konstanta drive dan utilitas numerik bersama dipusatkan pada lapisan dukungan.
+- Validasi loader menolak format asing, domain angka/counter tidak sah,
+  serta referensi snapshot kompak yang tidak konsisten, bukan memperbaikinya diam-diam.
+- Kompatibilitas save: `pycos/inti/mesin.py` — Naluri memakai `naluri/4`;
+  `naluri/3` dimigrasikan dengan jam subjektif awal dari `tick_count`.
+  Snapshot legacy tanpa format tetap melalui validasi; format tidak dikenal ditolak.
+  Profil `naluri/4-simpan` dan `naluri/4-minimal` diperluas sebelum pemulihan.
+- Kompatibilitas save: `pycos/dukungan/validasi_state.py` — registry juga mengenali
+  kawanan/5, nurani/2, jejak/2, kesadaran/1, presentasi/1, ritual/1,
+  reputasi/2 dan graf_asosiasi/2. Ini bukan janji migrasi semua versi terdahulu.
+  Save berkas tetap divalidasi checksum; perubahan ini tidak menghapus pemeriksaan itu.
+
+- Kompatibilitas save: `pycos/inti/naluri.py` — implementasi loader dipindah
+  ke mesin/state; fasad Naluri dan format save tetap tersedia melalui API yang sama.
+- Kompatibilitas save: `pycos/inti/keadaan.py` — loader state diekstrak tanpa
+  mengganti skema; validasi dan migrasi tetap dijalankan oleh lapisan pemilik.
+
+### Fixed
+
+- Jalur frasa adjektiva Tutur dengan kerangka default `None` tidak lagi crash.
+- Penolakan input dan postcondition kontrak diperkuat dengan tes regresi negatif.

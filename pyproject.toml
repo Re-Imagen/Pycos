@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pycos"
+version = "0.1.0"
+description = "Toolkit state kognitif untuk NPC dan agen simulasi: motivasi, afek, memori, atensi, refleksi, dan dialog."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Re-Imagen" }]
+keywords = ["npc", "simulasi", "kognisi", "motivasi", "memori-episodik", "dialog"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Games/Entertainment :: Simulation",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+# Murni standard library: tidak ada dependensi runtime pihak ketiga.
+dependencies = []
+
+[tool.setuptools.packages.find]
+include = ["pycos*"]
+
+[tool.setuptools.package-data]
+"pycos.sumber_daya" = ["*.json", "*.jsonl"]
+
+"pycos" = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+follow_imports = "silent"
+files = ["pycos/konektor.py", "pycos/dukungan", "pycos/kontrak.py", "pycos/inti/persona.py", "pycos/refleksi/nurani.py", "pycos/bahasa/tutur.py"]
+
+[project.optional-dependencies]
+dev = ["mypy==1.15.0", "coverage==7.6.12", "pyflakes==4.0.3"]

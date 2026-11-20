@@ -1,0 +1,446 @@
+{
+  "Naluri": {
+    "_detak_checkpoint": [
+      "naluri.extension.Naluri._detak_checkpoint._detak_checkpoint"
+    ],
+    "_emosi_naikkan": [
+      "naluri.organik.emosi"
+    ],
+    "_gejala_aktifkan_kembali": [
+      "naluri.extension.Naluri._gejala_aktifkan_kembali._gejala_aktifkan_kembali"
+    ],
+    "_gejala_klaim_drive": [
+      "naluri.extension.Naluri._gejala_klaim_drive._gejala_klaim_drive"
+    ],
+    "_gejala_klaim_emosi": [
+      "naluri.extension.Naluri._gejala_klaim_emosi._gejala_klaim_emosi"
+    ],
+    "_gejala_klaim_identitas": [
+      "naluri.extension.Naluri._gejala_klaim_identitas._gejala_klaim_identitas"
+    ],
+    "_gejala_klaim_memori": [
+      "naluri.extension.Naluri._gejala_klaim_memori._gejala_klaim_memori"
+    ],
+    "_gejala_klaim_tutur": [
+      "naluri.extension.Naluri._gejala_klaim_tutur._gejala_klaim_tutur"
+    ],
+    "_gejala_konten": [
+      "naluri.extension.Naluri._gejala_konten._gejala_konten"
+    ],
+    "_gejala_nama_sementara": [
+      "naluri.extension.Naluri._gejala_nama_sementara._gejala_nama_sementara"
+    ],
+    "_gejala_pipeline": [
+      "naluri.extension.Naluri._gejala_pipeline._gejala_pipeline"
+    ],
+    "_gejala_proses_tertunda": [
+      "naluri.extension.Naluri._gejala_proses_tertunda._gejala_proses_tertunda"
+    ],
+    "_gejala_terapkan": [
+      "naluri.extension.Naluri._gejala_terapkan._gejala_terapkan"
+    ],
+    "_vacancy_aktif": [
+      "naluri.extension.Naluri._vacancy_aktif._vacancy_aktif"
+    ],
+    "_vacancy_lewat": [
+      "naluri.extension.Naluri._vacancy_lewat._vacancy_lewat"
+    ],
+    "aktifkan_konsep": [
+      "naluri.extension.Naluri.aktifkan_konsep.aktifkan_konsep"
+    ],
+    "ambang_dimodifikasi": [
+      "naluri.extension.Naluri.ambang_dimodifikasi.ambang_dimodifikasi"
+    ],
+    "apersepsi_state": [
+      "naluri.extension.Naluri.apersepsi_state.apersepsi_state"
+    ],
+    "asosiasi": [
+      "naluri.extension.Naluri.asosiasi.asosiasi"
+    ],
+    "auto_deteksi_slot": [
+      "naluri.extension.Naluri.auto_deteksi_slot.auto_deteksi_slot"
+    ],
+    "batas_identitas_state": [
+      "naluri.extension.Naluri.batas_identitas_state.batas_identitas_state"
+    ],
+    "bertindak_dari_lapisan": [
+      "naluri.extension.Naluri.bertindak_dari_lapisan.bertindak_dari_lapisan"
+    ],
+    "blame_kausal": [
+      "naluri.extension.Naluri.blame_kausal.blame_kausal"
+    ],
+    "cabang_mustahil": [
+      "naluri.extension.Naluri.cabang_mustahil.cabang_mustahil"
+    ],
+    "counterfactual_kausal": [
+      "naluri.extension.Naluri.counterfactual_kausal.counterfactual_kausal"
+    ],
+    "daftarkan_residu": [
+      "naluri.extension.Naluri.daftarkan_residu.daftarkan_residu",
+      "naluri.extension.Naluri.register_residue.register_residue"
+    ],
+    "daftarkan_slot": [
+      "naluri.extension.Naluri.daftarkan_slot.daftarkan_slot"
+    ],
+    "detak_internal_state": [
+      "naluri.extension.Naluri.detak_internal_state.detak_internal_state"
+    ],
+    "duka": [
+      "naluri.extension.Naluri.duka.duka"
+    ],
+    "emosi_ditolak": [
+      "naluri.extension.Naluri.emosi_ditolak.emosi_ditolak"
+    ],
+    "enable_asosiasi": [
+      "naluri.extension.Naluri.enable_asosiasi.enable_asosiasi"
+    ],
+    "enable_eversi": [
+      "naluri.extension.Naluri.enable_eversi.enable_eversi"
+    ],
+    "enable_gejala": [
+      "naluri.extension.Naluri.enable_gejala.enable_gejala"
+    ],
+    "enable_invensi": [
+      "naluri.extension.Naluri.enable_invensi.enable_invensi"
+    ],
+    "enable_kausal": [
+      "naluri.extension.Naluri.enable_kausal.enable_kausal"
+    ],
+    "enable_latent_drift": [
+      "naluri.extension.Naluri.enable_latent_drift.enable_latent_drift"
+    ],
+    "enable_pelindung": [
+      "naluri.extension.Naluri.enable_pelindung.enable_pelindung",
+      "naluri.extension.Presentasi.enable_pelindung.enable_pelindung"
+    ],
+    "enable_perencana": [
+      "naluri.extension.Naluri.enable_perencana.enable_perencana"
+    ],
+    "enter_vacancy": [
+      "naluri.extension.Naluri.mulai_vacancy.mulai_vacancy",
+      "naluri.extension.Naluri.enter_vacancy.enter_vacancy"
+    ],
+    "eversi_param": [
+      "naluri.extension.Naluri.eversi_param.eversi_param"
+    ],
+    "felt_report_jujur": [
+      "naluri.extension.Naluri.felt_report_jujur.felt_report_jujur"
+    ],
+    "fobia": [
+      "naluri.extension.Naluri.fobia.fobia"
+    ],
+    "from_dict": [
+      "naluri.kognisi.deserialisasi",
+      "naluri.organik.serialisasi.Naluri.from_dict"
+    ],
+    "gejala_rasakan": [
+      "naluri.extension.Naluri.gejala_rasakan.gejala_rasakan",
+      "naluri.extension.Naluri.rasakan.rasakan"
+    ],
+    "gejala_state": [
+      "naluri.extension.Naluri.gejala_state.gejala_state"
+    ],
+    "intensitas_topologis": [
+      "naluri.extension.Naluri.intensitas_topologis.intensitas_topologis"
+    ],
+    "interupsi_internal_state": [
+      "naluri.extension.Naluri.interupsi_internal_state.interupsi_internal_state"
+    ],
+    "invensi_state": [
+      "naluri.extension.Naluri.invensi_state.invensi_state"
+    ],
+    "isi_ulang_slot": [
+      "naluri.extension.Naluri.isi_ulang_slot.isi_ulang_slot"
+    ],
+    "jelaskan_kenapa": [
+      "naluri.extension.Naluri.jelaskan_kenapa.jelaskan_kenapa"
+    ],
+    "kausal_state": [
+      "naluri.extension.Naluri.kausal_state.kausal_state"
+    ],
+    "kehilangan_state": [
+      "naluri.extension.Naluri.kehilangan_state.kehilangan_state"
+    ],
+    "kepercayaan": [
+      "naluri.extension.Naluri.kepercayaan.kepercayaan"
+    ],
+    "keyakinan_paralel": [
+      "naluri.extension.Naluri.keyakinan_paralel.keyakinan_paralel"
+    ],
+    "koaktifkan": [
+      "naluri.extension.Naluri.koaktifkan.koaktifkan"
+    ],
+    "kognisi_state": [
+      "naluri.extension.Naluri.kognisi_state.kognisi_state"
+    ],
+    "kosongkan_slot": [
+      "naluri.extension.Naluri.kosongkan_slot.kosongkan_slot"
+    ],
+    "kristalkan_invensi": [
+      "naluri.extension.Naluri.kristalkan_invensi.kristalkan_invensi"
+    ],
+    "lahirkan_struktur": [
+      "naluri.extension.Naluri.lahirkan_struktur.lahirkan_struktur"
+    ],
+    "langit_dimodifikasi": [
+      "naluri.extension.Naluri.langit_dimodifikasi.langit_dimodifikasi"
+    ],
+    "latent_drift": [
+      "naluri.extension.Naluri.latent_drift.latent_drift"
+    ],
+    "layak_cabang": [
+      "naluri.extension.Naluri.layak_cabang.layak_cabang"
+    ],
+    "mekanisme_kausal": [
+      "naluri.extension.Naluri.mekanisme_kausal.mekanisme_kausal"
+    ],
+    "mulai_vacancy": [
+      "naluri.extension.Naluri.mulai_vacancy.mulai_vacancy",
+      "naluri.extension.Naluri.enter_vacancy.enter_vacancy"
+    ],
+    "organik_state": [
+      "naluri.extension.Naluri.organik_state.organik_state"
+    ],
+    "paksa_interupsi": [
+      "naluri.extension.Naluri.paksa_interupsi.paksa_interupsi"
+    ],
+    "pegang_dua": [
+      "naluri.extension.Naluri.pegang_dua.pegang_dua"
+    ],
+    "pegang_keyakinan": [
+      "naluri.extension.Naluri.pegang_keyakinan.pegang_keyakinan"
+    ],
+    "pelajari_kausal": [
+      "naluri.extension.Naluri.pelajari_kausal.pelajari_kausal"
+    ],
+    "pelindung_state": [
+      "naluri.extension.Naluri.pelindung_state.pelindung_state",
+      "naluri.extension.Presentasi.pelindung_state.pelindung_state"
+    ],
+    "pengaruh_paralel": [
+      "naluri.extension.Naluri.pengaruh_paralel.pengaruh_paralel"
+    ],
+    "perbarui_kepercayaan": [
+      "naluri.extension.Naluri.perbarui_kepercayaan.perbarui_kepercayaan"
+    ],
+    "rasa_kabut": [
+      "naluri.extension.Naluri.rasa_kabut.rasa_kabut"
+    ],
+    "rasakan": [
+      "naluri.extension.Naluri.gejala_rasakan.gejala_rasakan",
+      "naluri.extension.Naluri.rasakan.rasakan"
+    ],
+    "register_residue": [
+      "naluri.extension.Naluri.daftarkan_residu.daftarkan_residu",
+      "naluri.extension.Naluri.register_residue.register_residue"
+    ],
+    "rencana_state": [
+      "naluri.extension.Naluri.rencana_state.rencana_state"
+    ],
+    "rencanakan": [
+      "naluri.extension.Naluri.rencanakan.rencanakan"
+    ],
+    "residu_state": [
+      "naluri.extension.Naluri.residu_state.residu_state"
+    ],
+    "selisih_self_state": [
+      "naluri.extension.Naluri.selisih_self_state.selisih_self_state"
+    ],
+    "slot_terisi": [
+      "naluri.extension.Naluri.slot_terisi.slot_terisi"
+    ],
+    "suntik_tubuh": [
+      "naluri.extension.Naluri.suntik_tubuh.suntik_tubuh"
+    ],
+    "tambal_residu": [
+      "naluri.extension.Naluri.tambal_residu.tambal_residu"
+    ],
+    "tandai_stimulus_bertentangan": [
+      "naluri.extension.Naluri.tandai_stimulus_bertentangan.tandai_stimulus_bertentangan"
+    ],
+    "tanpa_resolusi": [
+      "naluri.extension.Naluri.tanpa_resolusi.tanpa_resolusi"
+    ],
+    "tetapkan_identitas": [
+      "naluri.extension.Naluri.tetapkan_identitas.tetapkan_identitas"
+    ],
+    "tick": [
+      "naluri.kognisi.tick",
+      "naluri.organik.tick",
+      "naluri.gejala.tick",
+      "naluri.invensi.tick",
+      "naluri.kausal.tick",
+      "naluri.ketidaktahuan.doubt_nurani"
+    ],
+    "to_dict": [
+      "naluri.kognisi.serialisasi",
+      "naluri.organik.serialisasi.Naluri.to_dict",
+      "naluri.persistensi.profil"
+    ],
+    "tubuh_state": [
+      "naluri.extension.Naluri.tubuh_state.tubuh_state"
+    ],
+    "vacancy_state": [
+      "naluri.extension.Naluri.vacancy_state.vacancy_state"
+    ]
+  },
+  "Kesadaran": {
+    "_candidates": [
+      "naluri.ketidaktahuan.kandidat_sementara"
+    ],
+    "_ignite": [
+      "naluri.gejala.ignite"
+    ],
+    "_intrusi_spontan": [
+      "naluri.organik.intrusi_api._intrusi_spontan"
+    ],
+    "future_simulation": [
+      "naluri.organik.future_simulation"
+    ],
+    "hold_belief": [
+      "naluri.organik.hold_belief"
+    ],
+    "hud_state": [
+      "naluri.organik.hud_state",
+      "naluri.gejala.hud_state"
+    ],
+    "intrusi_state": [
+      "naluri.organik.intrusi_api.intrusi_state"
+    ],
+    "paksa_intrusi": [
+      "naluri.organik.intrusi_api.paksa_intrusi"
+    ]
+  },
+  "Presentasi": {
+    "_ganti_kata": [
+      "naluri.extension.Presentasi._ganti_kata._ganti_kata"
+    ],
+    "_ganti_struktur": [
+      "naluri.extension.Presentasi._ganti_struktur._ganti_struktur"
+    ],
+    "_kuantor_angka": [
+      "naluri.extension.Presentasi._kuantor_angka._kuantor_angka"
+    ],
+    "_pelindung_act_hint": [
+      "naluri.extension.Presentasi._pelindung_act_hint._pelindung_act_hint"
+    ],
+    "_pelindung_buffer_jenis": [
+      "naluri.extension.Presentasi._pelindung_buffer_jenis._pelindung_buffer_jenis"
+    ],
+    "_pelindung_entry": [
+      "naluri.extension.Presentasi._pelindung_entry._pelindung_entry"
+    ],
+    "_pelindung_kebaruan_input": [
+      "naluri.extension.Presentasi._pelindung_kebaruan_input._pelindung_kebaruan_input"
+    ],
+    "_pelindung_tanda_lelah": [
+      "naluri.extension.Presentasi._pelindung_tanda_lelah._pelindung_tanda_lelah"
+    ],
+    "_pengakuan_istirahat": [
+      "naluri.extension.Presentasi._pengakuan_istirahat._pengakuan_istirahat"
+    ],
+    "_pengakuan_repetisi": [
+      "naluri.extension.Presentasi._pengakuan_repetisi._pengakuan_repetisi"
+    ],
+    "_pilih_act": [
+      "naluri.boltzmann.choice",
+      "naluri.pelindung.pilih_act"
+    ],
+    "_pilih_act_boltzmann": [
+      "naluri.boltzmann.api._pilih_act_boltzmann"
+    ],
+    "_skor_acts": [
+      "naluri.boltzmann.api._skor_acts",
+      "naluri.ketidaktahuan.prior_presentasi"
+    ],
+    "boltzmann_terakhir": [
+      "naluri.boltzmann.api.boltzmann_terakhir"
+    ],
+    "buffer_manusiawi": [
+      "naluri.extension.Presentasi.buffer_manusiawi.buffer_manusiawi"
+    ],
+    "degradasi_state": [
+      "naluri.extension.Presentasi.degradasi_state.degradasi_state"
+    ],
+    "dengar": [
+      "naluri.pelindung.dengar"
+    ],
+    "dorong_geser": [
+      "naluri.extension.Presentasi.dorong_geser.dorong_geser"
+    ],
+    "enable_boltzmann": [
+      "naluri.boltzmann.api.enable_boltzmann"
+    ],
+    "enable_pelindung": [
+      "naluri.extension.Naluri.enable_pelindung.enable_pelindung",
+      "naluri.extension.Presentasi.enable_pelindung.enable_pelindung"
+    ],
+    "eskalasi_variasi": [
+      "naluri.extension.Presentasi.eskalasi_variasi.eskalasi_variasi"
+    ],
+    "from_dict": [
+      "naluri.pelindung.deserialisasi"
+    ],
+    "jeda_bermakna": [
+      "naluri.extension.Presentasi.jeda_bermakna.jeda_bermakna"
+    ],
+    "kelayakan_tutur": [
+      "naluri.organik.presentasi_api.kelayakan_tutur"
+    ],
+    "keragaman_tanda": [
+      "naluri.extension.Presentasi.keragaman_tanda.keragaman_tanda"
+    ],
+    "monitor_integritas": [
+      "naluri.extension.Presentasi.monitor_integritas.monitor_integritas"
+    ],
+    "pelindung_state": [
+      "naluri.extension.Naluri.pelindung_state.pelindung_state",
+      "naluri.extension.Presentasi.pelindung_state.pelindung_state"
+    ],
+    "penolakan_state": [
+      "naluri.organik.presentasi_api.penolakan_state"
+    ],
+    "pidato_gagal": [
+      "naluri.extension.Presentasi.pidato_gagal.pidato_gagal"
+    ],
+    "saring_meta": [
+      "naluri.extension.Presentasi.saring_meta.saring_meta"
+    ],
+    "serap_adversarial": [
+      "naluri.extension.Presentasi.serap_adversarial.serap_adversarial"
+    ],
+    "tandai_kontradiksi": [
+      "naluri.extension.Presentasi.tandai_kontradiksi.tandai_kontradiksi"
+    ],
+    "tandai_lupa": [
+      "naluri.extension.Presentasi.tandai_lupa.tandai_lupa"
+    ],
+    "tandai_tidak_paham": [
+      "naluri.extension.Presentasi.tandai_tidak_paham.tandai_tidak_paham"
+    ],
+    "to_dict": [
+      "naluri.pelindung.serialisasi"
+    ],
+    "ucap": [
+      "naluri.organik.penolakan_tutur",
+      "naluri.organik.self_model_tutur",
+      "naluri.pelindung.ucap",
+      "naluri.presentasi.penahanan_sadar",
+      "naluri.presentasi.audisi_diri"
+    ],
+    "watak_kegagalan": [
+      "naluri.extension.Presentasi.watak_kegagalan.watak_kegagalan"
+    ]
+  },
+  "KawananNPC": {
+    "keragaman": [
+      "naluri.kawanan.pelindung_api.keragaman"
+    ],
+    "monitor_scene": [
+      "naluri.kawanan.pelindung_api.monitor_scene"
+    ],
+    "tick_all": [
+      "naluri.kawanan.pelindung.tick_all"
+    ]
+  }
+}

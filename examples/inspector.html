@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pycos · HUD Inspector</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui;background:#101820;color:#e4edf3}body{max-width:900px;margin:3rem auto;padding:0 1.5rem}h1{letter-spacing:-.04em}small{color:#9bb2c2}section{background:#1b2a36;padding:1.5rem;border-radius:14px;margin:1rem 0}textarea{box-sizing:border-box;width:100%;height:160px;background:#101820;color:inherit;border:1px solid #597080;border-radius:8px;padding:1rem}button{background:#9fe1cc;border:0;padding:.7rem 1rem;border-radius:8px;font-weight:700;cursor:pointer}input{margin:1rem 0}#error{color:#ffb0a5}pre{white-space:pre-wrap;overflow-wrap:anywhere}label{display:block;margin:.7rem 0}progress{width:100%;accent-color:#9fe1cc}
+</style>
+<h1>Pycos <small>HUD Inspector</small></h1>
+<p>Buka JSON <code>hud_state()</code> atau respons CLI konektor. Data tetap di browser, tanpa server atau jaringan.</p>
+<section>
+<label for="file">Berkas JSON (maksimal 1 MB)</label><input id="file" type="file" accept=".json,application/json">
+<label for="payload">Atau tempel JSON</label><textarea id="payload" spellcheck="false" placeholder='{"nama":"Rama","mood":"tenang","bars":{"energi":0.5}}'></textarea>
+<button id="show">Tampilkan HUD</button><p id="error" role="alert"></p>
+</section>
+<section aria-live="polite"><h2 id="name">Belum ada NPC</h2><p id="summary"></p><div id="bars"></div><pre id="detail"></pre></section>
+<script>
+'use strict';
+const el=id=>document.getElementById(id), limit=1000000;
+function show(text){
+ try{
+  if(text.length>limit)throw Error('Payload terlalu besar');
+  const data=JSON.parse(text), hud=data && data.hud!==undefined ? data.hud : data;
+  if(!hud || typeof hud!=='object' || Array.isArray(hud) || typeof hud.nama!=='string')throw Error('HUD wajib objek dengan nama string');
+  const bars=hud.bars===undefined?{}:hud.bars;
+  if(!bars || typeof bars!=='object' || Array.isArray(bars))throw Error('bars wajib objek');
+  for(const [key,value] of Object.entries(bars))if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1)throw Error('Bar '+key+' wajib angka 0..1');
+  el('name').textContent=hud.tag_dialog || hud.nama;
+  el('summary').textContent=hud.ringkasan || hud.mood || '';
+  el('bars').replaceChildren();
+  for(const [key,value] of Object.entries(bars)){
+   const label=document.createElement('label'), bar=document.createElement('progress');
+   label.textContent=key+' · '+Math.round(value*100)+'%';bar.max=1;bar.value=value;label.append(bar);el('bars').append(label);
+  }
+  el('detail').textContent=JSON.stringify(hud,null,2);el('error').textContent='';
+ }catch(error){el('error').textContent=error.message;el('name').textContent='Data tidak sah';el('summary').textContent='';el('bars').replaceChildren();el('detail').textContent='';}
+}
+el('show').addEventListener('click',()=>show(el('payload').value));
+el('file').addEventListener('change',async()=>{
+ const file=el('file').files[0];if(!file)return;
+ if(file.size>limit){el('error').textContent='Berkas terlalu besar';return;}
+ try{const text=await file.text();el('payload').value=text;show(text);}catch(error){el('error').textContent=error.message;}
+});
+</script>
+</html>

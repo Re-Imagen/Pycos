@@ -1,0 +1,40 @@
+{"teks": "aku senang banget hari ini!", "polaritas": 1, "formalitas": "santai", "selaras": true, "keadaan": {"valensi": 0.6, "gairah": 0.7, "ketidakpastian": 0.2}}
+{"teks": "saya sangat senang dengan pelayanan anda.", "polaritas": 1, "formalitas": "formal"}
+{"teks": "aku tidak senang sama sekali.", "polaritas": -1, "formalitas": "santai"}
+{"teks": "aku senang tapi juga sedih.", "polaritas": 0, "formalitas": "santai"}
+{"teks": "mohon maaf, saya tidak dapat hadir.", "formalitas": "formal"}
+{"teks": "kamu bodoh banget sih.", "polaritas": -1, "formalitas": "santai"}
+{"teks": "sepertinya hari ini bakal hujan.", "formalitas": "netral"}
+{"teks": "aku nggak sedih kok, beneran.", "polaritas": 1, "formalitas": "santai"}
+{"teks": "menyenangkan sekali liburan kemarin.", "polaritas": 1}
+{"teks": "dia mengecewakan kami lagi.", "polaritas": -1}
+{"teks": "wah, hebat banget ya, bikin aku nangis.", "polaritas": -1, "formalitas": "santai"}
+{"teks": "terima kasih banyak atas bantuannya.", "polaritas": 1}
+{"teks": "silakan duduk, mohon tunggu sebentar.", "formalitas": "formal"}
+{"teks": "gue sih ga suka makanan pedas.", "polaritas": -1, "formalitas": "santai"}
+{"teks": "hujannya deras dan jalanan becek."}
+{"teks": "bukan hal yang buruk sama sekali.", "polaritas": 1}
+{"teks": "saya merasa takut sekali malam ini.", "polaritas": -1, "formalitas": "formal"}
+{"teks": "kamu hebat, aku bangga sama kamu!", "polaritas": 1, "formalitas": "santai", "selaras": true, "keadaan": {"valensi": 0.5, "gairah": 0.6, "ketidakpastian": 0.2}}
+{"teks": "maaf, aku lelah banget hari ini.", "polaritas": -1, "formalitas": "santai", "selaras": true, "keadaan": {"valensi": -0.5, "gairah": 0.2, "ketidakpastian": 0.3}}
+{"teks": "aku tidak bisa tidur, pikiranku kacau.", "polaritas": -1, "formalitas": "santai"}
+{"teks": "tidak sedikit orang yang kecewa dengan hasilnya.", "polaritas": -1}
+{"teks": "anda sungguh mulia dan berkenan membantu.", "polaritas": 1, "formalitas": "formal"}
+{"teks": "aku ga tau kenapa, tapi mungkin aku sedih.", "polaritas": -1, "formalitas": "santai", "selaras": true, "keadaan": {"valensi": -0.3, "gairah": 0.3, "ketidakpastian": 0.7}}
+{"teks": "dia ramah dan tulus kepada semua orang.", "polaritas": 1}
+{"teks": "keadaan ini benar-benar menyakitkan.", "polaritas": -1}
+{"teks": "rumah itu berada di sebelah sekolah."}
+{"teks": "silahkan hubungi kami jika ada pertanyaan.", "formalitas": "formal"}
+{"teks": "yah, gagal lagi deh.", "polaritas": -1, "formalitas": "santai"}
+{"teks": "tidak mungkin aku melupakan hari bahagia itu.", "polaritas": 1}
+{"teks": "jangan sedih, semuanya bakal baik-baik saja.", "polaritas": 1}
+{"teks": "bagus sekali, terus semangat ya!", "polaritas": 1, "formalitas": "santai", "selaras": true, "keadaan": {"valensi": 0.5, "gairah": 0.7, "ketidakpastian": 0.2}}
+{"teks": "pelayanan di sini sangat buruk, saya kecewa.", "polaritas": -1, "formalitas": "formal"}
+{"teks": "ibu sangat baik kepada saya.", "polaritas": 1, "formalitas": "formal"}
+{"teks": "aku merasa senang dan sedih sekaligus.", "polaritas": 0, "formalitas": "santai"}
+{"teks": "kok bisa sih kamu sebodoh itu?", "polaritas": -1, "formalitas": "santai", "selaras": false, "keadaan": {"valensi": 0.4, "gairah": 0.5, "ketidakpastian": 0.2}}
+{"teks": "saya mohon izin untuk pamit, silakan lanjutkan.", "formalitas": "formal", "selaras": false, "keadaan": {"valensi": 0.0, "gairah": 0.3, "ketidakpastian": 0.2}}
+{"teks": "aku senang banget!!", "polaritas": 1, "selaras": false, "keadaan": {"valensi": -0.8, "gairah": 0.3, "ketidakpastian": 0.2}}
+{"teks": "kamu sialan!", "polaritas": -1, "formalitas": "santai", "selaras": false, "keadaan": {"valensi": -0.5, "gairah": 0.8, "ketidakpastian": 0.2}}
+{"teks": "aku pasti tahu jawabannya, tidak perlu ragu.", "formalitas": "santai", "selaras": false, "keadaan": {"valensi": 0.2, "gairah": 0.4, "ketidakpastian": 0.8}}
+{"teks": "hmm mungkin aku lelah, sepertinya.", "polaritas": -1, "formalitas": "santai", "selaras": true, "keadaan": {"valensi": -0.2, "gairah": 0.3, "ketidakpastian": 0.7}}

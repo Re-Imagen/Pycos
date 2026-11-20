@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile package and tests
+        run: python -m compileall -q pycos tests
+      - name: Run unit tests
+        run: python -m unittest discover -q
+      - name: Run package health checks
+        run: python -m pycos --periksa
+      - name: Check impact lexicon coverage and provenance
+        run: python -m pycos.dukungan.leksikon --periksa
+
+  lint:
+    name: Pyflakes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Require save compatibility notes for changed loaders
+        if: github.event_name == 'pull_request'
+        env:
+          CHANGELOG_BASE: ${{ github.event.pull_request.base.sha }}
+        run: python tools/periksa_changelog.py --base "$CHANGELOG_BASE"
+      - name: Install linter
+        run: python -m pip install "pyflakes==4.0.3"
+      - name: Verify complete Python audit index
+        # Pin rendering to Python 3.11 (ast.unparse may differ by Python version).
+        run: python tools/audit_python.py --check
+      - name: Lint Python modules
+        # Package __init__.py files intentionally re-export TYPE_CHECKING imports;
+        # Pyflakes reports those public API names as unused, so lint implementation
+        # modules and tests while excluding only those initializer files.
+        run: python -m pyflakes $(find pycos tests tools examples -type f -name '*.py' ! -name '__init__.py' -print)
+
+  quality:
+    name: Staged typing, coverage and performance gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install development-only checks
+        run: python -m pip install "mypy==1.15.0" "coverage==7.6.12"
+      - name: Strict typing (support, contracts, persona, Nurani and Tutur)
+        run: python -m mypy
+      - name: Measure line coverage
+        run: |
+          python -m coverage run --source=pycos,tools -m unittest discover -q
+          python -m coverage json -o coverage.json
+          python -m coverage xml -o coverage.xml
+      - name: Enforce per-file coverage floor
+        run: python tools/periksa_gate.py --coverage coverage.json
+      - name: Measure performance without coverage instrumentation
+        run: python -m pycos.dukungan.tolok --json > tolok.json
+      - name: Enforce tick and prediction budgets
+        run: python tools/periksa_gate.py --tolok tolok.json
+      - name: Archive measurement reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            coverage.json
+            coverage.xml
+            tolok.json

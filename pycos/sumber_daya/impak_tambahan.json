@@ -1,0 +1,3797 @@
+{
+  "format": "impak/1",
+  "sumber_sha256": "3d66e1b17b86e170d5f5bd197e591ba18f74cf260bec917873f2f11056318cd0",
+  "aturan_tipe": {
+    "TAKUT": {
+      "keamanan": -0.3
+    },
+    "SEDIH": {
+      "energi": -0.15,
+      "afiliasi": -0.15
+    },
+    "SENANG": {
+      "energi": 0.15,
+      "afiliasi": 0.15
+    },
+    "MARAH": {
+      "keamanan": -0.15,
+      "afiliasi": -0.25
+    },
+    "CINTA": {
+      "afiliasi": 0.35
+    },
+    "SAYANG": {
+      "afiliasi": 0.3
+    },
+    "BENCI": {
+      "afiliasi": -0.35
+    },
+    "MALU": {
+      "afiliasi": -0.15,
+      "penguasaan": -0.1
+    },
+    "HARAP": {
+      "penguasaan": 0.15
+    },
+    "KESEPIAN": {
+      "afiliasi": -0.3
+    },
+    "TENANG": {
+      "keamanan": 0.25
+    },
+    "KERAGUAN": {
+      "koherensi": -0.15
+    },
+    "KESALAHAN": {
+      "penguasaan": -0.2
+    },
+    "KEPERCAYAAN": {
+      "koherensi": 0.2
+    },
+    "EDIBLE": {
+      "energi": 0.15
+    }
+  },
+  "kelompok": [
+    {
+      "drive": "energi",
+      "nilai": 0.3,
+      "id": [
+        "bergizi",
+        "bernutrisi",
+        "segar",
+        "bugar",
+        "pulih",
+        "memulihkan",
+        "pemulihan",
+        "menyegarkan",
+        "mengenyangkan",
+        "kenyang",
+        "sarapan",
+        "minum",
+        "hidrasi",
+        "terhidrasi",
+        "beristirahat",
+        "berbaring",
+        "bersantai",
+        "rehat",
+        "santai",
+        "stamina",
+        "vitalitas",
+        "kebugaran",
+        "vitamin",
+        "protein",
+        "kalori",
+        "suplemen",
+        "makan malam",
+        "tidur nyenyak"
+      ],
+      "en": [
+        "nourished",
+        "nourishing",
+        "nutrition",
+        "refreshed",
+        "refreshment",
+        "rested",
+        "restful",
+        "rest",
+        "sleep",
+        "nap",
+        "breakfast",
+        "lunch",
+        "dinner",
+        "hydration",
+        "hydrate",
+        "hydrated",
+        "nutritious",
+        "vitamin",
+        "protein",
+        "calories",
+        "stamina",
+        "vitality",
+        "recuperate",
+        "recover",
+        "recharge"
+      ]
+    },
+    {
+      "drive": "energi",
+      "nilai": -0.3,
+      "id": [
+        "keletihan",
+        "kelaparan",
+        "kehausan",
+        "lapar",
+        "haus",
+        "mengantuk",
+        "kantuk",
+        "terkuras",
+        "letih",
+        "capai",
+        "lesu",
+        "loyo",
+        "lemas",
+        "dehidrasi",
+        "insomnia",
+        "begadang",
+        "menguap",
+        "terkuras",
+        "pingsan",
+        "kelelahan",
+        "menguras",
+        "tenaga",
+        "kekurangan gizi",
+        "kurang tidur",
+        "kehabisan tenaga",
+        "kelelahan fisik",
+        "menguras tenaga"
+      ],
+      "en": [
+        "exhaustion",
+        "exhausted",
+        "exhausting",
+        "fatigue",
+        "fatigued",
+        "tired",
+        "tiring",
+        "hungry",
+        "hunger",
+        "thirsty",
+        "thirst",
+        "dehydration",
+        "dehydrated",
+        "sleepless",
+        "insomnia",
+        "drowsy",
+        "sleepy",
+        "drained",
+        "drain",
+        "overwork",
+        "starvation",
+        "starving",
+        "malnutrition",
+        "famished",
+        "weakness"
+      ]
+    },
+    {
+      "drive": "keamanan",
+      "nilai": 0.35,
+      "id": [
+        "terlindungi",
+        "pelindung",
+        "perlindungan",
+        "melindungi",
+        "dilindungi",
+        "menyelamatkan",
+        "diselamatkan",
+        "penyelamatan",
+        "keselamatan",
+        "penyelamat",
+        "pertolongan",
+        "menolong",
+        "ditolong",
+        "penyembuhan",
+        "sembuh",
+        "menyembuhkan",
+        "dipulihkan",
+        "pertahanan",
+        "bertahan",
+        "pengamanan",
+        "penjagaan",
+        "menjaga",
+        "waspada",
+        "pencegahan",
+        "mencegah",
+        "pencegah"
+      ],
+      "en": [
+        "protected",
+        "protection",
+        "protect",
+        "shelter",
+        "sheltered",
+        "sheltering",
+        "rescue",
+        "rescued",
+        "rescuer",
+        "safety",
+        "safeguard",
+        "guarded",
+        "guard",
+        "defend",
+        "defense",
+        "secure",
+        "security",
+        "prevention",
+        "prevent",
+        "healing",
+        "heal",
+        "healed",
+        "treatment",
+        "precaution",
+        "cautious"
+      ]
+    },
+    {
+      "drive": "keamanan",
+      "nilai": -0.4,
+      "id": [
+        "kebakaran",
+        "terbakar",
+        "membakar",
+        "ledakan",
+        "meledak",
+        "peledak",
+        "racun",
+        "beracun",
+        "keracunan",
+        "terluka",
+        "luka",
+        "melukai",
+        "cedera",
+        "mencederai",
+        "kecelakaan",
+        "serangan",
+        "menyerang",
+        "diserang",
+        "terancam",
+        "mengancam",
+        "ancaman",
+        "pembunuhan",
+        "membunuh",
+        "dibunuh",
+        "bencana",
+        "bahaya",
+        "ancaman",
+        "kekerasan",
+        "penyerangan",
+        "perampokan",
+        "kematian",
+        "maut"
+      ],
+      "en": [
+        "burning",
+        "burned",
+        "burns",
+        "explosion",
+        "explosive",
+        "explode",
+        "poison",
+        "poisoned",
+        "poisonous",
+        "injury",
+        "injured",
+        "wound",
+        "wounded",
+        "assault",
+        "assaulted",
+        "attacked",
+        "attacking",
+        "threatened",
+        "threatening",
+        "threat",
+        "murder",
+        "murdered",
+        "disaster",
+        "violence",
+        "robbery",
+        "death",
+        "deadly",
+        "lethal"
+      ]
+    },
+    {
+      "drive": "keingintahuan",
+      "nilai": 0.3,
+      "id": [
+        "penemuan",
+        "menemukan",
+        "temuan",
+        "penyelidikan",
+        "menyelidiki",
+        "investigasi",
+        "meneliti",
+        "penelitian",
+        "peneliti",
+        "riset",
+        "mengeksplorasi",
+        "eksplorasi",
+        "penasaran",
+        "keingintahuan",
+        "mengamati",
+        "pengamatan",
+        "observasi",
+        "eksperimen",
+        "percobaan",
+        "menguji",
+        "pengujian",
+        "menyimak",
+        "menyelami",
+        "menggali",
+        "wawasan",
+        "misterius",
+        "teka-teki",
+        "pertanyaan",
+        "bertanya",
+        "mempelajari"
+      ],
+      "en": [
+        "discovery",
+        "discover",
+        "discovered",
+        "discoveries",
+        "investigate",
+        "investigation",
+        "researcher",
+        "research",
+        "researching",
+        "explore",
+        "exploration",
+        "curious",
+        "curiosity",
+        "observe",
+        "observation",
+        "experiment",
+        "experiments",
+        "examine",
+        "examination",
+        "question",
+        "questioning",
+        "inquire",
+        "inquiry",
+        "puzzle",
+        "puzzles",
+        "mysteries"
+      ]
+    },
+    {
+      "drive": "keingintahuan",
+      "nilai": -0.25,
+      "id": [
+        "kebosanan",
+        "membosankan",
+        "jemu",
+        "menjemukan",
+        "kejenuhan",
+        "jenuh",
+        "monoton",
+        "repetitif",
+        "berulang",
+        "pengulangan",
+        "rutinitas",
+        "rutin",
+        "terbiasa",
+        "lazim",
+        "lumrah",
+        "umum",
+        "biasa",
+        "sehari-hari",
+        "diketahui",
+        "hafal",
+        "menghafal",
+        "terpola",
+        "ketebakan",
+        "membeku",
+        "stagnan",
+        "stagnasi"
+      ],
+      "en": [
+        "bored",
+        "boredom",
+        "boring",
+        "monotonous",
+        "monotony",
+        "repetitive",
+        "repetition",
+        "routine",
+        "habitual",
+        "accustomed",
+        "ordinary",
+        "predictable",
+        "familiar",
+        "commonplace",
+        "stale",
+        "uninteresting",
+        "tedious",
+        "tedium",
+        "humdrum",
+        "mundane",
+        "stagnation",
+        "stagnant",
+        "incurious",
+        "uninterested",
+        "disinterest"
+      ]
+    },
+    {
+      "drive": "penguasaan",
+      "nilai": 0.35,
+      "id": [
+        "keberhasilan",
+        "memenangkan",
+        "pemenang",
+        "kemenangan",
+        "menang",
+        "menuntaskan",
+        "tuntas",
+        "ketuntasan",
+        "menyelesaikan",
+        "terselesaikan",
+        "selesai",
+        "menguasai",
+        "penguasaan",
+        "terampil",
+        "keterampilan",
+        "keahlian",
+        "ahli",
+        "kemahiran",
+        "kompeten",
+        "kompetensi",
+        "pencapaian",
+        "mencapai",
+        "prestasi",
+        "berprestasi",
+        "memperbaiki",
+        "peningkatan",
+        "meningkat",
+        "mengatasi",
+        "teratasi",
+        "menaklukkan"
+      ],
+      "en": [
+        "achievement",
+        "achieve",
+        "achieved",
+        "accomplish",
+        "accomplishment",
+        "accomplished",
+        "success",
+        "successful",
+        "succeed",
+        "succeeded",
+        "winner",
+        "winning",
+        "win",
+        "mastery",
+        "master",
+        "skilled",
+        "skill",
+        "expertise",
+        "expert",
+        "competent",
+        "competence",
+        "improve",
+        "improvement",
+        "overcome",
+        "complete",
+        "completed"
+      ]
+    },
+    {
+      "drive": "penguasaan",
+      "nilai": -0.3,
+      "id": [
+        "kegagalan",
+        "gagal",
+        "kekalahan",
+        "kalah",
+        "dikalahkan",
+        "terkalahkan",
+        "menyerah",
+        "ketidakmampuan",
+        "ketidakberdayaan",
+        "kewalahan",
+        "buntu",
+        "terhambat",
+        "hambatan",
+        "menghambat",
+        "kegagapan",
+        "gagap",
+        "canggung",
+        "kesulitan",
+        "sulit",
+        "kesalahan",
+        "salah",
+        "keliru",
+        "kekeliruan",
+        "terpuruk",
+        "kemunduran",
+        "menurun",
+        "tak berdaya",
+        "tidak mampu"
+      ],
+      "en": [
+        "failure",
+        "failed",
+        "failing",
+        "defeated",
+        "defeat",
+        "loser",
+        "losing",
+        "lose",
+        "helpless",
+        "helplessness",
+        "incapable",
+        "inability",
+        "overwhelmed",
+        "blocked",
+        "blockage",
+        "obstacle",
+        "obstructed",
+        "clumsy",
+        "difficulty",
+        "difficult",
+        "error",
+        "erroneous",
+        "mistake",
+        "mistaken",
+        "setback",
+        "decline"
+      ]
+    },
+    {
+      "drive": "afiliasi",
+      "nilai": 0.35,
+      "id": [
+        "persahabatan",
+        "sahabat",
+        "bersahabat",
+        "berteman",
+        "pertemanan",
+        "kebersamaan",
+        "bersama",
+        "teman",
+        "kawan",
+        "rekan",
+        "kerabat",
+        "keluarga",
+        "saudara",
+        "menyayangi",
+        "disayangi",
+        "menyukai",
+        "disukai",
+        "mencintai",
+        "dicintai",
+        "kepedulian",
+        "peduli",
+        "keakraban",
+        "akrab",
+        "keramahan",
+        "ramah",
+        "kerjasama",
+        "kolaborasi",
+        "berkolaborasi",
+        "mendukung",
+        "didukung",
+        "dukungan",
+        "kasih sayang",
+        "bekerja sama"
+      ],
+      "en": [
+        "friendship",
+        "friendly",
+        "friends",
+        "friend",
+        "companion",
+        "companionship",
+        "together",
+        "togetherness",
+        "kinship",
+        "family",
+        "relatives",
+        "sibling",
+        "siblings",
+        "affection",
+        "affectionate",
+        "kindness",
+        "caring",
+        "care",
+        "beloved",
+        "loving",
+        "loved",
+        "love",
+        "support",
+        "supportive",
+        "collaboration",
+        "cooperate",
+        "cooperation",
+        "welcome",
+        "welcomed"
+      ]
+    },
+    {
+      "drive": "afiliasi",
+      "nilai": -0.35,
+      "id": [
+        "permusuhan",
+        "bermusuhan",
+        "musuh",
+        "memusuhi",
+        "kebencian",
+        "membenci",
+        "dibenci",
+        "kesepian",
+        "sepi",
+        "sendirian",
+        "sendiri",
+        "terasing",
+        "pengasingan",
+        "mengasingkan",
+        "dikucilkan",
+        "mengucilkan",
+        "pengucilan",
+        "ditolak",
+        "menolak",
+        "penolakan",
+        "perpisahan",
+        "berpisah",
+        "berduka",
+        "kehilangan",
+        "pengkhianatan",
+        "berkhianat",
+        "dikhianati",
+        "pertengkaran",
+        "bertengkar",
+        "konflik"
+      ],
+      "en": [
+        "hostility",
+        "hostile",
+        "enemy",
+        "enemies",
+        "hatred",
+        "hateful",
+        "loneliness",
+        "lonely",
+        "solitude",
+        "isolated",
+        "isolation",
+        "ostracized",
+        "ostracism",
+        "rejected",
+        "rejection",
+        "separation",
+        "separated",
+        "abandonment",
+        "abandoned",
+        "betrayal",
+        "betrayed",
+        "treachery",
+        "quarrel",
+        "arguing",
+        "conflict",
+        "estranged",
+        "alienated"
+      ]
+    },
+    {
+      "drive": "koherensi",
+      "nilai": 0.3,
+      "id": [
+        "kejelasan",
+        "jelas",
+        "memperjelas",
+        "penjelasan",
+        "menjelaskan",
+        "penjelas",
+        "diterangkan",
+        "menerangkan",
+        "terang",
+        "pemahaman",
+        "memahami",
+        "dipahami",
+        "mengerti",
+        "dimengerti",
+        "konsistensi",
+        "konsisten",
+        "keselarasan",
+        "selaras",
+        "kesesuaian",
+        "sesuai",
+        "keteraturan",
+        "teratur",
+        "runtut",
+        "koheren",
+        "koherensi",
+        "bukti",
+        "pembuktian",
+        "membuktikan",
+        "terbukti",
+        "konfirmasi",
+        "masuk akal"
+      ],
+      "en": [
+        "clarity",
+        "clear",
+        "clarify",
+        "clarification",
+        "explanation",
+        "explain",
+        "explained",
+        "understanding",
+        "understand",
+        "understood",
+        "comprehensible",
+        "coherent",
+        "coherence",
+        "consistency",
+        "consistent",
+        "aligned",
+        "alignment",
+        "orderly",
+        "order",
+        "logical",
+        "logic",
+        "evidence",
+        "proven",
+        "prove",
+        "confirmation",
+        "confirmed"
+      ]
+    },
+    {
+      "drive": "koherensi",
+      "nilai": -0.3,
+      "id": [
+        "kebingungan",
+        "bingung",
+        "membingungkan",
+        "kekacauan",
+        "kacau",
+        "mengacaukan",
+        "ketidakjelasan",
+        "kabur",
+        "samar",
+        "ambigu",
+        "ambiguitas",
+        "kontradiksi",
+        "kontradiktif",
+        "bertentangan",
+        "pertentangan",
+        "disonansi",
+        "disonan",
+        "ketidaksesuaian",
+        "inkonsisten",
+        "inkonsistensi",
+        "menyesatkan",
+        "sesat",
+        "kesesatan",
+        "paradoksal",
+        "ketidakpastian",
+        "tidak sesuai",
+        "tidak konsisten",
+        "tak masuk akal"
+      ],
+      "en": [
+        "confusion",
+        "confused",
+        "confusing",
+        "chaos",
+        "chaotic",
+        "unclear",
+        "ambiguity",
+        "ambiguous",
+        "contradiction",
+        "contradictory",
+        "contradict",
+        "conflicting",
+        "dissonance",
+        "inconsistent",
+        "inconsistency",
+        "incoherent",
+        "incoherence",
+        "misleading",
+        "misled",
+        "senseless",
+        "nonsense",
+        "illogical",
+        "irrational",
+        "uncertain",
+        "uncertainty",
+        "disorder",
+        "disordered"
+      ]
+    }
+  ],
+  "entri": {
+    "id": {
+      "bergizi": {
+        "energi": 0.3
+      },
+      "bernutrisi": {
+        "energi": 0.3
+      },
+      "segar": {
+        "energi": 0.3
+      },
+      "bugar": {
+        "energi": 0.3
+      },
+      "pulih": {
+        "energi": 0.3
+      },
+      "memulihkan": {
+        "energi": 0.3
+      },
+      "pemulihan": {
+        "energi": 0.3
+      },
+      "menyegarkan": {
+        "energi": 0.3
+      },
+      "mengenyangkan": {
+        "energi": 0.3
+      },
+      "kenyang": {
+        "energi": 0.3
+      },
+      "sarapan": {
+        "energi": 0.3
+      },
+      "minum": {
+        "energi": 0.3
+      },
+      "hidrasi": {
+        "energi": 0.3
+      },
+      "terhidrasi": {
+        "energi": 0.3
+      },
+      "beristirahat": {
+        "energi": 0.3
+      },
+      "berbaring": {
+        "energi": 0.3
+      },
+      "bersantai": {
+        "energi": 0.3
+      },
+      "rehat": {
+        "energi": 0.3
+      },
+      "santai": {
+        "energi": 0.3
+      },
+      "stamina": {
+        "energi": 0.3
+      },
+      "vitalitas": {
+        "energi": 0.3
+      },
+      "kebugaran": {
+        "energi": 0.3
+      },
+      "vitamin": {
+        "energi": 0.3
+      },
+      "protein": {
+        "energi": 0.3
+      },
+      "kalori": {
+        "energi": 0.3
+      },
+      "suplemen": {
+        "energi": 0.3
+      },
+      "makan malam": {
+        "energi": 0.3
+      },
+      "tidur nyenyak": {
+        "energi": 0.3
+      },
+      "keletihan": {
+        "energi": -0.3
+      },
+      "kelaparan": {
+        "energi": -0.3
+      },
+      "kehausan": {
+        "energi": -0.3
+      },
+      "lapar": {
+        "energi": -0.3
+      },
+      "haus": {
+        "energi": -0.3
+      },
+      "mengantuk": {
+        "energi": -0.3
+      },
+      "kantuk": {
+        "energi": -0.3
+      },
+      "terkuras": {
+        "energi": -0.3
+      },
+      "letih": {
+        "energi": -0.3
+      },
+      "capai": {
+        "energi": -0.3
+      },
+      "lesu": {
+        "energi": -0.3
+      },
+      "loyo": {
+        "energi": -0.3
+      },
+      "lemas": {
+        "energi": -0.3
+      },
+      "dehidrasi": {
+        "energi": -0.3
+      },
+      "insomnia": {
+        "energi": -0.3
+      },
+      "begadang": {
+        "energi": -0.3
+      },
+      "menguap": {
+        "energi": -0.3
+      },
+      "pingsan": {
+        "energi": -0.3
+      },
+      "kelelahan": {
+        "energi": -0.3
+      },
+      "menguras": {
+        "energi": -0.3
+      },
+      "tenaga": {
+        "energi": -0.3
+      },
+      "kekurangan gizi": {
+        "energi": -0.3
+      },
+      "kurang tidur": {
+        "energi": -0.3
+      },
+      "kehabisan tenaga": {
+        "energi": -0.3
+      },
+      "kelelahan fisik": {
+        "energi": -0.3
+      },
+      "menguras tenaga": {
+        "energi": -0.3
+      },
+      "terlindungi": {
+        "keamanan": 0.35
+      },
+      "pelindung": {
+        "keamanan": 0.35
+      },
+      "perlindungan": {
+        "keamanan": 0.35
+      },
+      "melindungi": {
+        "keamanan": 0.35
+      },
+      "dilindungi": {
+        "keamanan": 0.35
+      },
+      "menyelamatkan": {
+        "keamanan": 0.35
+      },
+      "diselamatkan": {
+        "keamanan": 0.35
+      },
+      "penyelamatan": {
+        "keamanan": 0.35
+      },
+      "keselamatan": {
+        "keamanan": 0.35
+      },
+      "penyelamat": {
+        "keamanan": 0.35
+      },
+      "pertolongan": {
+        "keamanan": 0.35
+      },
+      "menolong": {
+        "keamanan": 0.35
+      },
+      "ditolong": {
+        "keamanan": 0.35
+      },
+      "penyembuhan": {
+        "keamanan": 0.35
+      },
+      "sembuh": {
+        "keamanan": 0.35
+      },
+      "menyembuhkan": {
+        "keamanan": 0.35
+      },
+      "dipulihkan": {
+        "keamanan": 0.35
+      },
+      "pertahanan": {
+        "keamanan": 0.35
+      },
+      "bertahan": {
+        "keamanan": 0.35
+      },
+      "pengamanan": {
+        "keamanan": 0.35
+      },
+      "penjagaan": {
+        "keamanan": 0.35
+      },
+      "menjaga": {
+        "keamanan": 0.35
+      },
+      "waspada": {
+        "keamanan": 0.35
+      },
+      "pencegahan": {
+        "keamanan": 0.35
+      },
+      "mencegah": {
+        "keamanan": 0.35
+      },
+      "pencegah": {
+        "keamanan": 0.35
+      },
+      "kebakaran": {
+        "keamanan": -0.4
+      },
+      "terbakar": {
+        "keamanan": -0.4
+      },
+      "membakar": {
+        "keamanan": -0.4
+      },
+      "ledakan": {
+        "keamanan": -0.4
+      },
+      "meledak": {
+        "keamanan": -0.4
+      },
+      "peledak": {
+        "keamanan": -0.4
+      },
+      "racun": {
+        "keamanan": -0.4
+      },
+      "beracun": {
+        "keamanan": -0.4
+      },
+      "keracunan": {
+        "keamanan": -0.4
+      },
+      "terluka": {
+        "keamanan": -0.4
+      },
+      "luka": {
+        "keamanan": -0.4
+      },
+      "melukai": {
+        "keamanan": -0.4
+      },
+      "cedera": {
+        "keamanan": -0.4
+      },
+      "mencederai": {
+        "keamanan": -0.4
+      },
+      "kecelakaan": {
+        "keamanan": -0.4
+      },
+      "serangan": {
+        "keamanan": -0.4
+      },
+      "menyerang": {
+        "keamanan": -0.4
+      },
+      "diserang": {
+        "keamanan": -0.4
+      },
+      "terancam": {
+        "keamanan": -0.4
+      },
+      "mengancam": {
+        "keamanan": -0.4
+      },
+      "ancaman": {
+        "keamanan": -0.4
+      },
+      "pembunuhan": {
+        "keamanan": -0.4
+      },
+      "membunuh": {
+        "keamanan": -0.4
+      },
+      "dibunuh": {
+        "keamanan": -0.4
+      },
+      "bencana": {
+        "keamanan": -0.4
+      },
+      "bahaya": {
+        "keamanan": -0.4
+      },
+      "kekerasan": {
+        "keamanan": -0.4
+      },
+      "penyerangan": {
+        "keamanan": -0.4
+      },
+      "perampokan": {
+        "keamanan": -0.4
+      },
+      "kematian": {
+        "keamanan": -0.4
+      },
+      "maut": {
+        "keamanan": -0.4
+      },
+      "penemuan": {
+        "keingintahuan": 0.3
+      },
+      "menemukan": {
+        "keingintahuan": 0.3
+      },
+      "temuan": {
+        "keingintahuan": 0.3
+      },
+      "penyelidikan": {
+        "keingintahuan": 0.3
+      },
+      "menyelidiki": {
+        "keingintahuan": 0.3
+      },
+      "investigasi": {
+        "keingintahuan": 0.3
+      },
+      "meneliti": {
+        "keingintahuan": 0.3
+      },
+      "penelitian": {
+        "keingintahuan": 0.3
+      },
+      "peneliti": {
+        "keingintahuan": 0.3
+      },
+      "riset": {
+        "keingintahuan": 0.3
+      },
+      "mengeksplorasi": {
+        "keingintahuan": 0.3
+      },
+      "eksplorasi": {
+        "keingintahuan": 0.3
+      },
+      "penasaran": {
+        "keingintahuan": 0.3
+      },
+      "keingintahuan": {
+        "keingintahuan": 0.3
+      },
+      "mengamati": {
+        "keingintahuan": 0.3
+      },
+      "pengamatan": {
+        "keingintahuan": 0.3
+      },
+      "observasi": {
+        "keingintahuan": 0.3
+      },
+      "eksperimen": {
+        "keingintahuan": 0.3
+      },
+      "percobaan": {
+        "keingintahuan": 0.3
+      },
+      "menguji": {
+        "keingintahuan": 0.3
+      },
+      "pengujian": {
+        "keingintahuan": 0.3
+      },
+      "menyimak": {
+        "keingintahuan": 0.3
+      },
+      "menyelami": {
+        "keingintahuan": 0.3
+      },
+      "menggali": {
+        "keingintahuan": 0.3
+      },
+      "wawasan": {
+        "keingintahuan": 0.3
+      },
+      "misterius": {
+        "keingintahuan": 0.3
+      },
+      "teka-teki": {
+        "keingintahuan": 0.3
+      },
+      "pertanyaan": {
+        "keingintahuan": 0.3
+      },
+      "bertanya": {
+        "keingintahuan": 0.3
+      },
+      "mempelajari": {
+        "keingintahuan": 0.3
+      },
+      "kebosanan": {
+        "keingintahuan": -0.25
+      },
+      "membosankan": {
+        "keingintahuan": -0.25
+      },
+      "jemu": {
+        "keingintahuan": -0.25
+      },
+      "menjemukan": {
+        "keingintahuan": -0.25
+      },
+      "kejenuhan": {
+        "keingintahuan": -0.25
+      },
+      "jenuh": {
+        "keingintahuan": -0.25
+      },
+      "monoton": {
+        "keingintahuan": -0.25
+      },
+      "repetitif": {
+        "keingintahuan": -0.25
+      },
+      "berulang": {
+        "keingintahuan": -0.25
+      },
+      "pengulangan": {
+        "keingintahuan": -0.25
+      },
+      "rutinitas": {
+        "keingintahuan": -0.25
+      },
+      "rutin": {
+        "keingintahuan": -0.25
+      },
+      "terbiasa": {
+        "keingintahuan": -0.25
+      },
+      "lazim": {
+        "keingintahuan": -0.25
+      },
+      "lumrah": {
+        "keingintahuan": -0.25
+      },
+      "umum": {
+        "keingintahuan": -0.25
+      },
+      "biasa": {
+        "keingintahuan": -0.25
+      },
+      "sehari-hari": {
+        "keingintahuan": -0.25
+      },
+      "diketahui": {
+        "keingintahuan": -0.25
+      },
+      "hafal": {
+        "keingintahuan": -0.25
+      },
+      "menghafal": {
+        "keingintahuan": -0.25
+      },
+      "terpola": {
+        "keingintahuan": -0.25
+      },
+      "ketebakan": {
+        "keingintahuan": -0.25
+      },
+      "membeku": {
+        "keingintahuan": -0.25
+      },
+      "stagnan": {
+        "keingintahuan": -0.25
+      },
+      "stagnasi": {
+        "keingintahuan": -0.25
+      },
+      "keberhasilan": {
+        "penguasaan": 0.35
+      },
+      "memenangkan": {
+        "penguasaan": 0.35
+      },
+      "pemenang": {
+        "penguasaan": 0.35
+      },
+      "kemenangan": {
+        "penguasaan": 0.35
+      },
+      "menang": {
+        "penguasaan": 0.35
+      },
+      "menuntaskan": {
+        "penguasaan": 0.35
+      },
+      "tuntas": {
+        "penguasaan": 0.35
+      },
+      "ketuntasan": {
+        "penguasaan": 0.35
+      },
+      "menyelesaikan": {
+        "penguasaan": 0.35
+      },
+      "terselesaikan": {
+        "penguasaan": 0.35
+      },
+      "selesai": {
+        "penguasaan": 0.35
+      },
+      "menguasai": {
+        "penguasaan": 0.35
+      },
+      "penguasaan": {
+        "penguasaan": 0.35
+      },
+      "terampil": {
+        "penguasaan": 0.35
+      },
+      "keterampilan": {
+        "penguasaan": 0.35
+      },
+      "keahlian": {
+        "penguasaan": 0.35
+      },
+      "ahli": {
+        "penguasaan": 0.35
+      },
+      "kemahiran": {
+        "penguasaan": 0.35
+      },
+      "kompeten": {
+        "penguasaan": 0.35
+      },
+      "kompetensi": {
+        "penguasaan": 0.35
+      },
+      "pencapaian": {
+        "penguasaan": 0.35
+      },
+      "mencapai": {
+        "penguasaan": 0.35
+      },
+      "prestasi": {
+        "penguasaan": 0.35
+      },
+      "berprestasi": {
+        "penguasaan": 0.35
+      },
+      "memperbaiki": {
+        "penguasaan": 0.35
+      },
+      "peningkatan": {
+        "penguasaan": 0.35
+      },
+      "meningkat": {
+        "penguasaan": 0.35
+      },
+      "mengatasi": {
+        "penguasaan": 0.35
+      },
+      "teratasi": {
+        "penguasaan": 0.35
+      },
+      "menaklukkan": {
+        "penguasaan": 0.35
+      },
+      "kegagalan": {
+        "penguasaan": -0.3
+      },
+      "gagal": {
+        "penguasaan": -0.3
+      },
+      "kekalahan": {
+        "penguasaan": -0.3
+      },
+      "kalah": {
+        "penguasaan": -0.3
+      },
+      "dikalahkan": {
+        "penguasaan": -0.3
+      },
+      "terkalahkan": {
+        "penguasaan": -0.3
+      },
+      "menyerah": {
+        "penguasaan": -0.3
+      },
+      "ketidakmampuan": {
+        "penguasaan": -0.3
+      },
+      "ketidakberdayaan": {
+        "penguasaan": -0.3
+      },
+      "kewalahan": {
+        "penguasaan": -0.3
+      },
+      "buntu": {
+        "penguasaan": -0.3
+      },
+      "terhambat": {
+        "penguasaan": -0.3
+      },
+      "hambatan": {
+        "penguasaan": -0.3
+      },
+      "menghambat": {
+        "penguasaan": -0.3
+      },
+      "kegagapan": {
+        "penguasaan": -0.3
+      },
+      "gagap": {
+        "penguasaan": -0.3
+      },
+      "canggung": {
+        "penguasaan": -0.3
+      },
+      "kesulitan": {
+        "penguasaan": -0.3
+      },
+      "sulit": {
+        "penguasaan": -0.3
+      },
+      "kesalahan": {
+        "penguasaan": -0.3
+      },
+      "salah": {
+        "penguasaan": -0.3
+      },
+      "keliru": {
+        "penguasaan": -0.3
+      },
+      "kekeliruan": {
+        "penguasaan": -0.3
+      },
+      "terpuruk": {
+        "penguasaan": -0.3
+      },
+      "kemunduran": {
+        "penguasaan": -0.3
+      },
+      "menurun": {
+        "penguasaan": -0.3
+      },
+      "tak berdaya": {
+        "penguasaan": -0.3
+      },
+      "tidak mampu": {
+        "penguasaan": -0.3
+      },
+      "persahabatan": {
+        "afiliasi": 0.35
+      },
+      "sahabat": {
+        "afiliasi": 0.35
+      },
+      "bersahabat": {
+        "afiliasi": 0.35
+      },
+      "berteman": {
+        "afiliasi": 0.35
+      },
+      "pertemanan": {
+        "afiliasi": 0.35
+      },
+      "kebersamaan": {
+        "afiliasi": 0.35
+      },
+      "bersama": {
+        "afiliasi": 0.35
+      },
+      "teman": {
+        "afiliasi": 0.35
+      },
+      "kawan": {
+        "afiliasi": 0.35
+      },
+      "rekan": {
+        "afiliasi": 0.35
+      },
+      "kerabat": {
+        "afiliasi": 0.35
+      },
+      "keluarga": {
+        "afiliasi": 0.35
+      },
+      "saudara": {
+        "afiliasi": 0.35
+      },
+      "menyayangi": {
+        "afiliasi": 0.35
+      },
+      "disayangi": {
+        "afiliasi": 0.35
+      },
+      "menyukai": {
+        "afiliasi": 0.35
+      },
+      "disukai": {
+        "afiliasi": 0.35
+      },
+      "mencintai": {
+        "afiliasi": 0.35
+      },
+      "dicintai": {
+        "afiliasi": 0.35
+      },
+      "kepedulian": {
+        "afiliasi": 0.35
+      },
+      "peduli": {
+        "afiliasi": 0.35
+      },
+      "keakraban": {
+        "afiliasi": 0.35
+      },
+      "akrab": {
+        "afiliasi": 0.35
+      },
+      "keramahan": {
+        "afiliasi": 0.35
+      },
+      "ramah": {
+        "afiliasi": 0.35
+      },
+      "kerjasama": {
+        "afiliasi": 0.35
+      },
+      "kolaborasi": {
+        "afiliasi": 0.35
+      },
+      "berkolaborasi": {
+        "afiliasi": 0.35
+      },
+      "mendukung": {
+        "afiliasi": 0.35
+      },
+      "didukung": {
+        "afiliasi": 0.35
+      },
+      "dukungan": {
+        "afiliasi": 0.35
+      },
+      "kasih sayang": {
+        "afiliasi": 0.35
+      },
+      "bekerja sama": {
+        "afiliasi": 0.35
+      },
+      "permusuhan": {
+        "afiliasi": -0.35
+      },
+      "bermusuhan": {
+        "afiliasi": -0.35
+      },
+      "musuh": {
+        "afiliasi": -0.35
+      },
+      "memusuhi": {
+        "afiliasi": -0.35
+      },
+      "kebencian": {
+        "afiliasi": -0.35
+      },
+      "membenci": {
+        "afiliasi": -0.35
+      },
+      "dibenci": {
+        "afiliasi": -0.35
+      },
+      "kesepian": {
+        "afiliasi": -0.35
+      },
+      "sepi": {
+        "afiliasi": -0.35
+      },
+      "sendirian": {
+        "afiliasi": -0.35
+      },
+      "sendiri": {
+        "afiliasi": -0.35
+      },
+      "terasing": {
+        "afiliasi": -0.35
+      },
+      "pengasingan": {
+        "afiliasi": -0.35
+      },
+      "mengasingkan": {
+        "afiliasi": -0.35
+      },
+      "dikucilkan": {
+        "afiliasi": -0.35
+      },
+      "mengucilkan": {
+        "afiliasi": -0.35
+      },
+      "pengucilan": {
+        "afiliasi": -0.35
+      },
+      "ditolak": {
+        "afiliasi": -0.35
+      },
+      "menolak": {
+        "afiliasi": -0.35
+      },
+      "penolakan": {
+        "afiliasi": -0.35
+      },
+      "perpisahan": {
+        "afiliasi": -0.35
+      },
+      "berpisah": {
+        "afiliasi": -0.35
+      },
+      "berduka": {
+        "afiliasi": -0.35
+      },
+      "kehilangan": {
+        "afiliasi": -0.35
+      },
+      "pengkhianatan": {
+        "afiliasi": -0.35
+      },
+      "berkhianat": {
+        "afiliasi": -0.35
+      },
+      "dikhianati": {
+        "afiliasi": -0.35
+      },
+      "pertengkaran": {
+        "afiliasi": -0.35
+      },
+      "bertengkar": {
+        "afiliasi": -0.35
+      },
+      "konflik": {
+        "afiliasi": -0.35
+      },
+      "kejelasan": {
+        "koherensi": 0.3
+      },
+      "jelas": {
+        "koherensi": 0.3
+      },
+      "memperjelas": {
+        "koherensi": 0.3
+      },
+      "penjelasan": {
+        "koherensi": 0.3
+      },
+      "menjelaskan": {
+        "koherensi": 0.3
+      },
+      "penjelas": {
+        "koherensi": 0.3
+      },
+      "diterangkan": {
+        "koherensi": 0.3
+      },
+      "menerangkan": {
+        "koherensi": 0.3
+      },
+      "terang": {
+        "koherensi": 0.3
+      },
+      "pemahaman": {
+        "koherensi": 0.3
+      },
+      "memahami": {
+        "koherensi": 0.3
+      },
+      "dipahami": {
+        "koherensi": 0.3
+      },
+      "mengerti": {
+        "koherensi": 0.3
+      },
+      "dimengerti": {
+        "koherensi": 0.3
+      },
+      "konsistensi": {
+        "koherensi": 0.3
+      },
+      "konsisten": {
+        "koherensi": 0.3
+      },
+      "keselarasan": {
+        "koherensi": 0.3
+      },
+      "selaras": {
+        "koherensi": 0.3
+      },
+      "kesesuaian": {
+        "koherensi": 0.3
+      },
+      "sesuai": {
+        "koherensi": 0.3
+      },
+      "keteraturan": {
+        "koherensi": 0.3
+      },
+      "teratur": {
+        "koherensi": 0.3
+      },
+      "runtut": {
+        "koherensi": 0.3
+      },
+      "koheren": {
+        "koherensi": 0.3
+      },
+      "koherensi": {
+        "koherensi": 0.3
+      },
+      "bukti": {
+        "koherensi": 0.3
+      },
+      "pembuktian": {
+        "koherensi": 0.3
+      },
+      "membuktikan": {
+        "koherensi": 0.3
+      },
+      "terbukti": {
+        "koherensi": 0.3
+      },
+      "konfirmasi": {
+        "koherensi": 0.3
+      },
+      "masuk akal": {
+        "koherensi": 0.3
+      },
+      "kebingungan": {
+        "koherensi": -0.3
+      },
+      "bingung": {
+        "koherensi": -0.3
+      },
+      "membingungkan": {
+        "koherensi": -0.3
+      },
+      "kekacauan": {
+        "koherensi": -0.3
+      },
+      "kacau": {
+        "koherensi": -0.3
+      },
+      "mengacaukan": {
+        "koherensi": -0.3
+      },
+      "ketidakjelasan": {
+        "koherensi": -0.3
+      },
+      "kabur": {
+        "koherensi": -0.3
+      },
+      "samar": {
+        "koherensi": -0.3
+      },
+      "ambigu": {
+        "koherensi": -0.3
+      },
+      "ambiguitas": {
+        "koherensi": -0.3
+      },
+      "kontradiksi": {
+        "koherensi": -0.3
+      },
+      "kontradiktif": {
+        "koherensi": -0.3
+      },
+      "bertentangan": {
+        "koherensi": -0.3
+      },
+      "pertentangan": {
+        "koherensi": -0.3
+      },
+      "disonansi": {
+        "koherensi": -0.3
+      },
+      "disonan": {
+        "koherensi": -0.3
+      },
+      "ketidaksesuaian": {
+        "koherensi": -0.3
+      },
+      "inkonsisten": {
+        "koherensi": -0.3
+      },
+      "inkonsistensi": {
+        "koherensi": -0.3
+      },
+      "menyesatkan": {
+        "koherensi": -0.3
+      },
+      "sesat": {
+        "koherensi": -0.3
+      },
+      "kesesatan": {
+        "koherensi": -0.3
+      },
+      "paradoksal": {
+        "koherensi": -0.3
+      },
+      "ketidakpastian": {
+        "koherensi": -0.3
+      },
+      "tidak sesuai": {
+        "koherensi": -0.3
+      },
+      "tidak konsisten": {
+        "koherensi": -0.3
+      },
+      "tak masuk akal": {
+        "koherensi": -0.3
+      },
+      "takut": {
+        "keamanan": -0.3
+      },
+      "ngeri": {
+        "keamanan": -0.3
+      },
+      "seram": {
+        "keamanan": -0.3
+      },
+      "cemas": {
+        "keamanan": -0.3
+      },
+      "khawatir": {
+        "keamanan": -0.3
+      },
+      "panik": {
+        "keamanan": -0.3
+      },
+      "gentar": {
+        "keamanan": -0.3
+      },
+      "waswas": {
+        "keamanan": -0.3
+      },
+      "senang": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "bahagia": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "gembira": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "riang": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "lega": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "puas": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "bangga": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "syukur": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "sedih": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "murung": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "pilu": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "perih": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "hampa": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kecewa": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "putus asa": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "marah": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "murka": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "kesal": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "jengkel": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "geram": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "benci": {
+        "afiliasi": -0.35
+      },
+      "dendam": {
+        "afiliasi": -0.35
+      },
+      "malu": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "bersalah": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "hina": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "cinta": {
+        "afiliasi": 0.35
+      },
+      "sayang": {
+        "afiliasi": 0.35
+      },
+      "rindu": {
+        "afiliasi": 0.35
+      },
+      "kangen": {
+        "afiliasi": 0.35
+      },
+      "harap": {
+        "penguasaan": 0.15
+      },
+      "berharap": {
+        "penguasaan": 0.15
+      },
+      "optimis": {
+        "penguasaan": 0.15
+      },
+      "pesimis": {
+        "penguasaan": 0.15
+      },
+      "sunyi": {
+        "afiliasi": -0.3
+      },
+      "tenang": {
+        "keamanan": 0.25
+      },
+      "damai": {
+        "keamanan": 0.25
+      },
+      "sabar": {
+        "keamanan": 0.25
+      },
+      "lelah": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "gelisah": {
+        "keamanan": -0.3
+      },
+      "curiga": {
+        "keamanan": -0.3
+      },
+      "iri": {
+        "afiliasi": -0.35
+      },
+      "cemburu": {
+        "afiliasi": -0.35
+      },
+      "haru": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "iba": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "minder": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "gugup": {
+        "keamanan": -0.3
+      },
+      "tegang": {
+        "keamanan": -0.3
+      },
+      "segan": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "ragu": {
+        "koherensi": -0.15
+      },
+      "bimbang": {
+        "koherensi": -0.15
+      },
+      "sangsi": {
+        "koherensi": -0.15
+      },
+      "mendua": {
+        "koherensi": -0.15
+      },
+      "dongkol": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "sewot": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "berang": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "gusar": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "lara": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "nestapa": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "sendu": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "gundah": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "sukacita": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "girang": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "riang gembira": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "tentram": {
+        "keamanan": 0.25
+      },
+      "sentosa": {
+        "keamanan": 0.25
+      },
+      "lengang": {
+        "afiliasi": -0.3
+      },
+      "nyaman": {
+        "keamanan": 0.25
+      },
+      "terharu": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "siaga": {
+        "keamanan": -0.3
+      },
+      "ketakutan": {
+        "keamanan": -0.3
+      },
+      "bahagia sekali": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "getir": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "masygul": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kikuk": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "bangga sekali": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "lapang": {
+        "keamanan": 0.25
+      },
+      "air": {
+        "energi": 0.15
+      },
+      "buah": {
+        "energi": 0.15
+      },
+      "embun": {
+        "energi": 0.15
+      },
+      "biji": {
+        "energi": 0.15
+      },
+      "jagung": {
+        "energi": 0.15
+      },
+      "ubi": {
+        "energi": 0.15
+      },
+      "kelapa": {
+        "energi": 0.15
+      },
+      "pisang": {
+        "energi": 0.15
+      },
+      "mangga": {
+        "energi": 0.15
+      },
+      "pepaya": {
+        "energi": 0.15
+      },
+      "ikan": {
+        "energi": 0.15
+      },
+      "harapan": {
+        "penguasaan": 0.15
+      },
+      "kemarahan": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "kesedihan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kebahagiaan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "penyesalan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "rasa syukur": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "dosa": {
+        "penguasaan": -0.2
+      },
+      "keraguan": {
+        "koherensi": -0.15
+      },
+      "keyakinan": {
+        "koherensi": 0.2
+      },
+      "kepercayaan": {
+        "koherensi": 0.2
+      },
+      "nasi": {
+        "energi": 0.15
+      },
+      "roti": {
+        "energi": 0.15
+      },
+      "daging": {
+        "energi": 0.15
+      },
+      "telur": {
+        "energi": 0.15
+      },
+      "sayur": {
+        "energi": 0.15
+      },
+      "sup": {
+        "energi": 0.15
+      },
+      "bumbu": {
+        "energi": 0.15
+      },
+      "garam": {
+        "energi": 0.15
+      },
+      "gula": {
+        "energi": 0.15
+      },
+      "madu": {
+        "energi": 0.15
+      },
+      "susu": {
+        "energi": 0.15
+      },
+      "teh": {
+        "energi": 0.15
+      },
+      "kopi": {
+        "energi": 0.15
+      },
+      "anggur": {
+        "energi": 0.15
+      },
+      "bir": {
+        "energi": 0.15
+      },
+      "kue": {
+        "energi": 0.15
+      },
+      "biskuit": {
+        "energi": 0.15
+      },
+      "kerupuk": {
+        "energi": 0.15
+      },
+      "tempe": {
+        "energi": 0.15
+      },
+      "tahu": {
+        "energi": 0.15
+      },
+      "kacang": {
+        "energi": 0.15
+      },
+      "ubi jalar": {
+        "energi": 0.15
+      },
+      "singkong": {
+        "energi": 0.15
+      },
+      "sagu": {
+        "energi": 0.15
+      },
+      "ubi kayu": {
+        "energi": 0.15
+      },
+      "kentang": {
+        "energi": 0.15
+      },
+      "tomat": {
+        "energi": 0.15
+      },
+      "cabai": {
+        "energi": 0.15
+      },
+      "bawang": {
+        "energi": 0.15
+      },
+      "jahe": {
+        "energi": 0.15
+      },
+      "kunyit": {
+        "energi": 0.15
+      },
+      "serai": {
+        "energi": 0.15
+      },
+      "daun bawang": {
+        "energi": 0.15
+      },
+      "ayam bakar": {
+        "energi": 0.15
+      },
+      "ikan bakar": {
+        "energi": 0.15
+      },
+      "sate": {
+        "energi": 0.15
+      },
+      "bubur": {
+        "energi": 0.15
+      },
+      "mie": {
+        "energi": 0.15
+      },
+      "puding": {
+        "energi": 0.15
+      },
+      "pisang goreng": {
+        "energi": 0.15
+      },
+      "ubi rebus": {
+        "energi": 0.15
+      },
+      "ceria": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "galau": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "resah": {
+        "keamanan": -0.3
+      },
+      "adem": {
+        "keamanan": 0.25
+      },
+      "tenteram": {
+        "keamanan": 0.25
+      },
+      "yakin": {
+        "koherensi": 0.2
+      },
+      "percaya": {
+        "koherensi": 0.2
+      },
+      "kalut": {
+        "keamanan": -0.3
+      },
+      "ragu-ragu": {
+        "koherensi": -0.15
+      },
+      "kengerian": {
+        "keamanan": -0.3
+      },
+      "keseraman": {
+        "keamanan": -0.3
+      },
+      "kecemasan": {
+        "keamanan": -0.3
+      },
+      "kekhawatiran": {
+        "keamanan": -0.3
+      },
+      "kepanikan": {
+        "keamanan": -0.3
+      },
+      "kegentaran": {
+        "keamanan": -0.3
+      },
+      "kewaswasan": {
+        "keamanan": -0.3
+      },
+      "kesenangan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "kegembiraan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "keriangan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "kelegaan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "kepuasan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "kebanggaan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "kesyukuran": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "kemurungan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kepiluan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kehampaan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kemurkaan": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "kejengkelan": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "kegeraman": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "kedendaman": {
+        "afiliasi": -0.35
+      },
+      "kemaluan": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "kehinaan": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "kecintaan": {
+        "afiliasi": 0.35
+      },
+      "kesayangan": {
+        "afiliasi": 0.35
+      },
+      "kerinduan": {
+        "afiliasi": 0.35
+      },
+      "kekangenan": {
+        "afiliasi": 0.35
+      },
+      "keharapan": {
+        "penguasaan": 0.15
+      },
+      "keoptimisan": {
+        "penguasaan": 0.15
+      },
+      "kesendirian": {
+        "afiliasi": -0.3
+      },
+      "kesunyian": {
+        "afiliasi": -0.3
+      },
+      "ketenangan": {
+        "keamanan": 0.25
+      },
+      "kedamaian": {
+        "keamanan": 0.25
+      },
+      "kesabaran": {
+        "keamanan": 0.25
+      },
+      "kegelisahan": {
+        "keamanan": -0.3
+      },
+      "kecurigaan": {
+        "keamanan": -0.3
+      },
+      "keirian": {
+        "afiliasi": -0.35
+      },
+      "kecemburuan": {
+        "afiliasi": -0.35
+      },
+      "keharuan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "keibaan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "keminderan": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "kegugupan": {
+        "keamanan": -0.3
+      },
+      "ketegangan": {
+        "keamanan": -0.3
+      },
+      "kebimbangan": {
+        "koherensi": -0.15
+      },
+      "kesangsian": {
+        "koherensi": -0.15
+      },
+      "kedongkolan": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "kesewotan": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "kegusaran": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "kelaraan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kenestapaan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kesenduan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kegundahan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kesukacitaan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "kegirangan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "ketentraman": {
+        "keamanan": 0.25
+      },
+      "kesentosaan": {
+        "keamanan": 0.25
+      },
+      "kelengangan": {
+        "afiliasi": -0.3
+      },
+      "kewaspadaan": {
+        "keamanan": -0.3
+      },
+      "kesiagaan": {
+        "keamanan": -0.3
+      },
+      "kegetiran": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kemasygulan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "kecanggungan": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "kekikukan": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "kelapangan": {
+        "keamanan": 0.25
+      },
+      "air-air": {
+        "energi": 0.15
+      },
+      "buah-buah": {
+        "energi": 0.15
+      },
+      "embun-embun": {
+        "energi": 0.15
+      },
+      "biji-biji": {
+        "energi": 0.15
+      },
+      "jagung-jagung": {
+        "energi": 0.15
+      },
+      "ubi-ubi": {
+        "energi": 0.15
+      },
+      "pisang-pisang": {
+        "energi": 0.15
+      },
+      "mangga-mangga": {
+        "energi": 0.15
+      },
+      "dosa-dosa": {
+        "penguasaan": -0.2
+      },
+      "nasi-nasi": {
+        "energi": 0.15
+      },
+      "roti-roti": {
+        "energi": 0.15
+      },
+      "daging-daging": {
+        "energi": 0.15
+      },
+      "telur-telur": {
+        "energi": 0.15
+      },
+      "sayur-sayur": {
+        "energi": 0.15
+      },
+      "sup-sup": {
+        "energi": 0.15
+      },
+      "bumbu-bumbu": {
+        "energi": 0.15
+      },
+      "garam-garam": {
+        "energi": 0.15
+      },
+      "gula-gula": {
+        "energi": 0.15
+      },
+      "madu-madu": {
+        "energi": 0.15
+      },
+      "susu-susu": {
+        "energi": 0.15
+      },
+      "teh-teh": {
+        "energi": 0.15
+      },
+      "kopi-kopi": {
+        "energi": 0.15
+      },
+      "anggur-anggur": {
+        "energi": 0.15
+      },
+      "bir-bir": {
+        "energi": 0.15
+      },
+      "kue-kue": {
+        "energi": 0.15
+      },
+      "biskuit-biskuit": {
+        "energi": 0.15
+      },
+      "tempe-tempe": {
+        "energi": 0.15
+      },
+      "tahu-tahu": {
+        "energi": 0.15
+      },
+      "kacang-kacang": {
+        "energi": 0.15
+      },
+      "singkong-singkong": {
+        "energi": 0.15
+      },
+      "sagu-sagu": {
+        "energi": 0.15
+      },
+      "tomat-tomat": {
+        "energi": 0.15
+      },
+      "cabai-cabai": {
+        "energi": 0.15
+      },
+      "bawang-bawang": {
+        "energi": 0.15
+      },
+      "jahe-jahe": {
+        "energi": 0.15
+      },
+      "kunyit-kunyit": {
+        "energi": 0.15
+      },
+      "serai-serai": {
+        "energi": 0.15
+      },
+      "sate-sate": {
+        "energi": 0.15
+      },
+      "bubur-bubur": {
+        "energi": 0.15
+      },
+      "mie-mie": {
+        "energi": 0.15
+      },
+      "puding-puding": {
+        "energi": 0.15
+      },
+      "keceriaan": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "kegalauan": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "keresahan": {
+        "keamanan": -0.3
+      },
+      "keademan": {
+        "keamanan": 0.25
+      },
+      "ketenteraman": {
+        "keamanan": 0.25
+      },
+      "kekalutan": {
+        "keamanan": -0.3
+      }
+    },
+    "en": {
+      "nourished": {
+        "energi": 0.3
+      },
+      "nourishing": {
+        "energi": 0.3
+      },
+      "nutrition": {
+        "energi": 0.3
+      },
+      "refreshed": {
+        "energi": 0.3
+      },
+      "refreshment": {
+        "energi": 0.3
+      },
+      "rested": {
+        "energi": 0.3
+      },
+      "restful": {
+        "energi": 0.3
+      },
+      "rest": {
+        "energi": 0.3
+      },
+      "sleep": {
+        "energi": 0.3
+      },
+      "nap": {
+        "energi": 0.3
+      },
+      "breakfast": {
+        "energi": 0.3
+      },
+      "lunch": {
+        "energi": 0.3
+      },
+      "dinner": {
+        "energi": 0.3
+      },
+      "hydration": {
+        "energi": 0.3
+      },
+      "hydrate": {
+        "energi": 0.3
+      },
+      "hydrated": {
+        "energi": 0.3
+      },
+      "nutritious": {
+        "energi": 0.3
+      },
+      "vitamin": {
+        "energi": 0.3
+      },
+      "protein": {
+        "energi": 0.3
+      },
+      "calories": {
+        "energi": 0.3
+      },
+      "stamina": {
+        "energi": 0.3
+      },
+      "vitality": {
+        "energi": 0.3
+      },
+      "recuperate": {
+        "energi": 0.3
+      },
+      "recover": {
+        "energi": 0.3
+      },
+      "recharge": {
+        "energi": 0.3
+      },
+      "exhaustion": {
+        "energi": -0.3
+      },
+      "exhausted": {
+        "energi": -0.3
+      },
+      "exhausting": {
+        "energi": -0.3
+      },
+      "fatigue": {
+        "energi": -0.3
+      },
+      "fatigued": {
+        "energi": -0.3
+      },
+      "tired": {
+        "energi": -0.3
+      },
+      "tiring": {
+        "energi": -0.3
+      },
+      "hungry": {
+        "energi": -0.3
+      },
+      "hunger": {
+        "energi": -0.3
+      },
+      "thirsty": {
+        "energi": -0.3
+      },
+      "thirst": {
+        "energi": -0.3
+      },
+      "dehydration": {
+        "energi": -0.3
+      },
+      "dehydrated": {
+        "energi": -0.3
+      },
+      "sleepless": {
+        "energi": -0.3
+      },
+      "insomnia": {
+        "energi": -0.3
+      },
+      "drowsy": {
+        "energi": -0.3
+      },
+      "sleepy": {
+        "energi": -0.3
+      },
+      "drained": {
+        "energi": -0.3
+      },
+      "drain": {
+        "energi": -0.3
+      },
+      "overwork": {
+        "energi": -0.3
+      },
+      "starvation": {
+        "energi": -0.3
+      },
+      "starving": {
+        "energi": -0.3
+      },
+      "malnutrition": {
+        "energi": -0.3
+      },
+      "famished": {
+        "energi": -0.3
+      },
+      "weakness": {
+        "energi": -0.3
+      },
+      "protected": {
+        "keamanan": 0.35
+      },
+      "protection": {
+        "keamanan": 0.35
+      },
+      "protect": {
+        "keamanan": 0.35
+      },
+      "shelter": {
+        "keamanan": 0.35
+      },
+      "sheltered": {
+        "keamanan": 0.35
+      },
+      "sheltering": {
+        "keamanan": 0.35
+      },
+      "rescue": {
+        "keamanan": 0.35
+      },
+      "rescued": {
+        "keamanan": 0.35
+      },
+      "rescuer": {
+        "keamanan": 0.35
+      },
+      "safety": {
+        "keamanan": 0.35
+      },
+      "safeguard": {
+        "keamanan": 0.35
+      },
+      "guarded": {
+        "keamanan": 0.35
+      },
+      "guard": {
+        "keamanan": 0.35
+      },
+      "defend": {
+        "keamanan": 0.35
+      },
+      "defense": {
+        "keamanan": 0.35
+      },
+      "secure": {
+        "keamanan": 0.35
+      },
+      "security": {
+        "keamanan": 0.35
+      },
+      "prevention": {
+        "keamanan": 0.35
+      },
+      "prevent": {
+        "keamanan": 0.35
+      },
+      "healing": {
+        "keamanan": 0.35
+      },
+      "heal": {
+        "keamanan": 0.35
+      },
+      "healed": {
+        "keamanan": 0.35
+      },
+      "treatment": {
+        "keamanan": 0.35
+      },
+      "precaution": {
+        "keamanan": 0.35
+      },
+      "cautious": {
+        "keamanan": 0.35
+      },
+      "burning": {
+        "keamanan": -0.4
+      },
+      "burned": {
+        "keamanan": -0.4
+      },
+      "burns": {
+        "keamanan": -0.4
+      },
+      "explosion": {
+        "keamanan": -0.4
+      },
+      "explosive": {
+        "keamanan": -0.4
+      },
+      "explode": {
+        "keamanan": -0.4
+      },
+      "poison": {
+        "keamanan": -0.4
+      },
+      "poisoned": {
+        "keamanan": -0.4
+      },
+      "poisonous": {
+        "keamanan": -0.4
+      },
+      "injury": {
+        "keamanan": -0.4
+      },
+      "injured": {
+        "keamanan": -0.4
+      },
+      "wound": {
+        "keamanan": -0.4
+      },
+      "wounded": {
+        "keamanan": -0.4
+      },
+      "assault": {
+        "keamanan": -0.4
+      },
+      "assaulted": {
+        "keamanan": -0.4
+      },
+      "attacked": {
+        "keamanan": -0.4
+      },
+      "attacking": {
+        "keamanan": -0.4
+      },
+      "threatened": {
+        "keamanan": -0.4
+      },
+      "threatening": {
+        "keamanan": -0.4
+      },
+      "threat": {
+        "keamanan": -0.4
+      },
+      "murder": {
+        "keamanan": -0.4
+      },
+      "murdered": {
+        "keamanan": -0.4
+      },
+      "disaster": {
+        "keamanan": -0.4
+      },
+      "violence": {
+        "keamanan": -0.4
+      },
+      "robbery": {
+        "keamanan": -0.4
+      },
+      "death": {
+        "keamanan": -0.4
+      },
+      "deadly": {
+        "keamanan": -0.4
+      },
+      "lethal": {
+        "keamanan": -0.4
+      },
+      "discovery": {
+        "keingintahuan": 0.3
+      },
+      "discover": {
+        "keingintahuan": 0.3
+      },
+      "discovered": {
+        "keingintahuan": 0.3
+      },
+      "discoveries": {
+        "keingintahuan": 0.3
+      },
+      "investigate": {
+        "keingintahuan": 0.3
+      },
+      "investigation": {
+        "keingintahuan": 0.3
+      },
+      "researcher": {
+        "keingintahuan": 0.3
+      },
+      "research": {
+        "keingintahuan": 0.3
+      },
+      "researching": {
+        "keingintahuan": 0.3
+      },
+      "explore": {
+        "keingintahuan": 0.3
+      },
+      "exploration": {
+        "keingintahuan": 0.3
+      },
+      "curious": {
+        "keingintahuan": 0.3
+      },
+      "curiosity": {
+        "keingintahuan": 0.3
+      },
+      "observe": {
+        "keingintahuan": 0.3
+      },
+      "observation": {
+        "keingintahuan": 0.3
+      },
+      "experiment": {
+        "keingintahuan": 0.3
+      },
+      "experiments": {
+        "keingintahuan": 0.3
+      },
+      "examine": {
+        "keingintahuan": 0.3
+      },
+      "examination": {
+        "keingintahuan": 0.3
+      },
+      "question": {
+        "keingintahuan": 0.3
+      },
+      "questioning": {
+        "keingintahuan": 0.3
+      },
+      "inquire": {
+        "keingintahuan": 0.3
+      },
+      "inquiry": {
+        "keingintahuan": 0.3
+      },
+      "puzzle": {
+        "keingintahuan": 0.3
+      },
+      "puzzles": {
+        "keingintahuan": 0.3
+      },
+      "mysteries": {
+        "keingintahuan": 0.3
+      },
+      "bored": {
+        "keingintahuan": -0.25
+      },
+      "boredom": {
+        "keingintahuan": -0.25
+      },
+      "boring": {
+        "keingintahuan": -0.25
+      },
+      "monotonous": {
+        "keingintahuan": -0.25
+      },
+      "monotony": {
+        "keingintahuan": -0.25
+      },
+      "repetitive": {
+        "keingintahuan": -0.25
+      },
+      "repetition": {
+        "keingintahuan": -0.25
+      },
+      "routine": {
+        "keingintahuan": -0.25
+      },
+      "habitual": {
+        "keingintahuan": -0.25
+      },
+      "accustomed": {
+        "keingintahuan": -0.25
+      },
+      "ordinary": {
+        "keingintahuan": -0.25
+      },
+      "predictable": {
+        "keingintahuan": -0.25
+      },
+      "familiar": {
+        "keingintahuan": -0.25
+      },
+      "commonplace": {
+        "keingintahuan": -0.25
+      },
+      "stale": {
+        "keingintahuan": -0.25
+      },
+      "uninteresting": {
+        "keingintahuan": -0.25
+      },
+      "tedious": {
+        "keingintahuan": -0.25
+      },
+      "tedium": {
+        "keingintahuan": -0.25
+      },
+      "humdrum": {
+        "keingintahuan": -0.25
+      },
+      "mundane": {
+        "keingintahuan": -0.25
+      },
+      "stagnation": {
+        "keingintahuan": -0.25
+      },
+      "stagnant": {
+        "keingintahuan": -0.25
+      },
+      "incurious": {
+        "keingintahuan": -0.25
+      },
+      "uninterested": {
+        "keingintahuan": -0.25
+      },
+      "disinterest": {
+        "keingintahuan": -0.25
+      },
+      "achievement": {
+        "penguasaan": 0.35
+      },
+      "achieve": {
+        "penguasaan": 0.35
+      },
+      "achieved": {
+        "penguasaan": 0.35
+      },
+      "accomplish": {
+        "penguasaan": 0.35
+      },
+      "accomplishment": {
+        "penguasaan": 0.35
+      },
+      "accomplished": {
+        "penguasaan": 0.35
+      },
+      "success": {
+        "penguasaan": 0.35
+      },
+      "successful": {
+        "penguasaan": 0.35
+      },
+      "succeed": {
+        "penguasaan": 0.35
+      },
+      "succeeded": {
+        "penguasaan": 0.35
+      },
+      "winner": {
+        "penguasaan": 0.35
+      },
+      "winning": {
+        "penguasaan": 0.35
+      },
+      "win": {
+        "penguasaan": 0.35
+      },
+      "mastery": {
+        "penguasaan": 0.35
+      },
+      "master": {
+        "penguasaan": 0.35
+      },
+      "skilled": {
+        "penguasaan": 0.35
+      },
+      "skill": {
+        "penguasaan": 0.35
+      },
+      "expertise": {
+        "penguasaan": 0.35
+      },
+      "expert": {
+        "penguasaan": 0.35
+      },
+      "competent": {
+        "penguasaan": 0.35
+      },
+      "competence": {
+        "penguasaan": 0.35
+      },
+      "improve": {
+        "penguasaan": 0.35
+      },
+      "improvement": {
+        "penguasaan": 0.35
+      },
+      "overcome": {
+        "penguasaan": 0.35
+      },
+      "complete": {
+        "penguasaan": 0.35
+      },
+      "completed": {
+        "penguasaan": 0.35
+      },
+      "failure": {
+        "penguasaan": -0.3
+      },
+      "failed": {
+        "penguasaan": -0.3
+      },
+      "failing": {
+        "penguasaan": -0.3
+      },
+      "defeated": {
+        "penguasaan": -0.3
+      },
+      "defeat": {
+        "penguasaan": -0.3
+      },
+      "loser": {
+        "penguasaan": -0.3
+      },
+      "losing": {
+        "penguasaan": -0.3
+      },
+      "lose": {
+        "penguasaan": -0.3
+      },
+      "helpless": {
+        "penguasaan": -0.3
+      },
+      "helplessness": {
+        "penguasaan": -0.3
+      },
+      "incapable": {
+        "penguasaan": -0.3
+      },
+      "inability": {
+        "penguasaan": -0.3
+      },
+      "overwhelmed": {
+        "penguasaan": -0.3
+      },
+      "blocked": {
+        "penguasaan": -0.3
+      },
+      "blockage": {
+        "penguasaan": -0.3
+      },
+      "obstacle": {
+        "penguasaan": -0.3
+      },
+      "obstructed": {
+        "penguasaan": -0.3
+      },
+      "clumsy": {
+        "penguasaan": -0.3
+      },
+      "difficulty": {
+        "penguasaan": -0.3
+      },
+      "difficult": {
+        "penguasaan": -0.3
+      },
+      "error": {
+        "penguasaan": -0.3
+      },
+      "erroneous": {
+        "penguasaan": -0.3
+      },
+      "mistake": {
+        "penguasaan": -0.3
+      },
+      "mistaken": {
+        "penguasaan": -0.3
+      },
+      "setback": {
+        "penguasaan": -0.3
+      },
+      "decline": {
+        "penguasaan": -0.3
+      },
+      "friendship": {
+        "afiliasi": 0.35
+      },
+      "friendly": {
+        "afiliasi": 0.35
+      },
+      "friends": {
+        "afiliasi": 0.35
+      },
+      "friend": {
+        "afiliasi": 0.35
+      },
+      "companion": {
+        "afiliasi": 0.35
+      },
+      "companionship": {
+        "afiliasi": 0.35
+      },
+      "together": {
+        "afiliasi": 0.35
+      },
+      "togetherness": {
+        "afiliasi": 0.35
+      },
+      "kinship": {
+        "afiliasi": 0.35
+      },
+      "family": {
+        "afiliasi": 0.35
+      },
+      "relatives": {
+        "afiliasi": 0.35
+      },
+      "sibling": {
+        "afiliasi": 0.35
+      },
+      "siblings": {
+        "afiliasi": 0.35
+      },
+      "affection": {
+        "afiliasi": 0.35
+      },
+      "affectionate": {
+        "afiliasi": 0.35
+      },
+      "kindness": {
+        "afiliasi": 0.35
+      },
+      "caring": {
+        "afiliasi": 0.35
+      },
+      "care": {
+        "afiliasi": 0.35
+      },
+      "beloved": {
+        "afiliasi": 0.35
+      },
+      "loving": {
+        "afiliasi": 0.35
+      },
+      "loved": {
+        "afiliasi": 0.35
+      },
+      "love": {
+        "afiliasi": 0.35
+      },
+      "support": {
+        "afiliasi": 0.35
+      },
+      "supportive": {
+        "afiliasi": 0.35
+      },
+      "collaboration": {
+        "afiliasi": 0.35
+      },
+      "cooperate": {
+        "afiliasi": 0.35
+      },
+      "cooperation": {
+        "afiliasi": 0.35
+      },
+      "welcome": {
+        "afiliasi": 0.35
+      },
+      "welcomed": {
+        "afiliasi": 0.35
+      },
+      "hostility": {
+        "afiliasi": -0.35
+      },
+      "hostile": {
+        "afiliasi": -0.35
+      },
+      "enemy": {
+        "afiliasi": -0.35
+      },
+      "enemies": {
+        "afiliasi": -0.35
+      },
+      "hatred": {
+        "afiliasi": -0.35
+      },
+      "hateful": {
+        "afiliasi": -0.35
+      },
+      "loneliness": {
+        "afiliasi": -0.35
+      },
+      "lonely": {
+        "afiliasi": -0.35
+      },
+      "solitude": {
+        "afiliasi": -0.35
+      },
+      "isolated": {
+        "afiliasi": -0.35
+      },
+      "isolation": {
+        "afiliasi": -0.35
+      },
+      "ostracized": {
+        "afiliasi": -0.35
+      },
+      "ostracism": {
+        "afiliasi": -0.35
+      },
+      "rejected": {
+        "afiliasi": -0.35
+      },
+      "rejection": {
+        "afiliasi": -0.35
+      },
+      "separation": {
+        "afiliasi": -0.35
+      },
+      "separated": {
+        "afiliasi": -0.35
+      },
+      "abandonment": {
+        "afiliasi": -0.35
+      },
+      "abandoned": {
+        "afiliasi": -0.35
+      },
+      "betrayal": {
+        "afiliasi": -0.35
+      },
+      "betrayed": {
+        "afiliasi": -0.35
+      },
+      "treachery": {
+        "afiliasi": -0.35
+      },
+      "quarrel": {
+        "afiliasi": -0.35
+      },
+      "arguing": {
+        "afiliasi": -0.35
+      },
+      "conflict": {
+        "afiliasi": -0.35
+      },
+      "estranged": {
+        "afiliasi": -0.35
+      },
+      "alienated": {
+        "afiliasi": -0.35
+      },
+      "clarity": {
+        "koherensi": 0.3
+      },
+      "clear": {
+        "koherensi": 0.3
+      },
+      "clarify": {
+        "koherensi": 0.3
+      },
+      "clarification": {
+        "koherensi": 0.3
+      },
+      "explanation": {
+        "koherensi": 0.3
+      },
+      "explain": {
+        "koherensi": 0.3
+      },
+      "explained": {
+        "koherensi": 0.3
+      },
+      "understanding": {
+        "koherensi": 0.3
+      },
+      "understand": {
+        "koherensi": 0.3
+      },
+      "understood": {
+        "koherensi": 0.3
+      },
+      "comprehensible": {
+        "koherensi": 0.3
+      },
+      "coherent": {
+        "koherensi": 0.3
+      },
+      "coherence": {
+        "koherensi": 0.3
+      },
+      "consistency": {
+        "koherensi": 0.3
+      },
+      "consistent": {
+        "koherensi": 0.3
+      },
+      "aligned": {
+        "koherensi": 0.3
+      },
+      "alignment": {
+        "koherensi": 0.3
+      },
+      "orderly": {
+        "koherensi": 0.3
+      },
+      "order": {
+        "koherensi": 0.3
+      },
+      "logical": {
+        "koherensi": 0.3
+      },
+      "logic": {
+        "koherensi": 0.3
+      },
+      "evidence": {
+        "koherensi": 0.3
+      },
+      "proven": {
+        "koherensi": 0.3
+      },
+      "prove": {
+        "koherensi": 0.3
+      },
+      "confirmation": {
+        "koherensi": 0.3
+      },
+      "confirmed": {
+        "koherensi": 0.3
+      },
+      "confusion": {
+        "koherensi": -0.3
+      },
+      "confused": {
+        "koherensi": -0.3
+      },
+      "confusing": {
+        "koherensi": -0.3
+      },
+      "chaos": {
+        "koherensi": -0.3
+      },
+      "chaotic": {
+        "koherensi": -0.3
+      },
+      "unclear": {
+        "koherensi": -0.3
+      },
+      "ambiguity": {
+        "koherensi": -0.3
+      },
+      "ambiguous": {
+        "koherensi": -0.3
+      },
+      "contradiction": {
+        "koherensi": -0.3
+      },
+      "contradictory": {
+        "koherensi": -0.3
+      },
+      "contradict": {
+        "koherensi": -0.3
+      },
+      "conflicting": {
+        "koherensi": -0.3
+      },
+      "dissonance": {
+        "koherensi": -0.3
+      },
+      "inconsistent": {
+        "koherensi": -0.3
+      },
+      "inconsistency": {
+        "koherensi": -0.3
+      },
+      "incoherent": {
+        "koherensi": -0.3
+      },
+      "incoherence": {
+        "koherensi": -0.3
+      },
+      "misleading": {
+        "koherensi": -0.3
+      },
+      "misled": {
+        "koherensi": -0.3
+      },
+      "senseless": {
+        "koherensi": -0.3
+      },
+      "nonsense": {
+        "koherensi": -0.3
+      },
+      "illogical": {
+        "koherensi": -0.3
+      },
+      "irrational": {
+        "koherensi": -0.3
+      },
+      "uncertain": {
+        "koherensi": -0.3
+      },
+      "uncertainty": {
+        "koherensi": -0.3
+      },
+      "disorder": {
+        "koherensi": -0.3
+      },
+      "disordered": {
+        "koherensi": -0.3
+      },
+      "fear": {
+        "keamanan": -0.3
+      },
+      "glad": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "sorrow": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "anger": {
+        "keamanan": -0.15,
+        "afiliasi": -0.25
+      },
+      "hate": {
+        "afiliasi": -0.35
+      },
+      "shame": {
+        "afiliasi": -0.15,
+        "penguasaan": -0.1
+      },
+      "longing": {
+        "afiliasi": 0.35
+      },
+      "disappointed": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "calm": {
+        "keamanan": 0.25
+      },
+      "anxious": {
+        "keamanan": -0.3
+      },
+      "happy": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "hope": {
+        "penguasaan": 0.15
+      },
+      "water": {
+        "energi": 0.15
+      },
+      "fruit": {
+        "energi": 0.15
+      },
+      "know": {
+        "energi": 0.15
+      },
+      "trust": {
+        "koherensi": 0.2
+      },
+      "envy": {
+        "afiliasi": -0.35
+      },
+      "jealous": {
+        "afiliasi": -0.35
+      },
+      "proud": {
+        "energi": 0.15,
+        "afiliasi": 0.15
+      },
+      "moved": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      },
+      "peace": {
+        "keamanan": 0.25
+      },
+      "dew": {
+        "energi": 0.15
+      },
+      "seed": {
+        "energi": 0.15
+      },
+      "corn": {
+        "energi": 0.15
+      },
+      "coconut": {
+        "energi": 0.15
+      },
+      "banana": {
+        "energi": 0.15
+      },
+      "mango": {
+        "energi": 0.15
+      },
+      "papaya": {
+        "energi": 0.15
+      },
+      "sin": {
+        "penguasaan": -0.2
+      },
+      "doubt": {
+        "koherensi": -0.15
+      },
+      "belief": {
+        "koherensi": 0.2
+      },
+      "regret": {
+        "energi": -0.15,
+        "afiliasi": -0.15
+      }
+    }
+  }
+}
