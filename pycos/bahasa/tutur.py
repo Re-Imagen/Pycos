@@ -41,6 +41,21 @@ from typing import (Any, Dict, FrozenSet, List, Mapping, Optional, Sequence,
 
 from pycos.kontrak import hanya_kunci, teks_wajib
 
+# Fondasi teks bersama (A1–A6, D2–D4, G1, H3, E0). Dipakai untuk tokenizer,
+# stemmer, cakupan negasi, jenis kalimat, dan pemeriksa gramatika agar
+# tidak ada lagi 9 tokenizer / 8 stoplist yang terpecah.
+from pycos.bahasa.teks import (  # noqa: E402
+    cakupan_negasi as _cakupan_negasi,
+    jenis_kalimat as _jenis_kalimat_teks,
+    kandidat_dasar as _kandidat_dasar_teks,
+    pecah_kalimat as _pecah_kalimat,
+    periksa_gramatika as _periksa_gramatika,
+    potong_batas_kata as _potong_batas_kata,
+    stem as _stem_teks,
+    tokenisasi as _tokenisasi_teks,
+    urai_subjek_predikat as _urai_subjek_predikat,
+)
+
 # ===========================================================================
 # util kecil
 # ===========================================================================
@@ -99,9 +114,56 @@ class Lattice:
 # ===========================================================================
 # leksikon
 # ===========================================================================
+# Pengecualian leksikal nasalisasi (B3): bentuk yang tidak mengikuti tabel umum.
+_PENGECUALIAN_NASAL: Dict[str, str] = {
+    "tahu": "mengetahui",
+    "punya": "mempunyai",
+    "percaya": "memercayai",
+    "kaji": "mengkaji",
+    "tari": "menari",
+    "bom": "mengebom",
+    "cat": "mengecat",
+    "las": "mengelas",
+}
+
+# Koreksi tipe semantik (C3): lema yang salah kelompok di data.
+_KOREKSI_TIPE: Dict[str, List[str]] = {
+    "pesimis": ["KERAGUAN"],
+    "lelah": ["LELAH"],
+    "bingung": ["BINGUNG"],
+    "curiga": ["CURIGA"],
+    "waspada": ["CURIGA"],
+    "haru": ["HARU"],
+}
+
+# Koreksi valensi (C1): tanda salah pada data (bodoh/kejam/buruk positif, dst).
+_KOREKSI_VALENSI: Dict[str, float] = {
+    "bodoh": -0.8, "kejam": -0.8, "buruk": -0.7, "jelek": -0.7,
+    "malas": -0.5, "hangat": 0.4, "manis": 0.4, "membantu": 0.5,
+    "setuju": 0.4, "tahu": 0.0,
+}
+
+
 class Leksikon:
     def __init__(self, dok: Dict[str, Any]) -> None:
-        self.lattice = Lattice(dok.get("lattice") or {})
+        # Lattice diperbaiki (C4): TUMBUHAN di bawah HIDUP (bukan ANIMAT);
+        # TEMPAT/WAKTU cabang sendiri; tambah MANUSIA/ALAT/MAKANAN/HIDUP.
+        peta = dict(dok.get("lattice") or {})
+        peta.setdefault("HIDUP", "ENTITAS")
+        peta.setdefault("MANUSIA", "ANIMAT")
+        peta.setdefault("ALAT", "BENDA")
+        peta.setdefault("MAKANAN", "EDIBLE")
+        peta.setdefault("LELAH", "KEADAAN")
+        peta.setdefault("BINGUNG", "EMOSI")
+        peta.setdefault("CURIGA", "EMOSI")
+        peta.setdefault("HARU", "EMOSI")
+        if peta.get("TUMBUHAN") == "ANIMAT":
+            peta["TUMBUHAN"] = "HIDUP"
+        if peta.get("TEMPAT") == "ABSTRAK":
+            peta["TEMPAT"] = "ENTITAS"
+        if peta.get("WAKTU") == "ABSTRAK":
+            peta["WAKTU"] = "ENTITAS"
+        self.lattice = Lattice(peta)
         self.morfologi = dok.get("morfologi") or {}
         self.predikat = dok.get("predikat") or {}
         self.fungsi = dok.get("fungsi") or {}
@@ -114,6 +176,15 @@ class Leksikon:
         self._by_kelas: Dict[str, List[Dict[str, Any]]] = {}
         self._by_tipe: Dict[str, List[Dict[str, Any]]] = {}
         for e in self.entri:
+            # Koreksi tipe & valensi (C1, C3) diterapkan di atas data mentah
+            # agar berkas JSON (dengan sha provenance) tidak perlu diubah.
+            lema = e.get("lema", "")
+            if lema in _KOREKSI_TIPE:
+                e = dict(e)
+                e["tipe_semantik"] = list(_KOREKSI_TIPE[lema])
+            if lema in _KOREKSI_VALENSI:
+                e = dict(e)
+                e["valensi"] = _KOREKSI_VALENSI[lema]
             kunci = (e["bahasa"], e["lema"])
             self._by_lema.setdefault(kunci, e)
             self._senses.setdefault(kunci, []).append(e)
@@ -154,31 +225,61 @@ class Leksikon:
 
     # -- morfologi -------------------------------------------------------
     def nasalisasi(self, dasar: str) -> str:
-        n = self.morfologi.get("nasal") or {}
+        """Bentuk meN- dari dasar (B1–B3): tabel lengkap + pengecualian.
+
+        Afiks JSON yang dibangkitkan mekanis tidak dipercaya di sini
+        (mis. `mehalangii`, `berfire`); aturan + pengecualian yang dipakai.
+        """
         d = _norm(dasar)
-        if not d or " " in d:
+        if not d or " " in d or "-" in d:
             return d
+        if d in _PENGECUALIAN_NASAL:
+            return _PENGECUALIAN_NASAL[d]
         e = self.ambil("id", d)
         if e and e.get("tidak_di_nasalkan"):
             return d
-        if e:
-            v = (e.get("afiks") or {}).get("ver_kaus")
-            # afiks meN-kan menyimpan bentuk aktif; turunkan dasar meN-nya
-            if v and v.endswith("kan"):
-                return cast(str, v[:-3])
-            if v and v.endswith("i"):
-                return cast(str, v[:-1])
-        c = d[0]
-        luluh = n.get("luluh") or {"p": "m", "t": "n", "k": "ng", "s": "ny"}
-        if c in luluh:
-            if c == "k":
-                return "meng" + d[1:]
-            return "me" + cast(str, luluh[c]) + d[1:]
-        if c in (n.get("tetap_mem") or ["b", "f", "v"]):
-            return "mem" + d
-        if c in (n.get("tetap_men") or ["d", "c", "j", "z"]):
+        # Lema Inggris jangan diberi afiks Indonesia (C9).
+        if e is None and self.ambil("en", d) is not None:
+            return d
+        # Dasar satu suku kata → menge- (B1).
+        if len(re.findall(r"[aeiou]+", d)) == 1:
+            return "menge" + d
+        dua = d[:2]
+        # Gugus konsonan & serapan: konsonan tidak diluluh (B2).
+        if dua in ("kr", "kl", "pr", "tr", "st", "sp", "sk"):
+            if dua in ("pr", "sp"):
+                return "mem" + d
+            if dua in ("tr", "st"):
+                return "men" + d
+            return "meng" + d
+        # Digraf: sy, kh, ng, ny tidak diluluh (B2).
+        if dua in ("sy", "st"):
             return "men" + d
-        if c in (n.get("tanpa_asimilasi") or ["l", "m", "n", "r", "w", "y"]):
+        if dua == "kh":
+            return "meng" + d
+        if dua in ("ng", "ny"):
+            return "me" + d
+        c = d[0]
+        # mem-: b, f, v tetap; p luluh (B1).
+        if c in ("b", "f", "v"):
+            return "mem" + d
+        if c == "p":
+            return "mem" + d[1:]
+        # men-: c, d, j, z tetap; t luluh (B1).
+        if c in ("c", "d", "j", "z"):
+            return "men" + d
+        if c == "t":
+            return "men" + d[1:]
+        # meng-: vokal, g, h tetap; k luluh (B1).
+        if c in "aeiou" or c in ("g", "h"):
+            return "meng" + d
+        if c == "k":
+            return "meng" + d[1:]
+        # meny-: s luluh (B1).
+        if c == "s":
+            return "meny" + d[1:]
+        # me-: l, m, n, r, w, y tanpa asimilasi (B1).
+        if c in ("l", "m", "n", "r", "w", "y"):
             return "me" + d
         return "meng" + d
 
@@ -448,16 +549,21 @@ class L0:
             return node, turun
 
         # tindak tutur bernama emosi (mis. dipakai penguji/penulis skenario)
-        _EMO_ACT = {"marah": "MARAH", "sedih": "SEDIH", "senang": "SENANG",
-                    "takut": "TAKUT", "malu": "MALU", "benci": "BENCI",
-                    "cinta": "CINTA", "kesepian": "KESEPIAN",
-                    "tenang": "TENANG", "harap": "HARAP",
+        _EMO_ACT = {"marah": "MARAH", "sedih": "SEDIH", "bersedih": "SEDIH",
+                    "senang": "SENANG", "bersenang": "SENANG", "suka": "SENANG",
+                    "takut": "TAKUT", "bertakut": "TAKUT",
+                    "malu": "MALU", "bermalu": "MALU",
+                    "benci": "BENCI", "kesepian": "KESEPIAN",
+                    "tenang": "TENANG", "harap": "HARAP", "berharap": "HARAP",
                     "terkejut": "TERKEJUT", "jijik": "JIJIK",
                     "bangga": "BANGGA", "cemburu": "CEMBURU",
-                    "syukur": "BERSYUKUR", "penasaran": "PENASARAN",
+                    "syukur": "BERSYUKUR", "bersyukur": "BERSYUKUR",
+                    "penasaran": "PENASARAN",
                     "haru": "HARU", "mendidih": "DARAH_MENDIDIH",
                     "hancur": "HANCUR", "merinding": "MERINDING",
-                    "luluh": "LULUH", "berbatu": "HATI_BERBATU"}
+                    "luluh": "LULUH", "berbatu": "HATI_BERBATU",
+                    "mengeluh": "SEDIH", "menggerutu": "MARAH",
+                    "menyapa": "SENANG", "bergembira": "SENANG"}
         if act in _EMO_ACT:
             node = Node(_EMO_ACT[act], [
                 Arg("EXPERIENCER", "ANIMAT", isi="aku"),
@@ -531,8 +637,8 @@ class L0:
                 Arg("STIMULUS", "ENTITAS", isi="kamu kembali", opsional=True),
             ], intensitas=0.6, anchor="sekarang"), turun
 
-        # default: menyatakan
-        isi = ctx.niat or topik or (ctx.spotlight[0] if ctx.spotlight else None)
+        # default: menyatakan — ujaran dari pikiran yang terbentuk (E4)
+        isi = ctx.niat or ctx.inner or None
         if not isi:
             if ctx.menahan >= 0.6:
                 # penahanan sadar: dorongan tutur ditahan → jeda, bukan isi kosong
@@ -540,10 +646,27 @@ class L0:
                 return Node("HESITASI", [
                     Arg("EXPERIENCER", "ANIMAT", isi="aku"),
                 ], modus="nyata", intensitas=0.45), turun
+            # Titik fokus tanpa pikiran/keinginan terbentuk: ekspresikan
+            # *persepsi* terhadap topik (E3/E4), bukan "topik." mentah. Bila
+            # topik pun tidak ada, tidak ada yang dapat dinyatakan.
+            fokus = topik or (ctx.spotlight[0] if ctx.spotlight else None)
+            if fokus and " " not in _norm(fokus):
+                return Node("MELIHAT", [
+                    Arg("EXPERIENCER", "ANIMAT", isi="aku"),
+                    Arg("OBJEK", "ENTITAS", isi=fokus, opsional=False),
+                ], intensitas=0.4), turun
+            if fokus:
+                return Node("BERKATA", [
+                    Arg("AGENT", "ANIMAT", isi="aku"),
+                    Arg("UJARAN", "UJARAN", isi=fokus, opsional=False),
+                ], intensitas=0.35), turun
             turun.append("tanpa_topik")
+            return Node("HESITASI", [
+                Arg("EXPERIENCER", "ANIMAT", isi="aku"),
+            ], modus="nyata", intensitas=0.45), turun
         node = Node("BERKATA", [
             Arg("AGENT", "ANIMAT", isi="aku"),
-            Arg("UJARAN", "UJARAN", isi=isi, opsional=isi is None),
+            Arg("UJARAN", "UJARAN", isi=isi, opsional=False),
         ], intensitas=0.35)
         if ctx.values:
             node.args.append(Arg("ALASAN", "PROPOSISI", isi=ctx.values[0],
@@ -703,6 +826,11 @@ class L2:
         "CINTA": "CINTA", "MALU": "MALU", "HARAP": "HARAP",
         "KESEPIAN": "KESEPIAN", "TENANG": "TENANG",
     }
+    # Kutub valensi yang konsisten dengan predikat emosi (F2): kandidat yang
+    # berlawanan kutub tidak boleh dipakai ("terharu" +0,3 untuk SEDIH).
+    PRED_KUTUB = {"SEDIH": -1.0, "TAKUT": -1.0, "MARAH": -1.0, "MALU": -1.0,
+                  "BENCI": -1.0, "KESEPIAN": -1.0,
+                  "SENANG": 1.0, "CINTA": 1.0, "TENANG": 1.0, "HARAP": 1.0}
 
     def __init__(self, leks: Leksikon, rng: random.Random,
                  riwayat: Optional[List[str]] = None) -> None:
@@ -815,12 +943,49 @@ class L2:
         "PERINGATAN": "peringatan",
     }
 
+    def _pilih_dalam(self, kandidat: List[Dict[str, Any]], slot: Slot,
+                     ctx: GenContext) -> Tuple[Optional[Dict[str, Any]], Dict[str, Any]]:
+        """Seperti `pilih` tetapi kandidat sudah dibatasi dari luar (kutub)."""
+        info: Dict[str, Any] = {"slot": slot.nama,
+                                "kandidat": len(kandidat),
+                                "dibuang": {}, "terpilih": None,
+                                "alternatif": 0}
+        lolos: List[Tuple[float, Dict[str, Any]]] = []
+        for e in kandidat:
+            alasan = self._lolos_hard(e, slot, ctx)
+            if alasan:
+                info["dibuang"][alasan] = info["dibuang"].get(alasan, 0) + 1
+                continue
+            lolos.append((self._skor(e, slot, ctx), e))
+        if not lolos:
+            return None, info
+        lolos.sort(key=lambda kv: kv[0], reverse=True)
+        info["alternatif"] = len(lolos)
+        pilih = self._pilih_beragam(lolos, info)
+        return pilih, info
+
+    # =======================================================================
+    # PREDIKAT
+    # =======================================================================
     def pilih_predikat(self, node: Node, ctx: GenContext
                        ) -> Tuple[Optional[Dict[str, Any]], Dict[str, Any]]:
         """Pilih LEMA predikat dari keadaan (bukan dari template)."""
         tipe = self.PRED_TIPE.get(node.predikat)
         if tipe:
             slot = Slot("PREDIKAT", "ADJ", tipe, False, 0.6, 0.5, True)
+            kutub = self.PRED_KUTUB.get(node.predikat, 0.0)
+            if kutub:
+                asli = self.leks.kandidat(slot.kelas_wajib, ctx.bahasa)
+                lolos_kutub = [
+                    e for e in asli
+                    if (kutub > 0 and float(e.get("valensi", 0.0)) >= -0.1)
+                    or (kutub < 0 and float(e.get("valensi", 0.0)) <= 0.1)
+                ]
+                if lolos_kutub:
+                    # pilih lewat skor biasa di antara yang kutubnya konsisten
+                    pilih_k, info_k = self._pilih_dalam(lolos_kutub, slot, ctx)
+                    if pilih_k is not None:
+                        return pilih_k, info_k
             return self.pilih(slot, ctx)
         aksi = self.PRED_AKSI.get(node.predikat)
         if not aksi:
@@ -888,6 +1053,8 @@ class L3:
 
     # -- morfologi --------------------------------------------------------
     def bentuk_verba(self, dasar: str, voice: str, modus: str) -> str:
+        """Realisi diatesis (B7): aktif meN-, pasif di-, ter-, ke-…-an,
+        pasif pelaku orang pertama/kedua (kulihat/kaulihat), nom."""
         d = _norm(dasar)
         if not d:
             return ""
@@ -895,6 +1062,14 @@ class L3:
             return d
         if voice == "pasif":
             return "di" + d
+        if voice == "pasif_1":
+            return "ku" + d
+        if voice == "pasif_2":
+            return "kau" + d
+        if voice == "ter":
+            return "ter" + d
+        if voice == "kean":
+            return "ke" + d + "an"
         if voice == "nom":
             n = self.leks.nominalisasi(d)
             return n or d
@@ -913,6 +1088,12 @@ class L3:
 
     # -- frasa nomina -----------------------------------------------------
     def frasa_nomina(self, isi: Any, ctx: GenContext, topik: bool = False) -> str:
+        """Frasa nomina (B9): posesif, demonstrativa, penggolong.
+
+        Posesif/demonstrativa yang sudah ada pada `isi` dipertahankan;
+        penggolong (seorang/seekor/sebuah) ditambahkan untuk topik
+        berdasarkan tipe lattice.
+        """
         if isinstance(isi, Node):
             return self.klausa(isi, ctx, nested=True)
         if not isinstance(isi, str):
@@ -927,12 +1108,30 @@ class L3:
             if s in ("kamu", "kau"):
                 return "kau" if not ctx.dekat else "kamu"
             return KATA_GANTI[s]
+        if s in ("itu", "ini", "tersebut"):
+            return s
+        # posesif sudah terpasang (-ku/-mu/-nya): pertahankan
+        if s.endswith(("-ku", "-mu", "-nya")) or s.endswith(
+                ("ku", "mu", "nya")) and len(s) > 4 and " " not in s:
+            # hanya bila bentuk dasarnya dikenal (bukan kata yang kebetulan
+            # berakhiran sama, mis. "hanya")
+            base = s[:-2] if s.endswith(("ku", "mu")) else s[:-3]
+            if base and self.leks.ambil(ctx.bahasa, base) is not None:
+                return s
         # topik dari ujaran: mungkin frasa multi-kata → pakai apa adanya
         if " " in s:
             return s
         e = self.leks.ambil(ctx.bahasa, s)
         if e is None:
             return s
+        if topik:
+            tipe = set(e.get("tipe_semantik") or [])
+            if tipe & {"ORANG", "MANUSIA"}:
+                return "seorang " + s
+            if "HEWAN" in tipe:
+                return "seekor " + s
+            if tipe & {"BENDA", "EDIBLE", "TAK_EDIBLE", "ALAT", "MAKANAN"}:
+                return "sebuah " + s
         return s
 
     def frasa_adjektiva(self, isi: Any, ctx: GenContext,
@@ -1021,6 +1220,11 @@ class L3:
             or node.predikat.lower()
         if " " in _norm(lema) or "-" in lema:
             return lema
+        # lema yang sudah berimbuhan jangan diberi prefiks lagi
+        # (mis. "memperingatkan", "bertanya", "mendengar" sudah bentuk jadi).
+        if lema.startswith(("mem", "men", "meng", "meny", "menge",
+                            "ber", "ter", "di", "me")):
+            return lema
         return self.leks.nasalisasi(lema)
 
     # -- klausa (rekursi maks 1 tingkat) ---------------------------------
@@ -1037,11 +1241,24 @@ class L3:
             elif a.tipe in ("EMOSI", "KUALITAS", "TAKUT", "SENANG", "SEDIH",
                             "MARAH", "MALU", "CINTA", "BENCI", "KESEPIAN",
                             "TENANG", "HARAP", "TERKEJUT", "JIJIK",
-                            "KERAGUAN", "KEPERCAYAAN"):
+                            "KERAGUAN", "KEPERCAYAAN", "LELAH", "BINGUNG",
+                            "CURIGA", "HARU"):
                 bagian[a.peran] = self.frasa_adjektiva(
                     a.isi, ctx, intensitas=node.intensitas)
             else:
-                bagian[a.peran] = self.frasa_nomina(a.isi, ctx)
+                # Argumen entitas yang berupa kalimat utuh diringkas menjadi
+                # frasa nomina (E3) — jangan tempel kalimat mentah.
+                isi = a.isi
+                if isinstance(isi, str) and " " in _norm(isi) and \
+                        a.tipe in ("ENTITAS", "ANIMAT", "FISIK", "BENDA",
+                                   "EDIBLE", "TAK_EDIBLE", "MAKHLUK",
+                                   "INANIMAT", "ORANG", "HEWAN", "TUMBUHAN",
+                                   "TEMPAT", "WAKTU", "PERISTIWA"):
+                    from pycos.bahasa.teks import ekstrak_topik as _et
+                    ringkas = _et(isi, leksikon=self.leks)
+                    isi = ringkas or "itu"
+                bagian[a.peran] = self.frasa_nomina(
+                    isi, ctx, topik=(a.peran == "TOPIK"))
         # kalimat inti per predikat
         inti = self._kalimat_predikat(node, pred_lema, bagian, ctx)
         # modus tanya: pastikan ada tanda tanya (tanpa menggandakan)
@@ -1066,6 +1283,10 @@ class L3:
             subj = b.get("EXPERIENCER", "aku")
             prop = b.get("PROPOSISI", "")
             lema = node.lema or "ragu"
+            # Lema di luar kosakata ragu (mis. "mendua") diganti "ragu".
+            if lema not in ("ragu", "bimbang", "waswas", "ragu-ragu",
+                            "gamang", "dilema", "ragu-ragu"):
+                lema = "ragu"
             neg = "tidak " if node.modus == "ingkar" else ""
             if prop:
                 return f"{subj} {neg}{lema} apakah {prop}."
@@ -1076,7 +1297,11 @@ class L3:
             sebab = b.get("SEBAB") or getattr(node.arg("SEBAB"), "isi", "")
             sebab = str(sebab).strip().rstrip(" .!?;:")
             v = self._verba(node, ctx)
-            inti = (f"jangan ke {ob}" if ob else "jangan pergi ke sana")
+            # Objek berupa kalimat diringkas; tanpa objek pakai "sana".
+            if ob and " " in ob:
+                from pycos.bahasa.teks import ekstrak_topik as _et2
+                ob = _et2(ob, leksikon=self.leks) or "sana"
+            inti = (f"jangan pergi ke {ob}" if ob else "jangan pergi ke sana")
             return (
                 f"aku {v} kau: {inti}"
                 + (f" karena {sebab}" if sebab else "")
@@ -1110,7 +1335,8 @@ class L3:
                 return f"aku sadar {prop}."
             return "aku sadar sesuatu, dan itu membuatku hati-hati."
         if P in ("SEDIH", "TAKUT", "MALU", "BENCI", "CINTA", "KESEPIAN",
-                 "TENANG", "HARAP", "TERKEJUT", "JIJIK"):
+                 "TENANG", "HARAP", "TERKEJUT", "JIJIK", "RINDU", "YAKIN",
+                 "TAHU", "BANGGA", "CEMBURU", "PENASARAN", "HARU"):
             lema = node.lema or P.lower()
             st = b.get("STIMULUS", "") or b.get("TARGET", "")
             # apersepsi gagal menamai (ADA rasa tapi tak bisa dinamai — bukan
@@ -1127,9 +1353,26 @@ class L3:
                 return f"aku {lema}. Aku merasa {ctx.tubuh[0]}."
             if not st:
                 return f"aku {lema}."
+            # HARAP: "aku berharap X" (bukan "aku harap akan X").
+            if P == "HARAP":
+                return f"aku berharap {st}."
+            # Stimulus berupa kalimat diringkas menjadi frasa nomina (E3).
+            if " " in st:
+                from pycos.bahasa.teks import ekstrak_topik as _et3
+                st = _et3(st, leksikon=self.leks) or "itu"
             spec = self.leks.predikat.get(node.predikat) or {}
             hub = self.rng.choice(spec.get("konektor")
                                   or ["karena", "terhadap", "soal"])
+            # "bahwa" hanya untuk klausa, bukan nomina tunggal.
+            if hub == "bahwa" and " " not in st:
+                hub = "karena"
+            if ctx.bahasa == "en":
+                hub_en = {"karena": "because", "sebab": "because",
+                          "terhadap": "about", "soal": "about",
+                          "pada": "about", "tentang": "about",
+                          "kepada": "to", "akan": "will",
+                          "untuk": "for"}.get(hub, "about")
+                return f"I {lema} {hub_en} {st}."
             return f"aku {lema} {hub} {st}."
         if P == "BUTUH":
             subj = b.get("EXPERIENCER", "aku")
@@ -1146,13 +1389,19 @@ class L3:
             topik = b.get("TOPIK", "") or b.get("OBJEK", "")
             if not topik:
                 return "apa yang sebenarnya terjadi?"
+            # Topik yang sudah berupa pertanyaan tidak diberi awalan lagi.
+            if "?" in topik:
+                return topik if topik.rstrip().endswith("?") else topik + "?"
+            # Topik berupa kalimat diringkas menjadi frasa nomina (E3).
+            if " " in topik:
+                from pycos.bahasa.teks import ekstrak_topik as _et4
+                topik = _et4(topik, leksikon=self.leks) or "itu"
             # kata tanya dipilih dari keadaan, bukan tetap
             q = ("kenapa" if ctx.arousal > 0.6 else
                  "bagaimana" if ctx.doubt > 0.5 else
                  "apa")
             if q == "kenapa":
-                return f"kenapa {topik}? Aku ingin tahu."
-
+                return f"kenapa {topik}?"
             if q == "bagaimana":
                 return f"bagaimana sebenarnya {topik} itu?"
             return f"apa yang sebenarnya terjadi dengan {topik}?" if " " in topik \
@@ -1161,9 +1410,20 @@ class L3:
             lema = node.lema or "senang"
             st = b.get("STIMULUS", "")
             if st:
+                if " " in st:
+                    from pycos.bahasa.teks import ekstrak_topik as _et5
+                    # klausa stimulus dipertahankan; frasa diringkas
+                    if st.count(" ") > 2:
+                        st = _et5(st, leksikon=self.leks) or st
                 spec = self.leks.predikat.get(node.predikat) or {}
                 hub = self.rng.choice(spec.get("konektor")
                                       or ["karena", "sebab", "bahwa"])
+                if hub == "bahwa" and " " not in st:
+                    hub = "karena"
+                if ctx.bahasa == "en":
+                    hub_en = {"karena": "because", "sebab": "because",
+                              "bahwa": "that"}.get(hub, "because")
+                    return f"I {lema} {hub_en} {st}."
                 return f"aku {lema} {hub} {st}."
             return f"aku {lema} kau masih di sini."
         if P == "BERKATA":
@@ -1178,21 +1438,68 @@ class L3:
                         else "kau terlihat melamun. Ada yang mengganggumu?")
             v = self._verba(node, ctx)
             return f"aku {v} {ob}." if ob else f"aku {v} sesuatu."
-        # fallback generik dari kerangka
-        return f"{b.get('EXPERIENCER', b.get('AGENT', 'aku'))} {neg}{pred}."
+        # --- cabang valensi untuk predikat tanpa cabang khusus (E11) ---
+        _obj = (b.get("OBJEK", "") or b.get("STIMULUS", "")
+                or b.get("TARGET", "") or b.get("TOPIK", ""))
+        _subj = b.get("EXPERIENCER", b.get("AGENT", "aku"))
+        if P == "ADA":
+            return f"ada {_obj}." if _obj else "ada sesuatu."
+        if P == "ADALAH":
+            return f"itu {_obj}." if _obj else "begitulah."
+        if P == "DATANG":
+            return f"aku datang ke {_obj}." if _obj else "aku datang."
+        if P == "PERGI":
+            return f"aku pergi ke {_obj}." if _obj else "aku pergi."
+        if P == "HILANG":
+            return f"{_obj} hilang." if _obj else "aku hilang."
+        if P == "INGIN":
+            return f"aku ingin {_obj}." if _obj else "aku ingin tahu."
+        if P == "JANJI":
+            return f"aku janji untuk {_obj}." if _obj else "aku janji."
+        if P == "LUPA":
+            return f"aku lupa tentang {_obj}." if _obj else "aku lupa."
+        if P == "MEMAAFKAN":
+            return f"aku memaafkan {_obj or 'dia'}."
+        if P == "PERCAYA":
+            return f"aku percaya pada {_obj}." if _obj else "aku percaya."
+        if P == "PUNYA":
+            return f"aku punya {_obj or 'sesuatu'}."
+        if P == "MENYESAL":
+            return f"aku menyesal karena {_obj}." if _obj else "aku menyesal."
+        if P == "MERASA":
+            return f"aku merasa {_obj}." if _obj else "aku merasa sesuatu."
+        if P in ("MENGKHIANATI", "MEMBUNUH", "MENINGGALKAN", "MEMAKAN",
+                 "MENDENGAR", "MEMBUNUH"):
+            v = self._verba(node, ctx)
+            return f"aku {v} {_obj or 'itu'}."
+        if P == "YAKIN":
+            return f"aku yakin tentang {_obj}." if _obj else "aku yakin."
+        if P == "TAHU":
+            return f"aku tahu {_obj}." if _obj else "aku tahu."
+        # fallback generik dari kerangka (objek bawaan untuk verba transitif)
+        if pred.endswith("kan") and not _obj:
+            _obj = "itu"
+            return f"{_subj} {neg}{pred} {_obj}."
+        return f"{_subj} {neg}{pred}."
 
     # -- linearisasi dengan pemindahan topik ------------------------------
     def linearisasi(self, kerangka: Kerangka, ctx: GenContext) -> str:
         node = kerangka.node
         inti = self.klausa(node, ctx)
         # topik depan: "apinya, aku takut" — pengalaman yang dirasakan pemain
+        # (hindari pengulangan: bila topik sudah ada di inti, jangan tambah).
         topik = ctx.topik_aktif()
         if topik and kerangka.topik_front:
             arg = node.arg(kerangka.topik_front)
+            kata_inti = {w.strip(".,!?;:…—–\"'") for w in inti.split()}
             if arg and isinstance(arg.isi, str) and " " not in _norm(arg.isi):
                 front = _norm(arg.isi)
-                if front and front not in ("aku", "kamu", "kau", "dia", "kita"):
-                    inti = f"soal {front} — {inti}"
+                if front and front not in ("aku", "kamu", "kau", "dia", "kita") \
+                        and front not in kata_inti:
+                    if ctx.bahasa == "en":
+                        inti = f"about {front} — {inti}"
+                    else:
+                        inti = f"soal {front} — {inti}"
         # penahanan sadar: ujaran terbentuk, tapi tak habis diucapkan.
         if ctx.menahan >= 0.6 and inti and inti[-1] not in "…!?":
             inti = inti.rstrip(".") + "…"
@@ -1287,6 +1594,36 @@ class Orkestrator:
             teks = self._l3.linearisasi(kerangka, ctx)
             trace.append({"L3": {"teks": teks}})
             if teks and teks.strip():
+                # G1: pemeriksa kegramatikalan — kandidat yang gagal berat
+                # ditolak dan alternatif berikutnya dicoba (batas DFS).
+                masalah = _periksa_gramatika(teks, self.leks)
+                trace.append({"G1": {"masalah": masalah}})
+                berat = [m for m in masalah if m in (
+                    "tanda_baca_ganda", "kata_berulang", "preposisi_ganda",
+                    "adjektiva_bahwa", "afiks_tak_valid",
+                    "verba_transitif_tanpa_objek")]
+                if berat and depth < len(alternatif) - 1:
+                    continue
+                # E0: jejak INPUT → FILTER → FORMATION → OUTPUT.
+                from pycos.bahasa.teks import jejak_pembentukan as _jejak
+                trace.append({"E0": _jejak(
+                    input_teks=ctx.topik,
+                    keadaan={"emosi": list(ctx.emosi), "valensi": ctx.valensi,
+                             "arousal": ctx.arousal, "doubt": ctx.doubt,
+                             "apersepsi": ctx.apersepsi,
+                             "tekanan": ctx.tekanan},
+                    pengetahuan={"core": list(ctx.core),
+                                 "timeline": list(ctx.timeline)},
+                    situasi={"topik": ctx.topik, "spotlight": list(ctx.spotlight)},
+                    sosial={"kepada": ctx.kepada, "dekat": ctx.dekat,
+                            "register": ctx.register},
+                    bahasa_kognisi={"act": ctx.act, "predikat": kandidat.predikat,
+                                    "voice": kerangka.voice},
+                    biologis={"tubuh": list(ctx.tubuh)},
+                    medium={"bahasa": ctx.bahasa},
+                    percakapan={"inner": ctx.inner, "niat": ctx.niat},
+                    output_teks=teks.strip(), act=ctx.act,
+                    alasan_act="act dari keadaan internal; topik hanya faktor")})
                 return Tutur(teks=teks.strip(), status="SUKSES",
                              act=ctx.act, trace=trace)
         return Tutur(teks="", status="MENYERAH", act=ctx.act, trace=trace)
@@ -1382,11 +1719,18 @@ class SASPAnalyzer:
 
     def _semantik(self, ujaran: str, kata: Sequence[str]) -> Dict[str, Any]:
         """Lapisan kontekstual-bebas: hanya memakai bentuk ujarannya."""
+        from pycos.bahasa.teks import (
+            cakupan_negasi as _cn, jenis_kalimat as _jk,
+            jenis_pertanyaan as _jp, tokenisasi as _tk,
+            urai_subjek_predikat as _usp, ekstrak_entitas as _ee,
+            ekstrak_topik as _et,
+        )
+        toks = _tk(ujaran)
         low = " ".join(kata)
-        tipe = ("interogatif" if ujaran.rstrip().endswith("?") else
-                "eksklamatif" if ujaran.rstrip().endswith("!") else
-                "deklaratif")
-        negasi = any(w in self._NEGASI for w in kata)
+        tipe = _jk(ujaran, toks, self.leksikon)
+        neg_flags = _cn(toks)
+        negasi = any(neg_flags[i] for i, t in enumerate(toks)
+                     if t.jenis == "kata")
         penguat = [w for w in kata if w in self._PENGUAT
                    or w == "sangatlah" or w.startswith("sangatlah")]
 
@@ -1405,14 +1749,15 @@ class SASPAnalyzer:
             makna = ("Kalimat menyatakan bahwa suhu udara di luar ruangan "
                      + ("tidak tinggi." if negasi else "sedang tinggi."))
         else:
-            # Representasi literal minimal untuk ujaran umum: predikat adalah
-            # kata isi terakhir yang dikenali; konteks tidak mengisi bagian ini.
-            isi = [w for w in kata if w not in self._STOP]
-            predikat = isi[-1] if isi else (kata[-1] if kata else "")
-            subjek = " ".join(isi[:-1]) if len(isi) > 1 else (
-                isi[0] if isi else "")
+            # Pengurai dangkal subjek–predikat–objek (D4) menggantikan
+            # pembagian posisi yang memberi subjek "lapar" untuk "Aku lapar".
+            urai = _usp(toks, self.leksikon)
+            predikat = urai.get("predikat") or (kata[-1] if kata else "")
+            subjek = urai.get("subjek")
             proposisi = {"subjek": subjek or None,
                          "predikat": predikat or None,
+                         "objek": urai.get("objek"),
+                         "keterangan": urai.get("keterangan"),
                          "polaritas": "negatif" if negasi else "positif",
                          "intensitas": round(min(1.0, 0.5 + 0.15 * len(penguat)), 3)}
             makna = (f"Ujaran mengatribusikan makna literal '{predikat}'"
@@ -1422,21 +1767,28 @@ class SASPAnalyzer:
         return {"jenis_kalimat": tipe, "proposisi": proposisi,
                 "makna_literal": makna, "negasi": negasi,
                 "penguat": penguat,
+                "jenis_pertanyaan": _jp(ujaran, toks) if tipe == "interogatif" else {},
+                "entitas": _ee(ujaran, toks, self.leksikon),
+                "topik": _et(ujaran, toks, self.leksikon),
                 "leksikal": self._leksikal(kata),
                 "bebas_konteks": True}
 
     def _pragmatik(self, ujaran: str, kata: Sequence[str],
                    semantik: Dict[str, Any], konteks: Dict[str, Any]
                    ) -> Dict[str, Any]:
+        from pycos.bahasa.teks import tindak_tutur_skor as _tts
         low = " ".join(kata)
         tersedia = self._available(konteks)
         jenis = "asertif"
         bukti: List[str] = []
         maksud: List[Dict[str, Any]] = []
         kalimat = semantik.get("jenis_kalimat")
+        # Skor tindak tutur diperluas (D5); label utama tetap kompatibel.
+        skor_tindak = _tts(ujaran, semantik=semantik)
         request_markers = {"tolong", "mohon", "silakan", "please"}
         ability_markers = {"bisa", "dapat", "maukah", "sudi", "boleh"}
-        imperative = bool(kata and kata[0] in request_markers) or low.startswith(
+        imperative = kalimat == "imperatif" or bool(
+            kata and kata[0] in request_markers) or low.startswith(
             ("jangan ", "tolong ", "mohon ", "silakan "))
         if imperative:
             jenis = "permintaan_atau_perintah_eksplisit"
@@ -1452,6 +1804,13 @@ class SASPAnalyzer:
             else:
                 jenis = "permintaan_informasi"
                 bukti.append("intonasi/tanda tanya mengemas ujaran sebagai pertanyaan")
+        # Tindak khusus (salam/pujian/hinaan/ancaman/dll) dicatat sebagai
+        # maksud berskor tanpa menimpa label utama di atas.
+        for nama, skor in sorted(skor_tindak.items(),
+                                 key=lambda kv: -kv[1]):
+            if skor >= 0.7 and nama not in ("asertif", "pertanyaan"):
+                maksud.append({"jenis": nama, "confidence": round(skor, 3),
+                               "status": "hipotesis, bukan fakta"})
 
         # Hints konvensional: informasi cuaca/suhu sering relevan sebagai
         # keluhan atau permintaan perubahan lingkungan. Ini tetap inferensi.
@@ -1800,15 +2159,40 @@ def konteks_dari_presentasi(p: Any, act: str, kepada: Any = None,
             except Exception:
                 label = "netral"
     dekat = label in ("akrab", "suka", "percaya")
-    # nuansa register: kedekatan relasi → ragam akrab; selain itu netral.
-    # (ragam formal tersedia untuk pemanggil eksplisit.)
-    reg = "akrab" if dekat else "netral"
+    # register (F2): persona formal/santai/netral → ragam formal/akrab/
+    # netral (tiga register persona dipetakan, bukan hanya akrab/netral).
+    # Tanpa persona pada presentasi/naluri, ragam mengikuti relasi.
+    reg = ""
+    for pembawa in (getattr(p, "persona", None),
+                    getattr(getattr(p, "naluri", None), "persona", None)):
+        reg_p = getattr(pembawa, "register", None) if pembawa is not None else None
+        if isinstance(reg_p, str) and reg_p.strip():
+            reg = reg_p.strip().lower()
+            break
+    if reg == "formal":
+        reg = "formal"
+    elif reg == "santai":
+        reg = "akrab"
+    elif reg == "netral":
+        reg = "netral"
+    else:
+        reg = "akrab" if dekat else "netral"
+    # bahasa (F2): dari konfigurasi (`params["bahasa"]` presentasi atau
+    # naluri), bukan selalu "id".
+    bahasa = "id"
+    for sumber in (getattr(p, "params", None),
+                   getattr(getattr(p, "naluri", None), "params", None)):
+        if isinstance(sumber, Mapping):
+            b = str(sumber.get("bahasa", "") or "").strip().lower()
+            if b:
+                bahasa = b
+                break
     refusal = ""
     ref = _call("_refusal")
     if isinstance(ref, dict):
         refusal = str(ref.get("alasan", ""))
     return GenContext(
-        act=act, bahasa="id", register=reg,
+        act=act, bahasa=bahasa, register=reg,
         topik=str(topik or ""), kepada=str(getattr(kepada, "name", kepada) or ""),
         dekat=dekat,
         spotlight=tuple(x for x in spotlight if x),
@@ -1938,24 +2322,17 @@ _MIN_STEM = 3
 
 
 def _kandidat_dasar(kata: str) -> List[str]:
-    """Bentuk dasar yang mungkin untuk `kata`, dari yang paling sederhana."""
-    hasil: List[str] = [kata]
-    tahap = [kata]
-    for lapis in (_KLITIK, _SUFIKS):
-        baru = []
-        for t in tahap:
-            for akhiran in lapis:
-                if t.endswith(akhiran) and len(t) - len(akhiran) >= _MIN_STEM:
-                    baru.append(t[: -len(akhiran)])
-        hasil.extend(baru)
-        tahap = tahap + baru
-    prefiks_dicoba = []
-    for t in list(dict.fromkeys(hasil)):
-        for awal, pengganti in _PREFIKS:
-            if t.startswith(awal) and len(t) - len(awal) >= _MIN_STEM:
-                prefiks_dicoba.append(pengganti + t[len(awal):])
-    hasil.extend(prefiks_dicoba)
-    return list(dict.fromkeys(hasil))
+    """Bentuk dasar yang mungkin untuk `kata` (B4: urut afiks tersedikit).
+
+    Didelegasikan ke stemmer bersama di `pycos.bahasa.teks` agar
+    "pemarah"→"marah" (bukan "parah") dan "mengajar"→"ajar".
+    """
+    return _kandidat_dasar_teks(kata)
+
+
+def stem_kata(kata: str, kosakata: Optional[set] = None) -> str:
+    """Stem satu kata dengan validasi opsional ke `kosakata` (B4)."""
+    return _stem_teks(kata, kosakata)
 
 
 LEKSIKON_CIRI_BAWAAN = LeksikonCiri(
@@ -2045,11 +2422,17 @@ class FiturTutur:
 
 
 def _tokenkan(teks: str) -> List[str]:
-    """Token huruf kecil; tanda baca pemisah klausa menjadi `_BATAS_KLAUSA`."""
+    """Token ternormalisasi; tanda baca pemisah klausa menjadi `_BATAS_KLAUSA`.
+
+    Memakai tokenizer bersama (A1–A2): "senaaang"→"senang", "gk"→"tidak",
+    klitik dibuang, reduplikasi angka diurai.
+    """
     keluar: List[str] = []
-    for m in _TOKEN_CIRI.finditer(teks):
-        g = m.group(0)
-        keluar.append(_BATAS_KLAUSA if g in ",.!?;:" else g.lower())
+    for t in _tokenisasi_teks(teks):
+        if t.jenis == "kata":
+            keluar.append(t.bentuk)
+        elif t.jenis == "tanda_baca" and t.asli in ",.!?;:":
+            keluar.append(_BATAS_KLAUSA)
     return keluar
 
 
@@ -2058,27 +2441,76 @@ def _kata_saja(token: List[str]) -> List[str]:
 
 
 def _sentimen(token: List[str], leksikon: LeksikonCiri) -> Tuple[int, int, int]:
-    """Hitung (positif, negatif, dinegasi) dengan jendela negasi berbatas klausa."""
+    """Hitung (positif, negatif, dinegasi) dengan cakupan negasi bersama (D2).
+
+    Cakupan sampai batas klausa (bukan jendela tetap), negasi ganda
+    membatalkan, "jangan" tidak membalik, "kurang"/"mana mungkin"
+    melemahkan (tidak dihitung), idiom multi-kata dihitung utuh.
+    """
+    from pycos.bahasa import teks as _teks_mod
+    from pycos.bahasa.teks import IDIOM_SENTIMEN as _IDIOM
     pos = neg = dinegasi = 0
+    # idiom: tandai token yang sudah dikonsumsi idiom
+    gabung = " ".join(t for t in token if t != _BATAS_KLAUSA)
+    dikonsumsi: set = set()
+    for frasa, polar in _IDIOM.items():
+        if frasa in gabung:
+            # tandai semua token yang membentuk frasa (cocok berurutan)
+            ftoks = frasa.split()
+            for i in range(len(token) - len(ftoks) + 1):
+                if token[i:i + len(ftoks)] == ftoks:
+                    for j in range(i, i + len(ftoks)):
+                        dikonsumsi.add(j)
+                    if polar == "positif":
+                        pos += 1
+                    elif polar == "negatif":
+                        neg += 1
+                    break
+    # cakupan negasi: sumber tunggal di teks.cakupan_negasi (D2); "|" adalah
+    # batas klausa.
+    tks = [_teks_mod.Token(t, t, (0, len(t)),
+                           "tanda_baca" if t == _BATAS_KLAUSA else "kata")
+           for t in token]
+    neg_flags = _cakupan_negasi(tks)
+    # prohibitif ("jangan X"): X tidak dihitung sebagai sentimen pernyataan —
+    # inklusi larangan bukan pernyataan keadaan ("jangan sedih" ≠ positif/negatif).
+    larang: List[bool] = [False] * len(token)
     for i, w in enumerate(token):
-        if w == _BATAS_KLAUSA:
+        if w == "jangan":
+            jml = 0
+            for k in range(i + 1, len(token)):
+                if token[k] == _BATAS_KLAUSA:
+                    break
+                jml += 1
+                if jml > 4:
+                    break
+                larang[k] = True
+    for i, w in enumerate(token):
+        if w == _BATAS_KLAUSA or i in dikonsumsi or larang[i]:
+            continue
+        # pelemahan: "kurang" di dekat sebelum sentimen → jangan dihitung
+        lemah = False
+        for j in range(max(0, i - 2), i):
+            if token[j] == _BATAS_KLAUSA:
+                break
+            if token[j] == "kurang":
+                lemah = True
+                break
+        if lemah:
+            continue
+        # retorika: "mana mungkin" sebelum sentimen → jangan dihitung
+        if i >= 2 and token[i - 2:i] == ["mana", "mungkin"]:
             continue
         kategori = None
         if w == "kasih" and i > 0 and token[i - 1] == "terima":
-            kategori = "positif"  # frasa "terima kasih" dihitung pada "kasih"
+            kategori = "positif"
         elif leksikon.kanonik(w, "positif") is not None:
             kategori = "positif"
         elif leksikon.kanonik(w, "negatif") is not None:
             kategori = "negatif"
         if kategori is None:
             continue
-        dibalik = False
-        for j in range(i - 1, max(-1, i - 1 - JENDELA_NEGASI), -1):
-            if token[j] == _BATAS_KLAUSA:
-                break
-            if token[j] in leksikon.negasi:
-                dibalik = True
-                break
+        dibalik = neg_flags[i]
         positif = (kategori == "positif") != dibalik
         if dibalik:
             dinegasi += 1
@@ -2118,9 +2550,15 @@ def analisis_teks(teks: str, leksikon: Optional[LeksikonCiri] = None) -> FiturTu
     )
 
 
+_TOKEN_MENTAH = re.compile(r"[^\W\d_]+(?:-[^\W\d_]+)*")
+
+
 def token_dari(teks: str) -> List[str]:
-    """Kata huruf kecil dari `teks` tanpa tanda baca (untuk pencocokan pantangan)."""
-    return _kata_saja(_tokenkan(teks))
+    """Kata asli (huruf kecil, tanpa normalisasi) untuk pencocokan pantangan.
+
+    Sengaja TIDAK men-strip klitik: "bodohnya" bukan "bodoh" sebagai token.
+    """
+    return [m.group(0).lower() for m in _TOKEN_MENTAH.finditer(str(teks or ""))]
 
 
 __all__ = ["TuturEngine", "Leksikon", "Lattice", "GenContext", "Node", "Arg",

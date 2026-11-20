@@ -24,6 +24,10 @@ PRESENTASI_DEFAULTS: Dict[str, Any] = {
     "presentasi_idle": True,
     "presentasi_riwayat_max": 64,
     "presentasi_bosan_ambang": 0.58,
+    # D8: ujaran yang didengar ikut menggerakkan keadaan batin (bukan
+    # sekadar dicatat). `presentasi_dengar_efek` mematikan efek bila perlu.
+    "presentasi_dengar_efek": True,
+    "presentasi_dengar_efek_gain": 0.12,
     "presentasi_bosan_gain": 0.12,
     "presentasi_bosan_pulih": 0.34,
     "presentasi_bosan_riwayat_max": 16,
@@ -119,6 +123,7 @@ class Presentasi:
         self._history: List[Dict[str, Any]] = []
         self._pending_topic: Optional[str] = None
         self._pending_speaker: Optional[str] = None
+        self._ucapan_terakhir: Optional[str] = None
         self._mood_carry: float = 0.0
         self._recent_texts: List[str] = []
         # --- kesadaran temporal (konsep 4) ---
@@ -141,6 +146,10 @@ class Presentasi:
         self._hesitasi_terakhir: Optional[Dict[str, Any]] = None
         self._shift_seen_tick: int = -10_000
         self._last_spot_check_tick: int = -1
+        # --- PRONOMINA KONSISTEN (F1): satu pasangan (diri, lawan)
+        # per mitra bicara, dipilih dari register persona (atau relasi);
+        # tidak pernah campuran "kau/kamu" dalam satu ujaran. ---
+        self._pronomina_per_mitra: Dict[str, Tuple[str, str]] = {}
         # --- LINGER (histeresis per kanal) ---
         self._histeresis: Dict[str, float] = {}
         # --- TUTUR GENERATIF (L0–L3) ---
@@ -1391,6 +1400,142 @@ class Presentasi:
             return "akrab"
         return "menyatakan"
 
+    def _jawaban_keadaan(self, kepada: Any = None) -> Optional[str]:
+        """Jawab pertanyaan tentang diri/keadaan dari state yang ada (E2).
+
+        Hanya menjawab bila ujaran yang didengar memang menanyakannya,
+        dan isi jawaban dibatasi keadaan yang benar-benar terbentuk pada
+        Pycos (mood, emosi, nama) — bukan gudang jawaban lepas.
+        """
+        teks = str(self._ucapan_terakhir or "").lower()
+        if not teks:
+            return None
+        addr = self._addr(kepada)
+        sapaan = f", {addr}" if addr else ""
+
+        def keadaan_singkat() -> str:
+            try:
+                m = self.naluri.mood()
+                valensi = float(getattr(m, "valence", 0.0))
+            except Exception as _galat_diagnostik_121:
+                _diag.catat('naluri.Presentasi._jawaban_keadaan',
+                            "galat pada jalur fallback",
+                            galat=_galat_diagnostik_121, jalur=121)
+                valensi = 0.0
+            if valensi > 0.25:
+                return "aku baik"
+            if valensi < -0.25:
+                return "aku tidak baik-baik saja"
+            return "aku biasa saja"
+
+        def emosi_teratas() -> Optional[Tuple[str, float]]:
+            try:
+                es = {k: float(v)
+                      for k, v in dict(self.naluri.emosi_state() or {}).items()}
+            except Exception as _galat_diagnostik_122:
+                _diag.catat('naluri.Presentasi._jawaban_keadaan',
+                            "galat pada jalur fallback",
+                            galat=_galat_diagnostik_122, jalur=122)
+                return None
+            if not es:
+                return None
+            nama, nilai = max(es.items(), key=lambda kv: kv[1])
+            return (nama, nilai) if nilai >= 0.3 else None
+
+        # --- pertanyaan tentang kabar/keadaan batin ---
+        if (re.search(r"\b(apa|bagaimana)\s+(kabar|keadaan)\b", teks)
+                or "kabarmu" in teks or "keadaanmu" in teks):
+            pokok = keadaan_singkat()
+            emo = emosi_teratas()
+            detail = f", sedang {emo[0]}" if emo else ""
+            try:
+                arousal = float(getattr(self.naluri.mood(), "arousal", 0.0))
+            except Exception as _galat_diagnostik_123:
+                _diag.catat('naluri.Presentasi._jawaban_keadaan',
+                            "galat pada jalur fallback",
+                            galat=_galat_diagnostik_123, jalur=123)
+                arousal = 0.0
+            if arousal > 0.6:
+                detail += " dan pikiranku sedang penuh" if detail \
+                    else ", pikiranku sedang penuh"
+            return f"{pokok}{detail}{sapaan}."
+        # --- pertanyaan tentang identitas ---
+        if re.search(r"\bsiapa\s+(kamu|kau|dirimu|aku)\b", teks):
+            nama = str(getattr(self.naluri, "name", "") or "").strip()
+            if nama:
+                return f"aku {nama}{sapaan}."
+            return f"aku yang sedang bicara denganmu{sapaan}."
+        # --- pertanyaan tentang isi pikiran/rasa ---
+        if re.search(r"\b(apa|siapa)\s+yang\s+(kamu|kau)\s+"
+                     r"(rasa|rasakan|pikirkan|pikir|inginkan|mau)\b", teks):
+            inner = self._inner_speech()
+            if inner:
+                return inner
+            emo = emosi_teratas()
+            if emo:
+                return f"aku merasa {emo[0]}{sapaan}."
+            return f"{keadaan_singkat()}{sapaan}."
+        return None
+
+    def _pronomina(self, kepada: Any) -> Tuple[str, str]:
+        """Pasangan (diri, lawan) yang konsisten untuk percakapan ini (F1).
+
+        Register persona (formal/santai/netral) menentukan pasangan:
+        formal → (saya, Anda); santai/netral → (aku, kamu) atau (aku, kau),
+        dipilih sekali per mitra bicara (stabil lintas ujaran percakapan
+        yang sama). Persona dibaca duck-typed dari `p.persona` atau
+        `naluri.persona`; tanpa persona, pilihan mengikuti relasi.
+        """
+        kunci = self._eid(kepada) or "-"
+        cached = self._pronomina_per_mitra.get(kunci)
+        if cached is not None:
+            return cached
+        reg = ""
+        persona = getattr(self, "persona", None)
+        if persona is None:
+            persona = getattr(self.naluri, "persona", None)
+        if persona is not None:
+            reg = str(getattr(persona, "register", "") or "").lower()
+        if reg == "formal":
+            pasangan = ("saya", "Anda")
+        elif reg in ("santai", "netral", "akrab"):
+            # dua ragam akrab disahkan F1; pilih satu per mitra bicara
+            pasangan = ("aku", "kau" if sum(map(ord, kunci)) % 2 == 0
+                        else "kamu")
+        else:
+            label = self._label_rel(kepada) if kepada is not None else "netral"
+            pasangan = (("aku", "kau" if sum(map(ord, kunci)) % 2 == 0
+                         else "kamu")
+                        if label in ("akrab", "suka", "percaya")
+                        else ("aku", "kamu"))
+        self._pronomina_per_mitra[kunci] = pasangan
+        return pasangan
+
+    def _konsisten_pronomina(self, teks: str, kepada: Any) -> str:
+        """Normalisasi pronomina pada satu ujaran agar konsisten (F1).
+
+        Semua bentuk lawan (`kamu|kau|anda`) dan diri (`aku|saya|gue`)
+        diganti pasangan pilihan percakapan. Awalan `ku-` yang melekat pada
+        verba dilepas ke bentuk `saya/aku + verba` bila diri = saya/Anda
+        (ragam formal tidak memakai klitik). Kapital dipertahankan di awal
+        kalimat.
+        """
+        if not teks:
+            return teks
+        diri, lawan = self._pronomina(kepada)
+        out = teks
+        if diri == "saya":
+            # klitik ku- → diri + spasi (ragam formal tidak memakai klitik)
+            out = re.sub(r"\bku(?=[bcdfghjklmnprstvwz])", diri + " ", out)
+        out = re.sub(r"\b(kamu|kau|anda)\b", lawan, out, flags=re.IGNORECASE)
+        out = re.sub(r"\b(aku|saya|gue)\b",
+                     lambda m: diri,
+                     out, flags=re.IGNORECASE)
+        # kapital di awal kalimat
+        out = re.sub(r"(^|[.!?…]\s*)([a-zà-ÿ])",
+                     lambda m: m.group(1) + m.group(2).upper(), out)
+        return out
+
     def _addr(self, kepada: Any) -> str:
         if kepada is None:
             return ""
@@ -1516,6 +1661,9 @@ class Presentasi:
                 f"aku senang kau ada, {addr}." if addr else "aku senang kau ada.",
             ])
         if act == "menjawab":
+            jawaban = self._jawaban_keadaan(kepada)
+            if jawaban:
+                return jawaban
             if inner:
                 return inner
             return self._pick([
@@ -1723,6 +1871,10 @@ class Presentasi:
         batas = max(1, int(round(1 + 1.5 * verb)))
         if len(kalimat) > batas:
             teks = ". ".join(kalimat[:batas]).rstrip(".") + "."
+        if direct is None:
+            # F1: satu pasangan pronomina per percakapan; ujaran yang
+            # dipilih sadar (direct) tidak diubah.
+            teks = self._konsisten_pronomina(teks, kepada)
         self._recent_texts.append(teks)
         if len(self._recent_texts) > 6:
             self._recent_texts = self._recent_texts[-6:]
@@ -1775,6 +1927,141 @@ class Presentasi:
         self._log(entry)
         return entry
 
+    def _dengar_efek(self, teks: str, dari: Any) -> Dict[str, Any]:
+        """Teruskan ujaran yang didengar ke keadaan batin (D8).
+
+        * **Drive** bergerak lewat `impact_of` (pecahan kecil dari vektor
+          leksikon; alasan tercatat di `delta_log`).
+        * **Emosi** (takut/marah/senang/sedih/penasaran) digerakkan oleh
+          tindak tutur yang didengar, diskalakan relasi dengan pembicara —
+          kalimat yang sama terasa berbeda dari orang yang dipercaya.
+        * **Rasa epistemik** (ragu/yakin/penasaran) diperbarui lewat
+          Kesadaran bila aktif — ini "pembaruan keyakinan" ujaran masuk.
+
+        Aman dipanggil kapan pun: semua kanal dinonaktifkan bila state
+        terkait absen/mati. Fungsi ini bersifat aditif dan kecil — ujaran
+        masuk menggeser, tidak memutarbalikkan, keadaan batin.
+        """
+        n = self.naluri
+        if not bool(self.params.get("presentasi_dengar_efek", True)):
+            return {}
+        efek: Dict[str, Any] = {}
+        # --- 1) drive via impact_of (pecahan; pulihkan counter NURANI) ---
+        if hasattr(n, "impact_of"):
+            nur = getattr(n, "nurani", None)
+            hits0 = getattr(nur, "affective_hits", 0) if nur is not None else 0
+            try:
+                imp = n.impact_of(str(teks)) or {}
+            except Exception as _galat_diagnostik_110:
+                _diag.catat('naluri.Presentasi._dengar_efek',
+                            "galat pada jalur fallback",
+                            galat=_galat_diagnostik_110, jalur=110)
+                imp = {}
+            if nur is not None:
+                nur.affective_hits = hits0
+            gain = float(self.params.get("presentasi_dengar_efek_gain", 0.12))
+            applied: Dict[str, float] = {}
+            for drive, nilai in imp.items():
+                try:
+                    dv = float(nilai) * gain
+                except (TypeError, ValueError):
+                    continue
+                if abs(dv) >= 0.02:
+                    try:
+                        n.delta(drive, dv, reason="dengar:ujaran masuk")
+                        applied[str(drive)] = round(dv, 4)
+                    except Exception as _galat_diagnostik_111:
+                        _diag.catat('naluri.Presentasi._dengar_efek',
+                                    "galat pada jalur fallback",
+                                    galat=_galat_diagnostik_111, jalur=111)
+                        pass
+            if applied:
+                efek["drive"] = applied
+        # --- 2) emosi via tindak tutur × relasi ---
+        try:
+            from pycos.bahasa.teks import tindak_tutur_skor
+            tindak = tindak_tutur_skor(str(teks)) or {}
+        except Exception as _galat_diagnostik_114:
+            _diag.catat('naluri.Presentasi._dengar_efek',
+                        "galat pada jalur fallback",
+                        galat=_galat_diagnostik_114, jalur=114)
+            tindak = {}
+        label = "netral"
+        if dari is not None:
+            try:
+                label = str(self._label_rel(dari))
+            except Exception as _galat_diagnostik_115:
+                _diag.catat('naluri.Presentasi._dengar_efek',
+                            "galat pada jalur fallback",
+                            galat=_galat_diagnostik_115, jalur=115)
+                label = "netral"
+        dekat = label in ("akrab", "suka", "percaya")
+        mult_neg = 0.6 if dekat else 1.0   # orang dekat lebih mudah dilukai? tidak — lebih kecil kontribusi sinis
+        mult_pos = 1.2 if dekat else 1.0
+        pemetaan = {   # tindak -> (emosi, dasar, pengali)
+            "pujian": ("senang", 0.10, mult_pos),
+            "terima_kasih": ("senang", 0.06, mult_pos),
+            "hinaan": ("marah", 0.12, mult_neg),
+            "tuduhan": ("marah", 0.10, mult_neg),
+            "ancaman": ("takut", 0.14, mult_neg),
+            "peringatan": ("takut", 0.07, mult_neg),
+            "keluhan": ("sedih", 0.05, 1.0),
+            "penolakan": ("sedih", 0.05, 1.0),
+            "ajakan": ("senang", 0.04, mult_pos),
+            "persetujuan": ("senang", 0.06, mult_pos),
+            "pertanyaan": ("penasaran", 0.05, 1.0),
+        }
+        emo_applied: Dict[str, float] = {}
+        if getattr(n, "_emosi_aktif", lambda: False)():
+            for tt, (emosi, dasar, mult) in pemetaan.items():
+                try:
+                    skor = float(tindak.get(tt, 0.0) or 0.0)
+                except (TypeError, ValueError):
+                    skor = 0.0
+                if skor <= 0.05:
+                    continue
+                jumlah = dasar * skor * mult
+                try:
+                    n._emosi_naikkan(emosi, jumlah, alasan="dengar:" + tt)
+                    emo_applied[emosi] = round(emo_applied.get(emosi, 0.0) + jumlah, 4)
+                except Exception as _galat_diagnostik_112:
+                    _diag.catat('naluri.Presentasi._dengar_efek',
+                                "galat pada jalur fallback",
+                                galat=_galat_diagnostik_112, jalur=112)
+                    pass
+        if emo_applied:
+            efek["emosi"] = emo_applied
+        # --- 3) rasa epistemik (pembaruan keyakinan ringan) ---
+        ks = self._kes()
+        if ks is not None:
+            asertif = float(tindak.get("asertif", 0.0) or 0.0)
+            tanya = float(tindak.get("pertanyaan", 0.0) or 0.0)
+            try:
+                if tanya >= 0.5:
+                    ks.epistemic_emotion("penasaran", 0.15,
+                                         sebab="mendengar pertanyaan")
+                if asertif >= 0.5:
+                    if dekat:
+                        ks.epistemic_emotion(
+                            "yakin", 0.12,
+                            sebab="klaim dari orang yang dipercaya")
+                    else:
+                        ks.epistemic_emotion(
+                            "bingung", 0.08,
+                            sebab="klaim dari pembicara tidak akrab")
+            except Exception as _galat_diagnostik_113:
+                _diag.catat('naluri.Presentasi._dengar_efek',
+                            "galat pada jalur fallback",
+                            galat=_galat_diagnostik_113, jalur=113)
+                pass
+        if tindak:
+            teratas = {k: round(float(v), 3)
+                       for k, v in tindak.items()
+                       if float(v or 0.0) > 0.05}
+            if teratas:
+                efek["tindak"] = teratas
+        return efek
+
     def dengar(self, teks: str, dari: Any = None,
                konteks: Optional[Mapping[str, Any]] = None,
                **kwargs: Any) -> Dict[str, Any]:
@@ -1791,9 +2078,34 @@ class Presentasi:
             except Exception as _galat_diagnostik_100:
                 _diag.catat('naluri.Presentasi.dengar', "galat pada jalur fallback", galat=_galat_diagnostik_100, jalur=100)
                 pass
-        self._pending_topic = str(teks)[:80]
         self._pending_speaker = self._eid(dari)
-        tanya = str(teks).strip().endswith("?")
+        self._ucapan_terakhir = str(teks)[:160]
+        # E3: topik adalah frasa nomina hasil pemahaman, bukan salinan
+        # mentah teks lawan (teks[:80]); bila tak ada nomina bermakna,
+        # biarkan None — jangan mengarang topik.
+        try:
+            from pycos.bahasa.teks import ekstrak_topik
+            _leks = None
+            _fn_eng = getattr(self, "tutur_engine", None)
+            _eng = _fn_eng() if callable(_fn_eng) else None
+            if _eng is not None:
+                _leks = getattr(_eng, "leks", None)
+            self._pending_topic = (ekstrak_topik(str(teks), None, _leks)
+                                   or None)
+        except Exception as _galat_diagnostik_117:
+            _diag.catat('naluri.Presentasi.dengar',
+                        "galat pada jalur fallback",
+                        galat=_galat_diagnostik_117, jalur=117)
+            self._pending_topic = None
+        # D3: jenis kalimat tidak bergantung pada tanda baca akhir;
+        # `tanya` tetap dipertahankan untuk kompatibilitas pemanggil lama.
+        try:
+            from pycos.bahasa.teks import jenis_kalimat
+            tanya = jenis_kalimat(str(teks)) == "interogatif"
+        except Exception as _galat_diagnostik_116:
+            _diag.catat('naluri.Presentasi.dengar', "galat pada jalur fallback",
+                        galat=_galat_diagnostik_116, jalur=116)
+            tanya = str(teks).strip().endswith("?")
         ks = self._kes()
         if ks is not None:
             try:
@@ -1808,12 +2120,17 @@ class Presentasi:
                     _diag.catat('naluri.Presentasi.dengar', "galat pada jalur fallback", galat=_galat_diagnostik_102, jalur=102)
                     pass
         analisis = self.analisis_sa_sp(teks, ctx, speaker=dari)
+        # D8: ujaran yang didengar menggerakkan keadaan batin — drive lewat
+        # impact_of, emosi/keyakinan lewat tindak tutur × relasi pembicara.
+        efek = self._dengar_efek(teks, dari)
         self._boredom = max(0.0, self._boredom - self._p("presentasi_bosan_pulih"))
         # backchannel kadang muncul saat mendengarkan
         if self._rng.random() < 0.3:
             self.backchannel()
         hasil = {"topik": self._pending_topic, "dari": self._pending_speaker,
                  "pertanyaan": tanya}
+        if efek:
+            hasil["efek"] = efek
         if analisis and analisis.get("aktif") is not False:
             hasil["sa_sp"] = copy.deepcopy(analisis)
         return hasil

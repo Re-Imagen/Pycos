@@ -1606,21 +1606,45 @@ class Naluri:
         (`_lexicon_dirty`), menggantikan `sorted(..., key=len, reverse=True)`
         yang dihitung ulang pada SETIAP panggilan `impact_of()`.
         """
+        # Indeks frasa leksikon sebagai rentang token ternormalisasi (D1):
+        # "zaman dahulu" tidak lagi cocok dengan substring "aman".
+        from pycos.bahasa.teks import normalisasi_token as _norm_tok
+
         root: Dict[str, Any] = {}
+        entri_parts: Dict[tuple, List[str]] = {}
         for word in self.lexicon:
-            w = str(word).lower()
+            w = str(word).lower().strip()
             if not w:
+                continue
+            parts = tuple(p for p in
+                          (_norm_tok(pw) for pw in w.split())
+                          if p)
+            if not parts:
                 continue
             node = root
             for ch in w:
                 node = node.setdefault(ch, {})
-            node[""] = w  # penanda ujung frasa
+            node[""] = w  # penanda ujung frasa (kompatibilitas)
+            entri_parts.setdefault(parts, []).append(w)
         self._trie = root
+        self._entri_parts = entri_parts
+        # panjang maksimum frasa dalam leksikon (untuk pemindaian jendela)
+        self._maks_frasa = max((len(p) for p in entri_parts), default=1)
         # Urutan lama: panjang menurun, seri -> urutan insersi (sorted stabil).
         order = sorted(self.lexicon.keys(), key=len, reverse=True)
         self._lexicon_rank = {w: i for i, w in enumerate(order)}
         self._tags_lower = [(str(t).lower(), dict(dv))
                             for t, dv in self.tag_lexicon.items()]
+        self._tags_by_lower = {str(t).lower(): dict(dv)
+                               for t, dv in self.tag_lexicon.items()}
+        tag_parts: Dict[tuple, List[Tuple[str, Dict[str, float]]]] = {}
+        for t, dv in self._tags_lower:
+            parts = tuple(p for p in
+                          (_norm_tok(pw) for pw in t.split())
+                          if p)
+            if parts:
+                tag_parts.setdefault(parts, []).append((t, dv))
+        self._tag_parts = tag_parts
         self._impact_cache = {}
         self._lexicon_dirty = False
 
@@ -1651,41 +1675,136 @@ class Naluri:
             i += 1
         return occ
 
+    _PENGUAT_POS = frozenset({"kurang", "ringan", "agak", "sedikit", "jarang"})
+
+    def _span_cocok(self, text: str
+                    ) -> List[Tuple[str, int, int, bool, bool]]:
+        """Rentang token leksikon/tag di `text`.
+
+        Mengembalikan (nama_entri, awal, akhir, terbalik, diabaikan) per entri
+        yang cocok, memakai tokenisasi bersama (A1–A2: "senaaang"→"senang",
+        "gk"→"tidak") dan cakupan negasi bersama (D2). `terbalik` True bila
+        mayoritas isi rentang berada dalam cakupan negasi — tandanya dibalik.
+        `diabaikan` True bila diatur pengurang ("kurang X") atau retorika
+        ("mana mungkin") — kontribusinya nol.
+        """
+        from pycos.bahasa.teks import cakupan_negasi, tokenisasi
+        deltas_flags: List[Tuple[str, int, int, bool, bool]] = []
+        toks = tokenisasi(text)
+        if not toks:
+            return []
+        flags = cakupan_negasi(toks)
+        # daftar kata sesuai urutan, dengan indeks klausa dan flag negasi
+        kata: List[str] = []
+        kata_flag: List[bool] = []
+        kata_klausa: List[int] = []
+        klausa = 0
+        for t, f in zip(toks, flags):
+            if t.jenis == "tanda_baca":
+                klausa += 1
+                continue
+            if t.jenis != "kata":
+                continue
+            kata.append(t.bentuk)
+            kata_flag.append(f)
+            kata_klausa.append(klausa)
+        n = len(kata)
+        if n == 0:
+            return []
+        # pengurangan & retorika per klausa
+        batas_kanan = [0] * n
+        for i in range(n):
+            j = i
+            while j + 1 < n and kata_klausa[j + 1] == kata_klausa[j]:
+                j += 1
+            batas_kanan[i] = j + 1
+        terdeteksi: List[Tuple[tuple, int]] = []
+        # pemangkasan jendela: hanya mulai di kata, panjang <= maks_frasa
+        for i in range(n):
+            for L in range(self._maks_frasa, 0, -1):
+                if i + L > n:
+                    continue
+                if kata_klausa[i] != kata_klausa[i + L - 1]:
+                    continue
+                jendela = tuple(kata[i:i + L])
+                if jendela in self._entri_parts or jendela in self._tag_parts:
+                    terdeteksi.append((jendela, i))
+        # aturan lemah: jangan tumpang-tindih bagian dari rentang lebih panjang
+        terdeteksi.sort(key=lambda kv: (-len(kv[0]), kv[1]))
+        terpakai: List[Tuple[int, int]] = []
+        for jendela, i in terdeteksi:
+            L = len(jendela)
+            if any(i < e and s < i + L for s, e in terpakai):
+                continue
+            isi_flag = kata_flag[i:i + L]
+            terbalik = sum(isi_flag) > L / 2.0
+            # pengurang: kata sebelum rentang dalam klausa yang sama & dekat
+            lemah = False
+            for j in range(max(0, i - 2), i):
+                if kata_klausa[j] != kata_klausa[i]:
+                    break
+                if kata[j] in self._PENGUAT_POS:
+                    lemah = True
+                    break
+            # retorika: "mana/masa mungkin" mendahului dalam klausa yang sama
+            if not lemah:
+                awal_k = i
+                while awal_k > 0 and kata_klausa[awal_k - 1] == kata_klausa[i]:
+                    awal_k -= 1
+                for j in range(awal_k, i):
+                    if kata[j] in ("mana", "masa") and j + 1 < n \
+                            and kata[j + 1] == "mungkin":
+                        lemah = True
+                        break
+            for nama in self._entri_parts.get(jendela, []):
+                deltas_flags.append((nama, i, i + L, terbalik, lemah))
+            for t, dv in self._tag_parts.get(jendela, []):
+                deltas_flags.append(("tag::" + t, i, i + L, terbalik, lemah))
+            terpakai.append((i, i + L))
+        return deltas_flags
+
     def _base_impact(self, text: str) -> Dict[str, float]:
         """Dampak lexicon+tag+marker (SEBELUM prior NURANI & clip).
 
-        Semantik algoritma lama dipertahankan persis: kata diproses sesuai
-        urutan panjang-menurun (seri = urutan insersi), tiap kata maksimal
-        satu kali pada kemunculan utuh pertamanya (setara `replace(word," ",1)`
-        — kemunculan yang tertimpa penggantian sebelumnya tidak dihitung),
-        maksimum 5 hit.
+        D1: pencocokan berdasarkan token (A1/A2), bukan substring — "aman"
+        tidak lagi cocok di dalam "dahulu"— dan cakupan negasi (D2) membalik
+        tanda entri ("tidak aman" → keamanan −0,5; "bukan ancaman" → +0,6).
+        Urutan terpanjang-dulu, entri yang sama maksimal satu kali,
+        maksimum 5 hit (dipertahankan dari algoritma lama).
         """
-        low = text.lower()
         deltas = {d: 0.0 for d in DRIVES}
-        # tag khusus (bobotnya kecil agar tidak mendominasi)
-        for tag_low, dv in self._tags_lower:
-            if tag_low in low:
-                for k, v in dv.items():
-                    deltas[k] += v * 0.3
-        # kumpulkan semua kemunculan sekaligus, lalu pilih sesuai rank lama
-        pertama: Dict[str, List[Tuple[int, int]]] = {}
-        for w, s, e in self._lexicon_occurrences(low):
-            pertama.setdefault(w, []).append((s, e))
-        if pertama:
-            dikonsumsi: List[Tuple[int, int]] = []
+        cocok = self._span_cocok(text)
+        if cocok:
+            # pilih menurut rank lexicon lama (panjang menurun, lalu insersi),
+            # entri yang sama sekali per kemunculan pertama
+            per_entri: Dict[str, Tuple[int, int, bool, bool]] = {}
+            for nama, i, e, terbalik, lemah in cocok:
+                per_entri.setdefault(nama, (i, e, terbalik, lemah))
+            dipilih = sorted(per_entri.items(),
+                             key=lambda kv: self._lexicon_rank.get(
+                                 kv[0].replace("tag::", "").lower(), 10 ** 9))
             hits = 0
-            for word in sorted(pertama, key=self._lexicon_rank.get):
+            for nama, (i, e, terbalik, lemah) in dipilih:
                 if hits >= 5:
                     break
-                for s, e in pertama[word]:  # kemunculan kiri-ke-kanan
-                    if any(s < ce and cs < e for cs, ce in dikonsumsi):
-                        continue  # rusak tertimpa penggantian sebelumnya
-                    for k, v in self.lexicon[word].items():
+                if lemah:
+                    continue
+                if nama.startswith("tag::"):
+                    t_low = nama[5:].lower()
+                    dv = dict(self._tags_by_lower.get(t_low) or {})
+                    for k, v in dv.items():
                         if k in deltas:
-                            deltas[k] += v
-                    dikonsumsi.append((s, e))
+                            deltas[k] += v * (-0.3 if terbalik else 0.3)
                     hits += 1
-                    break
+                    continue
+                entri = self.lexicon.get(nama)
+                if not entri:
+                    continue
+                tanda = -1.0 if terbalik else 1.0
+                for k, v in entri.items():
+                    if k in deltas:
+                        deltas[k] += v * tanda
+                hits += 1
         # deteksi sleeper/tanda waktu: t+N → ancaman laten
         if "[⌛" in text or "t+" in text:
             deltas["keamanan"] -= 0.05

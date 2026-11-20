@@ -25,13 +25,19 @@ melalui jalur implementasi, tetapi bukan otomatis API root.
 
 Pada snapshot ini ada **66** nama publik subpaket yang belum diekspor root,
 bukan persis 65 seperti estimasi rekomendasi. **64** dipromosikan dan **2**
-dikecualikan seperti tabel di atas. Total `pycos.__all__` menjadi **125** nama
-(termasuk `__version__`). Angka ini inventaris tahap R5.4, bukan batas permanen.
+dikecualikan seperti tabel di atas. Peningkatan sistem linguistik (tokenizer,
+stemmer, negasi, pemeriksa gramatika, entitas/topik, jejak pembentukan)
+menambahkan **22** nama publik dari `pycos.bahasa.teks` ke dua `__all__`;
+semuanya dipromosikan root, sehingga total `pycos.__all__` menjadi **147**
+nama (termasuk `__version__`). Angka ini inventaris bertahap, bukan batas
+permanen.
 
 Tambahan mencakup `EversiTD`, `Perencana`, `ModelKausal`, `GrafAsosiasi`, state
 organik, data/komponen Tutur (`Arg`, `Node`, `L0`–`L3`, `Tutur`, `Leksikon`,
-`Orkestrator`), utilitas kalibrasi, konstanta dunia, `Badan`, `peta_contoh`,
-resolusi sumber daya dan `inventaris` patch. Tidak ada fungsi baru atau wrapper;
+`Orkestrator`), utilitas fondasi teks (`tokenisasi`, `stem`, `periksa_gramatika`,
+`cakupan_negasi`, `jenis_kalimat`, `tindak_tutur_skor`, `ekstrak_topik`,
+`jejak_pembentukan`, …), utilitas kalibrasi, konstanta dunia, `Badan`,
+`peta_contoh`, resolusi sumber daya dan `inventaris` patch. Tidak ada fungsi baru atau wrapper;
 objek root identik dengan objek pemiliknya.
 
 ```python

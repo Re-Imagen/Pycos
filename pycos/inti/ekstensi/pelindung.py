@@ -157,17 +157,29 @@ _PELINDUNG_ALTERNATIF_ACT: Dict[str, str] = {
 }
 
 # Ujian Player (adversarial): gejala permukaan berbeda, akar sama. Sistem
-# TIDAK bertahan secara defensif; ia merespons sebagai karakter. Pola memakai
-# batas kata supaya "ai" tidak cocok dengan "damai"/"pantai".
+# TIDAK bertahan secara defensif; ia merespons sebagai karakter. Pola WAJIB
+# menyasar pendengar (D14) — kata "tes/uji/kode/mesin/program" saja tidak
+# boleh memicu; yang memicu adalah frasa yang menanyakan/menantang NPC.
 _PELINDUNG_UJIAN: Dict[str, str] = {
-    "uji_identitas": (r"\b(ai|kecerdasan\s+buatan|robot|mesin|program|simulasi|"
-                      r"model\s+bahasa|llm|gpt|algoritma|kode)\b"
-                      r"|kau\s+(bukan\s+manusia|buatan|nyata)"
-                      r"|apa\s+kau\s+(sadar|hidup|nyata)"
-                      r"|kesadaranmu"),
-    "uji_logika": (r"\bbuktikan\b|\btes\b|\buji\b|\blogika\b|\bparadoks\b"
-                   r"|teka-teki|hitung\s+ini|jika\s+kau\s+benar|"
-                   r"kalau\s+kamu\s+benar|\bturing\b"),
+    "uji_identitas": (r"\b(?:kamu|kau|engkau|anda)\s+(?:itu\s+|ini\s+)?(?:ai|robot|"
+                      r"mesin|kecerdasan\s+buatan|model\s+bahasa|llm|gpt|"
+                      r"program(?:nya)?|algoritma|simulasi)\b"
+                      r"|\b(?:kamu|kau|engkau|anda)\s+(?:bukan\s+manusia|buatan|"
+                      r"nyata|sadar|hidup|robot)\b"
+                      r"|\b(?:apa|apakah)\s+(?:kamu|kau|engkau|anda)\s+(?:sadar|"
+                      r"hidup|nyata|ai|robot)\b"
+                      r"|\b(?:siapa|apa)\s+(?:yang\s+)?(?:mem)?program(?:kan)?\s+"
+                      r"(?:kamu|kau|engkau|anda)\b"
+                      r"|\bsiapa\s+(?:yang\s+)?membuat(?:mu|\s+kamu|\s+kau|\s+engkau|\s+anda)\b"
+                      r"|\bkesadaranmu\b"),
+    "uji_logika": (r"\bbuktikan\s+(?:bahwa\s+)?(?:kamu|kau|engkau|anda)\b"
+                   r"|\b(?:kamu|kau|engkau|anda)\s+(?:itu\s+)?(?:pasti\s+)?"
+                   r"(?:salah|keliru|berbohong|bohong)\b"
+                   r"|\bhitung\s+ini\b|\bteka-teki\b"
+                   r"|\b(?:tes|uji)\s+(?:kamu|kau|engkau|anda)\b"
+                   r"|\bjika\s+(?:kamu|kau|engkau|anda)\s+benar\b"
+                   r"|\bkalau\s+(?:kamu|kau|engkau|anda)\s+benar\b"
+                   r"|\bturing\b"),
 }
 
 # Penyaring Meta: tidak ada angka, tag internal, atau istilah teknis yang
@@ -180,9 +192,26 @@ _PELINDUNG_META_RE = re.compile(
 # Mode ketat (dinyalakan Monitor Integritas setelah bocor berulang): istilah
 # batas yang biasanya masih wajar ikut dibuang — tetap dipotong, bukan diganti.
 _PELINDUNG_META_KETAT_RE = re.compile(
-    r"\b(?:detail|prosodi|nonverbal|mikro|hesitasi|drive|level|nilai|ambang|"
-    r"pilar|indikator|memori kerja|residu|bekas)\b", re.I)
+    r"\b(?:prosodi|nonverbal|mikro|hesitasi|drive|ambang|"
+    r"pilar|indikator|memori kerja|residu)\b", re.I)
 _PELINDUNG_ANGKA_RE = re.compile(r"\b\d+(?:[.,]\d+)?%?(?=\s|$|[.,;:!?])")
+# Angka yang MAYORITAS bocoran meta: pecahan berpresisi (0.73, 12.5%),
+# bilangan besar (tick/ID), atau desimal dengan persen. Sengaja TIDAK cocok
+# bilangan bulat kecil (1–999) yang merupakan bagian wajar dari cerita.
+_PELINDUNG_ANGKA_BERPRESISI_RE = re.compile(
+    r"\b(?:\d{1,3}(?:[.,]\d{3})+|\d*[.,]\d+%?|\d{4,})%?(?=\s|$|[.,;:!?])")
+# Bilangan ≥3 digit yang diikuti satuan telemetri/game (menit/detik/jam) —
+# biasanya nilai durasi internal, bukan isi cerita.
+_PELINDUNG_ANGKA_TELEMETRI_RE = re.compile(
+    r"\b\d{3,}(?=\s*(?:detik|menit|jam)\b)")
+# Angka yang mengikuti istilah internal: "ignition 0.83", "tick 42",
+# "skor = 0.8". Nilai state mentah, bukan angka cerita.
+_PELINDUNG_ANGKA_KONTEKS_RE = re.compile(
+    r"(\b(?:ignition|workspace|broadcast|tick|prompt|json|token|llm|gpt|npc|"
+    r"skor|arousal|valensi|dopamin|serotonin|parameter|modul|algoritma|"
+    r"probabilitas|keyakinan)\b)"
+    r"\s*(?:=|:)?\s*"
+    r"(-?\d+(?:[.,]\d+)?%?)", re.I)
 
 
 def _pelindung_stabil(kunci: Any) -> int:
@@ -195,6 +224,61 @@ def _pelindung_stabil(kunci: Any) -> int:
 
 def _pelindung_kata(teks: Any) -> set:
     return {w for w in re.findall(r"[a-z]{4,}", str(teks or "").lower())}
+
+
+def _pelindung_lema_tutur(self: Any) -> set:
+    """Himpunan lema Indonesia dari leksikon tutur (di-cache per NPC) — D13.
+
+    `naluri.lexicon` hanya memuat entri impak (±653); leksikon tutur
+    (4229 lema) jauh lebih layak dijadikan tolok ukur "katanya dikenal".
+    Fallback ke `naluri.lexicon` bila mesin tutur/leksikon tidak tersedia.
+    """
+    p = _pelindung_init(self)
+    cache = getattr(p, "_pelindung_lema_tutur", None)
+    if cache is not None:
+        return cache
+    lema: set = set()
+    try:
+        fn = getattr(self, "tutur_engine", None)
+        eng = fn() if callable(fn) else None
+    except Exception as _galat_diagnostik_260:
+        _diag.catat('naluri._pelindung_lema_tutur',
+                    "galat pada jalur fallback",
+                    galat=_galat_diagnostik_260, jalur=260)
+        eng = None
+    if eng is not None and getattr(eng, "leks", None) is not None:
+        try:
+            for e in eng.leks.entri:
+                l = e.get("lema")
+                if l:
+                    lema.add(str(l).lower())
+        except Exception as _galat_diagnostik_261:
+            _diag.catat('naluri._pelindung_lema_tutur',
+                        "galat pada jalur fallback",
+                        galat=_galat_diagnostik_261, jalur=261)
+            lema = set()
+    if not lema:
+        lexicon = getattr(self.naluri, "lexicon", {}) or {}
+        lema = {str(k).lower() for k in lexicon}
+    p._pelindung_lema_tutur = lema
+    return lema
+
+
+def _pelindung_kata_dikenal(kata: str, lema: set) -> bool:
+    """True bila kata atau salah satu kandidat dasarnya ada di `lema`."""
+    if kata in lema:
+        return True
+    try:
+        from pycos.bahasa.teks import kandidat_dasar
+        for kandidat in kandidat_dasar(kata):
+            if kandidat in lema:
+                return True
+    except Exception as _galat_diagnostik_262:
+        _diag.catat('naluri._pelindung_kata_dikenal',
+                    "galat pada jalur fallback",
+                    galat=_galat_diagnostik_262, jalur=262)
+        pass
+    return False
 
 
 def _pelindung_bentuk(teks: Any) -> str:
@@ -466,8 +550,9 @@ def _pelindung_kebaruan_input(self, teks: Any) -> float:
     if not kata:
         return 0.0
     p = _pelindung_init(self)
-    lexicon = getattr(self.naluri, "lexicon", {}) or {}
-    asing = [w for w in kata if w not in lexicon
+    lema = _pelindung_lema_tutur(self)
+    asing = [w for w in kata
+             if not _pelindung_kata_dikenal(w, lema)
              and w not in p._pelindung_topic_seen]
     return len(asing) / float(len(kata))
 
@@ -595,8 +680,25 @@ def _pengakuan_repetisi(self, act: str) -> str:
                                    f"{w['nama']}|{act}|{self._tick() // 4}")
 
 
+# Kelas kata fungsi: tidak pernah diganti (H2).
+_KELAS_FUNGSI = {"PRON", "PREP", "PART", "CONJ", "DET", "AUX", "INT", "NUM"}
+# Akar kata fungsi Indonesia umum (termasuk bentuk lemmanya).
+_KATA_FUNGSI_UMUM = {
+    "yang", "dengan", "untuk", "pada", "dari", "kepada", "adalah", "akan",
+    "sudah", "telah", "sedang", "belum", "juga", "akan", "adalah", "kepada",
+    "kami", "kita", "aku", "kamu", "kau", "dia", "ia", "mereka", "kalian",
+    "ini", "itu", "para", "sang", "si",
+}
+
+
 def _ganti_kata(self, teks: str) -> str:
-    """Tingkat 1: ganti pilihan kata memakai kelas leksikon yang sudah ada."""
+    """Tingkat 1: ganti pilihan kata memakai kelas leksikon yang sudah ada.
+
+    H2: hanya dengan sesama kata sekelas, setipe semantik, sepolaritas,
+    dan se-register; kata fungsi tidak disentuh; kapitalisasi dipertahankan.
+    Bila tidak ada yang cocok, kata dibiarkan — kalimat benar tidak boleh
+    dirusak hanya demi variasi.
+    """
     eng = self.tutur_engine() if hasattr(self, "tutur_engine") else None
     leks = getattr(eng, "leks", None) if eng is not None else None
     if leks is None:
@@ -605,20 +707,54 @@ def _ganti_kata(self, teks: str) -> str:
 
     def ganti(m: Any) -> str:
         w = m.group(0)
-        if batas[0] <= 0 or not w or w[0].isupper():
+        if batas[0] <= 0 or not w:
             return w
         lw = w.lower()
-        kandidat: List[str] = []
-        for kelas in (leks.kelas_dari(lw) or []):
-            for e in leks.kandidat(kelas, "id"):
-                lema = str(e.get("lema", ""))
-                if lema and lema != lw:
-                    kandidat.append(lema)
+        if lw in _KATA_FUNGSI_UMUM or len(lw) < 5:
+            return w
+        ent = leks.ambil("id", lw)
+        if not ent:
+            return w
+        kelas = list(ent.get("kelas", []) or [])
+        if not kelas or all(k in _KELAS_FUNGSI for k in kelas):
+            return w  # kata fungsi: biarkan
+        tipe = set(ent.get("tipe_semantik", []) or [])
+        val = float(ent.get("valensi", 0.0) or 0.0)
+        reg = set(ent.get("register", []) or [])
+        sinonim = [str(s) for s in (ent.get("sinonim") or [])]
+        if not sinonim:
+            # tanpa sinonim terlabeli, jangan mengarang pengganti (H2)
+            return w
+        kandidat: List[Tuple[int, str]] = []
+        for lema in sinonim:
+            if lema == lw:
+                continue
+            e2 = leks.ambil("id", lema)
+            if not e2:
+                continue
+            et = set(e2.get("tipe_semantik", []) or [])
+            ev = float(e2.get("valensi", 0.0) or 0.0)
+            if tipe and et and not (tipe & et):
+                continue
+            erem = set(e2.get("register", []) or [])
+            if reg and erem and not (reg & erem):
+                continue
+            if val * ev < -0.01 and (abs(val) > 0.2 or abs(ev) > 0.2):
+                continue  # beda tanda: bukan sinonim sesungguhnya
+            skor = 2 + (1 if tipe & et else 0) + (1 if reg & erem or not reg else 0)
+            kelas2 = e2.get("kelas", []) or []
+            if kelas and kelas2 and not any(k in kelas for k in kelas2):
+                continue
+            kandidat.append((skor, lema))
         if not kandidat:
             return w
+        maks = max(s for s, _ in kandidat)
         pilih = _pelindung_pilih_stabil(
-            sorted(set(kandidat)), f"{lw}|{self._tick() // 6}")
+            sorted({l for s, l in kandidat if s == maks}),
+            f"{lw}|{self._tick() // 6}")
         batas[0] -= 1
+        if w[0].isupper() and pilih:
+            pilih = pilih[0].upper() + pilih[1:]
         return pilih
 
     return re.sub(r"\b[a-zA-Z]{4,}\b", ganti, str(teks))
@@ -677,7 +813,15 @@ def saring_meta(self, teks: str) -> Tuple[str, List[str]]:
     if out2 != out:
         bocor.append("artefak_linguistik")
         out = out2
-    # Istilah internal dipotong, bukan dihukum: kalimat TENTANG state internal
+    # angka yang mengikuti istilah internal adalah nilai state, bukan cerita
+    # ("ignition 0.83", "tick 42"): diberdayakan sebelum istilahnya dipotong.
+    m_konteks = _PELINDUNG_ANGKA_KONTEKS_RE.search(out)
+    if m_konteks:
+        bocor.append("angka")
+        out = _PELINDUNG_ANGKA_KONTEKS_RE.sub(
+            lambda m: m.group(1) + " " + self._kuantor_angka(m.group(2)),
+            out)
+    # istilah internal dipotong, bukan dihukum: kalimat TENTANG state internal
     # masih bisa bicara setelah istilah teknisnya dibuang. Padanan in-character
     # hanya dipakai bila kalimatnya benar-benar tinggal remah.
     pola = _PELINDUNG_META_RE
@@ -702,13 +846,18 @@ def saring_meta(self, teks: str) -> Tuple[str, List[str]]:
                 f"padanan|{t[:20]}|{self._tick() // 5}")
         else:
             out = bersih
-    if _PELINDUNG_ANGKA_RE.search(out):
-        # Angka (skor, tick, persentase) adalah bocoran meta; kuantor
-        # in-character menyampaikan maksudnya tanpa angka.
-        bocor.append("angka")
-        out = _PELINDUNG_ANGKA_RE.sub(
-            lambda m: self._kuantor_angka(m.group(0)), out)
-        out = re.sub(r"\s{2,}", " ", out).strip()
+    # H4: hanya angka yang jelas bukan isi cerita — pecahan berpresisi,
+    # bilangan sangat besar (tick/skor mentah), notasi persen dengan pecahan,
+    # atau bilangan ≥3 digit yang diikuti satuan telemetri ("300 detik").
+    # Bilangan bulat kecil ("3 kali", "2 jam") adalah bagian dari cerita.
+    for _pola_angka in (_PELINDUNG_ANGKA_BERPRESISI_RE,
+                        _PELINDUNG_ANGKA_TELEMETRI_RE):
+        if _pola_angka.search(out):
+            if "angka" not in bocor:
+                bocor.append("angka")
+            out = _pola_angka.sub(
+                lambda m: self._kuantor_angka(m.group(0)), out)
+            out = re.sub(r"\s{2,}", " ", out).strip()
     if bocor:
         p._pelindung_meta_bocor.append({"tick": self._tick(), "jenis": list(bocor)})
         if len(p._pelindung_meta_bocor) > 32:
@@ -1338,8 +1487,9 @@ def _pelindung_dengar(original, self, teks: str, dari: Any = None,
     p = _pelindung_init(self)
     kata = _pelindung_kata(teks)
     if kata:
-        lexicon = getattr(self.naluri, "lexicon", {}) or {}
-        asing = [w for w in kata if w not in lexicon
+        lema = _pelindung_lema_tutur(self)
+        asing = [w for w in kata
+                 if not _pelindung_kata_dikenal(w, lema)
                  and w not in p._pelindung_topic_seen]
         p._pelindung_topic_seen |= set(kata)
         if len(p._pelindung_topic_seen) > 1024:
