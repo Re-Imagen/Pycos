@@ -108,7 +108,7 @@ FITUR_WAJIB: Dict[str, Tuple[str, ...]] = {
     ),
     "4_bahasa": (
         "bahasa.tutur_generatif", "bahasa.variasi_leksikal", "bahasa.sa_sp", "bahasa.ciri_linguistik",
-        "bahasa.leksikon_ciri",
+        "bahasa.leksikon_ciri", "bahasa.teks",
     ),
     "5_memori": (
         "memori.episodik", "memori.prediksi_ranking", "memori.retrieval_terbatas", "memori.reinforce_kalibrasi",
@@ -244,6 +244,18 @@ CAKUPAN_API: Dict[str, str] = {
     "SASPAnalyzer": "bahasa.sa_sp", "sa_sp": "bahasa.sa_sp",
     "sa_sp_literal": "bahasa.sa_sp", "sa_sp_pragmatik": "bahasa.sa_sp",
     "analisis_teks": "bahasa.ciri_linguistik", "FiturTutur": "bahasa.ciri_linguistik",
+    # bahasa.teks — fondasi teks bersama (R5.4: dipromosikan root)
+    "Token": "bahasa.teks", "tokenisasi": "bahasa.teks",
+    "normalisasi_token": "bahasa.teks", "normalisasi_teks": "bahasa.teks",
+    "pecah_kalimat": "bahasa.teks", "stem": "bahasa.teks",
+    "kandidat_dasar": "bahasa.teks", "cakupan_negasi": "bahasa.teks",
+    "jenis_kalimat": "bahasa.teks", "jenis_pertanyaan": "bahasa.teks",
+    "urai_subjek_predikat": "bahasa.teks", "tindak_tutur_skor": "bahasa.teks",
+    "ekstrak_entitas": "bahasa.teks", "ekstrak_topik": "bahasa.teks",
+    "deteksi_bahasa": "bahasa.teks", "kemiripan": "bahasa.teks",
+    "koreksi_ejaan": "bahasa.teks", "periksa_gramatika": "bahasa.teks",
+    "potong_batas_kata": "bahasa.teks", "analisis_ujaran": "bahasa.teks",
+    "JejakLinguistik": "bahasa.teks", "jejak_pembentukan": "bahasa.teks",
     # lingkungan
     "Lingkungan": "dunia.siklus_langkah", "Peta": "dunia.peta",
     "ObjekDunia": "dunia.objek_bahaya_cuaca",
@@ -815,6 +827,50 @@ class OrkestraSST:
         _cek(fitur.polaritas() and fitur.polaritas() > 0, "polaritas ciri")
         _cek(isinstance(fitur, FiturTutur), "FiturTutur")
         _cek(token_dari("Rumah-besar itu"), "token_dari")
+        # Fondasi teks bersama (pycos.bahasa.teks) — dipanggil langsung di sini
+        from pycos.bahasa import teks as teks_api
+        toks = teks_api.tokenisasi("senaaang gk senang, dia baik2 saja")
+        _cek([t.bentuk for t in toks if t.jenis == "kata"][:2] == ["senang", "tidak"],
+             "tokenisasi normalisasi informal")
+        _cek(teks_api.pecah_kalimat("Halo! Apa kabar?") == ["Halo!", "Apa kabar?"],
+             "pecah_kalimat")
+        _cek(teks_api.normalisasi_token("senaaang") == "senang"
+             and teks_api.normalisasi_teks("Aku gk  tahu") == "aku tidak tahu",
+             "normalisasi token/teks")
+        _cek(teks_api.stem("mengajar") == "ajar", "stem Nazief-Adriani")
+        _cek("ajar" in teks_api.kandidat_dasar("mengajar"), "kandidat_dasar")
+        flag = teks_api.cakupan_negasi(teks_api.tokenisasi("tidak senang, dia baik"))
+        _cek(any(flag), "cakupan negasi")
+        _cek(teks_api.jenis_kalimat("tolong ambilkan air") == "imperatif",
+             "jenis_kalimat imperatif")
+        _cek(teks_api.jenis_pertanyaan("apa kabar?").get("jenis") == "apa",
+             "jenis_pertanyaan")
+        urai = teks_api.urai_subjek_predikat(
+            teks_api.tokenisasi("aku lapar"), engine.leks)
+        _cek(urai.get("subjek") == "aku", "urai_subjek_predikat")
+        skor = teks_api.tindak_tutur_skor("tolong ambilkan air")
+        _cek(skor["permintaan"] >= skor["perintah"] - 1e-9, "tindak_tutur_skor")
+        _cek(isinstance(teks_api.ekstrak_entitas("Budi sedang ke pasar"), list),
+             "ekstrak_entitas")
+        _cek(isinstance(teks_api.ekstrak_topik("aku memikirkan perjalanan itu",
+                                               None, engine.leks),
+                        str),
+             "ekstrak_topik")
+        _cek(teks_api.deteksi_bahasa("aku tidak tahu") == "id", "deteksi_bahasa")
+        _cek(teks_api.kemiripan("api di gudang", "ada api di gudang") > 0.3,
+             "kemiripan")
+        _cek(teks_api.koreksi_ejaan("seang", ["senang"]) == "senang", "koreksi_ejaan")
+        _cek("kata_berulang" in teks_api.periksa_gramatika("dia yang yang pergi."),
+             "periksa_gramatika")
+        _cek(len(teks_api.potong_batas_kata("cerita yang cukup panjang dipotong",
+                                              25)) <= 25,
+             "potong_batas_kata")
+        hasil = teks_api.analisis_ujaran("aku tidak senang.")
+        _cek(hasil["token"] and hasil["jenis_kalimat"], "analisis_ujaran")
+        jejak = teks_api.jejak_pembentukan(input_teks="halo", act="menyatakan")
+        _cek(jejak["input"] == "halo" and "formation" in jejak, "jejak_pembentukan")
+        _cek(teks_api.JejakLinguistik().to_dict()["act"] == "", "JejakLinguistik")
+        self._t("bahasa.teks", "tokenisasi/stem/negasi/gramatika/jejak pembentukan")
         self._t("bahasa.ciri_linguistik", "analisis_teks/FiturTutur/token_dari")
 
         lx = LeksikonCiri.from_dict({k: [] for k in

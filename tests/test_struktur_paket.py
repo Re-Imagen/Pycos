@@ -13,7 +13,8 @@ Struktur yang dijaga:
                             keselarasan), ketidaktahuan.py
     pycos/memori/         — jejak_prediksi.py
     pycos/mandiri/       — organik.py, kognisi_lanjut.py
-    pycos/bahasa/         — tutur.py (termasuk ciri linguistik)
+    pycos/bahasa/         — tutur.py (mesin tutur L0–L3), teks.py (fondasi
+                            teks bersama: tokenizer, morfologi, negasi, G1)
     pycos/lingkungan/     — dunia.py
     pycos/sumber_daya/    — leksikon_pycos.json, korpus_contoh.jsonl
 
@@ -46,7 +47,7 @@ PETA = {
     "refleksi": ["nurani", "ketidaktahuan"],
     "memori": ["jejak_prediksi"],
     "mandiri": ["organik", "kognisi_lanjut"],
-    "bahasa": ["tutur"],
+    "bahasa": ["tutur", "teks"],
     "lingkungan": ["dunia"],
 }
 
