@@ -241,11 +241,10 @@ class Leksikon:
         # Lema Inggris jangan diberi afiks Indonesia (C9).
         if e is None and self.ambil("en", d) is not None:
             return d
-        # Dasar satu suku kata → menge- (B1).
-        if len(re.findall(r"[aeiou]+", d)) == 1:
-            return "menge" + d
         dua = d[:2]
-        # Gugus konsonan & serapan: konsonan tidak diluluh (B2).
+        # Gugus konsonan & serapan: konsonan tidak diluluh (B2) —
+        # diperiksa SEBELUM hitungan suku kata agar "klaim"/"kritik"
+        # tidak terambil aturan satu suku kata.
         if dua in ("kr", "kl", "pr", "tr", "st", "sp", "sk"):
             if dua in ("pr", "sp"):
                 return "mem" + d
@@ -259,6 +258,9 @@ class Leksikon:
             return "meng" + d
         if dua in ("ng", "ny"):
             return "me" + d
+        # Dasar satu suku kata → menge- (B1).
+        if len(re.findall(r"[aeiou]+", d)) == 1:
+            return "menge" + d
         c = d[0]
         # mem-: b, f, v tetap; p luluh (B1).
         if c in ("b", "f", "v"):
