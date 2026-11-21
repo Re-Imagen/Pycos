@@ -666,7 +666,10 @@ def tindak_tutur_skor(teks: str, tokens: Optional[Sequence[Token]] = None,
     """Skor tiap tindak tutur (D5); bukan satu label tunggal."""
     toks = list(tokens) if tokens is not None else tokenisasi(teks)
     kata = [t.bentuk for t in _kata_tokens(toks)]
-    s = set(kata)
+    # Cocokkan lintas bentuk (D5): klitik/afiks dibuang lewat stem, sehingga
+    # "memukulmu"/"menghina" tetap terbaca sebagai leksemnya.
+    lema = [stem(k) for k in kata]
+    s = set(kata) | set(lema)
     low = " ".join(kata)
     sem = dict(semantik or {})
     jenis = sem.get("jenis_kalimat") or jenis_kalimat(teks, toks)
@@ -689,17 +692,25 @@ def tindak_tutur_skor(teks: str, tokens: Optional[Sequence[Token]] = None,
         skor["terima_kasih"] = 0.9
     if any(w in s for w in ("maaf", "menyesal", "ampun")):
         skor["maaf"] = 0.85
-    if any(w in s for w in ("hebat", "bagus", "keren", "pintar", "mantap")) \
-            and (s & PRONOMINA):
+    _PUJIAN = ("hebat", "bagus", "keren", "pintar", "mantap", "jenius",
+               "cerdas", "brilian", "menakjubkan", "terbaik", "memukau")
+    _HINAAN = ("bodoh", "tolol", "brengsek", "sialan", "payah", "kecut",
+               "pengecut", "goblok", "dungu", "bajingan", "sampah",
+               "pengkhianat", "kampungan", "pecundang", "lancang")
+    _TUDUHAN = {"curang", "bohong", "pembohong", "penipu", "khianat",
+                "mencuri", "licik", "culas", "tipu", "curi", "nipu"}
+    if any(w in s for w in _PUJIAN) and (s & PRONOMINA):
         skor["pujian"] = 0.7
-    if any(w in s for w in ("bodoh", "tolol", "brengsek", "sialan", "payah")) \
-            and (s & PRONOMINA):
+    if any(w in s for w in _HINAAN) and (s & PRONOMINA):
         skor["hinaan"] = 0.8
     if jenis == "interogatif" and (s & PRONOMINA) and (
             s & NEGATOR_LOGIS or "kenapa" in s):
         skor["tuduhan"] = 0.5
-    if "awas" in s or ("akan" in s and s & {"bunuh", "hancur", "hajar",
-                                            "bakar", "musnah"}):
+    if jenis == "deklaratif" and (s & _TUDUHAN) and (s & PRONOMINA):
+        skor["tuduhan"] = max(skor["tuduhan"], 0.6)
+    _ANCAMAN = {"bunuh", "hancur", "hajar", "bakar", "musnah", "sikat",
+                "habisi", "lumat"}
+    if "awas" in s or ("akan" in s and s & _ANCAMAN):
         skor["ancaman"] = 0.8
     if any(w in s for w in ("hati-hati", "waspada", "awas")) or (
             jenis == "imperatif" and s & {"bahaya", "ancaman", "risiko"}):

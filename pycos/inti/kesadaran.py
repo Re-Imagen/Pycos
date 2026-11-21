@@ -10,6 +10,43 @@ from pycos.dukungan import diagnostik as _diag
 from pycos.dukungan.numerik import jepit, jepit_01
 from pycos.inti._konfigurasi import (DRIVES, EMOSI_ALIASES, EPISTEMIC_ALIASES, EPISTEMIC_EMOTIONS, FELT_STATES, KESADARAN_DEFAULTS, MORAL_ALIASES, MORAL_EMOTIONS, REALITY_SOURCES, SELF_BIASES, _MAKS_LOSSES, _kclip)
 
+def _pertanyaan_balik(teks: str, pembicara: str) -> str:
+    """Pertanyaan balik dari ISI ujaran lawan (E9).
+
+    Jenis pertanyaan (D6) + topik (D7) membentuk kalimat balik yang berbeda
+    tiap jenis, alih-alih satu template tetap.
+    """
+    nama = str(pembicara or "kamu").strip() or "kamu"
+    s = str(teks or "").strip()
+    jenis = ""
+    topik = ""
+    try:
+        from pycos.bahasa.teks import jenis_pertanyaan, ekstrak_topik
+        jp = jenis_pertanyaan(s) or {}
+        jenis = str(jp.get("jenis") or "").strip().lower()
+        topik = str(ekstrak_topik(s) or "").strip()
+    except Exception as _galat_diagnostik_131:
+        _diag.catat('naluri.Kesadaran._pertanyaan_balik',
+                    "galat pada jalur fallback",
+                    galat=_galat_diagnostik_131, jalur=131)
+        jenis, topik = "", ""
+    if jenis == "siapa":
+        return f"siapa yang kamu pikir, {nama}?"
+    if jenis == "kapan":
+        return f"kapan menurutmu paling pas, {nama}?"
+    if jenis in ("di mana", "dimana"):
+        return f"kamu mau tahu posisinya di mana, {nama}?"
+    if jenis == "kenapa":
+        return f"kenapa itu yang kamu tanyakan, {nama}?"
+    if jenis == "bagaimana":
+        return f"menurut kamu sendiri bagaimana, {nama}?"
+    if jenis == "berapa":
+        return f"kamu kira berapa, {nama}?"
+    if topik:
+        return f"kenapa {topik} yang kamu tanyakan, {nama}?"
+    return f"kenapa kamu bertanya begitu, {nama}?"
+
+
 class Kesadaran:
     """Lapisan kesadaran naratif untuk satu `Naluri`.
 
@@ -2076,11 +2113,18 @@ class Kesadaran:
         t["last_speaker"] = str(pembicara)[:40]
         t["turn"] = int(t.get("turn", 0)) + 1
         t["topic"] = str(teks)[:60]
-        tanya = str(teks).strip().endswith("?")
+        try:
+            from pycos.bahasa.teks import jenis_kalimat
+            tanya = jenis_kalimat(str(teks)) == "interogatif"
+        except Exception as _galat_diagnostik_132:
+            _diag.catat('naluri.Kesadaran.dialogue_turn',
+                        "galat pada jalur fallback",
+                        galat=_galat_diagnostik_132, jalur=132)
+            tanya = str(teks).strip().endswith("?")
         t["open_question"] = str(teks)[:80] if tanya else None
         balik = None
         if tanya and pembicara.lower() not in ("aku", "saya", "npc"):
-            balik = f"kenapa kamu melakukan itu, {pembicara}?"
+            balik = _pertanyaan_balik(teks, pembicara)
             t["open_question"] = balik
         # referensi sejarah bersama
         ref = (self._shared_history[-1] if self._shared_history else None)
