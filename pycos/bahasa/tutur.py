@@ -2474,6 +2474,25 @@ def _sentimen(token: List[str], leksikon: LeksikonCiri) -> Tuple[int, int, int]:
                            "tanda_baca" if t == _BATAS_KLAUSA else "kata")
            for t in token]
     neg_flags = _cakupan_negasi(tks)
+    # retorika: "mana/masa mungkin" mendahului dalam klausa yang sama →
+    # sentimen setelahnya bukan pernyataan keadaan, dihitung nol (D9).
+    klausa_id: List[int] = []
+    _kid = 0
+    for _t in token:
+        klausa_id.append(_kid)
+        if _t == _BATAS_KLAUSA:
+            _kid += 1
+    retorika: List[bool] = [False] * len(token)
+    for i in range(len(token)):
+        if token[i] == _BATAS_KLAUSA:
+            continue
+        for j in range(i - 2, -1, -1):
+            if klausa_id[j] != klausa_id[i]:
+                break
+            if token[j] in ("mana", "masa") and j + 1 < i \
+                    and token[j + 1] == "mungkin":
+                retorika[i] = True
+                break
     # prohibitif ("jangan X"): X tidak dihitung sebagai sentimen pernyataan —
     # inklusi larangan bukan pernyataan keadaan ("jangan sedih" ≠ positif/negatif).
     larang: List[bool] = [False] * len(token)
@@ -2500,8 +2519,8 @@ def _sentimen(token: List[str], leksikon: LeksikonCiri) -> Tuple[int, int, int]:
                 break
         if lemah:
             continue
-        # retorika: "mana mungkin" sebelum sentimen → jangan dihitung
-        if i >= 2 and token[i - 2:i] == ["mana", "mungkin"]:
+        # retorika: "mana/masa mungkin" mendahului dalam klausa (D9)
+        if retorika[i]:
             continue
         kategori = None
         if w == "kasih" and i > 0 and token[i - 1] == "terima":
