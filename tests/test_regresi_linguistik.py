@@ -45,6 +45,105 @@ class ManaMungkinTest(unittest.TestCase):
         self.assertEqual(0, f.negatif)
 
 
+class MorphologySection3Test(unittest.TestCase):
+    """J1: baris tabel morfologi di bagian 3 dokumen analisis."""
+
+    def setUp(self):
+        self.lex = Leksikon({"leksikon": []})
+
+    def test_nasalisasi_baris_dokumen(self):
+        self.assertEqual("menghalangi", self.lex.nasalisasi("halangi"))
+        self.assertEqual("menghormati", self.lex.nasalisasi("hormati"))
+        self.assertEqual("mengetahui", self.lex.nasalisasi("tahu"))
+        self.assertEqual("mengkritik", self.lex.nasalisasi("kritik"))
+        self.assertEqual("mengebom", self.lex.nasalisasi("bom"))
+        self.assertEqual("mengecat", self.lex.nasalisasi("cat"))
+
+    def test_stem_baris_dokumen(self):
+        from pycos.bahasa import teks
+        self.assertEqual("ajar", teks.stem("mengajar"))
+        self.assertEqual("marah", teks.stem("pemarah"))
+        self.assertEqual("baik", teks.stem("baik-baik"))
+
+    def test_stem_tervalidasi_leksikon(self):
+        from pycos.bahasa import teks
+        self.assertEqual("halangi", teks.stem("menghalangi"))
+        self.assertEqual("tahu", teks.stem("mengetahui"))
+
+
+class NegasiSection3Test(unittest.TestCase):
+    """J1: baris tabel negasi/idiolek di bagian 3 dokumen analisis."""
+
+    def test_zaman_dahulu_tidak_berdampak(self):
+        from pycos.inti.naluri import Naluri
+        n = Naluri(name="Uji", rng_seed=7, params={})
+        dampak = n.impact_of("zaman dahulu")
+        self.assertEqual(0.0, dampak.get("keamanan", 0.0))
+
+    def test_dia_tidak_gagal_positif(self):
+        from pycos.inti.naluri import Naluri
+        n = Naluri(name="Uji", rng_seed=7, params={})
+        dampak = n.impact_of("dia tidak gagal")
+        self.assertGreater(dampak.get("penguasaan", 0.0), 0.0)
+
+    def test_tidak_pernah_bahagia_tidak_positif(self):
+        f = analisis_teks("tidak pernah sangat bahagia")
+        self.assertEqual(0, f.positif)
+
+    def test_bukan_tidak_senang_positif(self):
+        f = analisis_teks("bukannya tidak senang")
+        self.assertGreaterEqual(f.positif, 1)
+
+    def test_senggatan_informal_dan_idiom(self):
+        self.assertEqual(0, analisis_teks("jangan sedih").positif)
+        self.assertEqual(0, analisis_teks("kurang suka").positif)
+        self.assertEqual(1, analisis_teks("senaaang bangettt").positif)
+        self.assertEqual(1, analisis_teks("gk senang").negatif)
+
+
+class TipeSemantikSection3Test(unittest.TestCase):
+    """C3: pesimis/lelah/bingung/curiga/haru dipisah dari kelas asalnya."""
+
+    def _tipe(self, lema):
+        import json
+        from pycos.dukungan.sumber import jalur_leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            dok = json.load(f)
+        for e in dok["leksikon"]:
+            if e["lema"] == lema:
+                return list(e.get("tipe_semantik") or [])
+        return None
+
+    def test_tipe_dipisah(self):
+        self.assertEqual(["KERAGUAN"], self._tipe("pesimis"))
+        self.assertEqual(["LELAH"], self._tipe("lelah"))
+        self.assertEqual(["BINGUNG"], self._tipe("bingung"))
+        self.assertEqual(["CURIGA"], self._tipe("curiga"))
+        self.assertEqual(["HARU"], self._tipe("haru"))
+
+    def test_valensi_bukan_default_salah(self):
+        import json
+        from pycos.dukungan.sumber import jalur_leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            dok = json.load(f)
+        for e in dok["leksikon"]:
+            self.assertNotEqual(-0.05, e["valensi"],
+                                "valensi default lama masih dipakai: %s" % e["lema"])
+        for e in dok["leksikon"]:
+            if set(e.get("tipe_semantik") or []) & {"KUALITAS"}:
+                if e["lema"] in ("bodoh", "kejam", "buruk", "jelek", "malas"):
+                    self.assertLess(e["valensi"], 0.0, e["lema"])
+
+
+class PeriksaLeksikonTest(unittest.TestCase):
+    """C1: pemeriksa menolak konflik tanda dan memuat provenance."""
+
+    def test_periksa_ok(self):
+        from pycos.dukungan import leksikon as _leks
+        hasil = _leks.periksa()
+        self.assertTrue(hasil["ok"])
+
+
 class NasalisasiGugusTest(unittest.TestCase):
     """B2: gugus konsonan/digraf diperiksa SEBELUM aturan satu suku kata."""
 

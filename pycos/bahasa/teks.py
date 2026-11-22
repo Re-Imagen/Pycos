@@ -19,6 +19,7 @@ import difflib
 import re
 import unicodedata
 from collections import Counter
+from functools import lru_cache
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
@@ -296,6 +297,8 @@ def pecah_kalimat(teks: str) -> List[str]:
 _PREFIKS: Tuple[Tuple[str, str], ...] = (
     ("memper", ""), ("diper", ""), ("keber", ""),
     ("menge", ""), ("meny", "s"), ("peny", "s"), ("meny", "ny"), ("peny", "ny"),
+    ("mensy", "sy"), ("peny", "sy"),
+    ("mengkh", "kh"), ("pengkh", "kh"),
     ("meng", "k"), ("men", "t"), ("mem", "p"),
     ("peng", "k"), ("pen", "t"), ("pem", "p"),
     ("bel", ""),
@@ -307,7 +310,7 @@ _SUFIKS: Tuple[str, ...] = ("kan", "an", "i")
 # dan vokal). Dipakai memvalidasi restorasi alofon nasal.
 _KLASTER_LEGAL = frozenset(
     ("pr", "br", "dr", "tr", "kr", "gr", "pl", "bl", "kl", "gl", "fl", "fr",
-     "sw", "sp", "st"))
+     "sw", "sp", "st", "sy", "kh", "ng", "ny"))
 
 
 def kandidat_dasar(kata: str) -> List[str]:
@@ -359,6 +362,8 @@ def kandidat_dasar(kata: str) -> List[str]:
         "mem": "aeioubf", "pem": "aeioubf",
         "meng": "aeiougkh", "peng": "aeiougkh",
         "meny": None, "peny": None,
+        "mensy": "u", "peny": None,
+        "mengkh": "a", "pengkh": "a",
     }
     baru = []
     for bentuk, na, nc, nr in list(semua):
@@ -410,16 +415,40 @@ def kandidat_dasar(kata: str) -> List[str]:
     return [w] + hasil
 
 
+@lru_cache(maxsize=1)
+def kosakata_bawaan() -> frozenset:
+    """Himpunan lema bahasa Indonesia dari sumber daya (lazy, sekali baca).
+
+    Dipakai untuk memvalidasi kandidat stem (B4) sehingga "menghalangi"
+    berhenti di "halangi", "mengetahui" di "tahu", "mensyukuri" di
+    "syukur" — bukan berhenti di separuh afiks.
+    """
+    try:
+        import json
+        from pycos.dukungan.sumber import ada_sumber_daya, jalur_leksikon
+        if not ada_sumber_daya():
+            return frozenset()
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            dok = json.load(f)
+        return frozenset(str(e.get("lema", "")).lower()
+                         for e in dok.get("leksikon", [])
+                         if e.get("bahasa") == "id" and e.get("lema"))
+    except Exception:
+        return frozenset()
+
+
 def stem(kata: str, kosakata: Optional[Set[str]] = None) -> str:
-    """Stem satu kata; bila `kosakata` diberi, validasi ke sana (B4)."""
+    """Stem satu kata; validasi ke `kosakata` atau leksikon bawaan (B4)."""
     cands = kandidat_dasar(kata)
     if not cands:
         return str(kata or "").lower()
+    if kosakata is None:
+        kosakata = kosakata_bawaan()
     if kosakata:
-        for c in cands:
+        for c in cands[1:]:
             if c in kosakata:
                 return c
-    # tanpa validasi: kandidat terpendek-afiks setelah bentuk asli
+    # tanpa yang cocok di leksikon: kandidat terpendek-afiks setelah bentuk asli
     for c in cands[1:]:
         if c != cands[0]:
             return c
