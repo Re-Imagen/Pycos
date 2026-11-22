@@ -1314,7 +1314,7 @@ class Naluri:
             else:
                 templates = GOAL_TEMPLATES.get(d)
                 tpl = self._rng.choice(templates)
-                stmt = tpl.format(urg=self.urgency[d])
+                stmt = tpl.format(urg=self.urgency[d]) if "{urg" in tpl else tpl
                 g = Goal(drive=d, urgency=self.urgency[d],
                          statement=stmt, created_tick=self.tick_count)
             new_goals.append(g)
@@ -1342,10 +1342,10 @@ class Naluri:
             raise ValueError(f"drive subgoal tidak dikenal: {child_drive!r}")
         parent = next((g for g in self.goals if g.drive == parent_drive), None)
         if parent is None:
-            templates = GOAL_TEMPLATES.get(parent_drive, ["{urg:.2f}"])
+            templates = GOAL_TEMPLATES.get(parent_drive,
+                                           ["Tetapkan langkah berikutnya"])
             parent = Goal(parent_drive, self.urgency.get(parent_drive, 0.0),
-                          self._rng.choice(templates).format(
-                              urg=self.urgency.get(parent_drive, 0.0)), self.tick_count)
+                          self._rng.choice(templates), self.tick_count)
             self.goals.append(parent)
             self.goals.sort(key=lambda g: g.urgency, reverse=True)
             self.goals = self.goals[:max(1, int(self.params.get("max_goals", 4)))]

@@ -577,28 +577,28 @@ DRIVE_ATTENTION: Dict[str, List[str]] = {
 # Goal templates per drive (dipakai goal_to_scenario()).
 GOAL_TEMPLATES: Dict[str, List[str]] = {
     "energi": [
-        "Cari jalan efisien: kurangi biaya komputasi dan hemat energi (urgensi {urg:.2f})",
-        "Prioritaskan aksi rendah biaya untuk memulihkan energi (urgensi {urg:.2f})",
+        "Cari jalan efisien: kurangi biaya komputasi dan hemat energi",
+        "Prioritaskan aksi rendah biaya untuk memulihkan energi",
     ],
     "keamanan": [
-        "Kurangi risiko: identifikasi ancaman laten dan skenario terburuk (urgensi {urg:.2f})",
-        "Mitigasi bahaya yang terdeteksi, siapkan rute cadangan (urgensi {urg:.2f})",
+        "Kurangi risiko: identifikasi ancaman laten dan skenario terburuk",
+        "Mitigasi bahaya yang terdeteksi, siapkan rute cadangan",
     ],
     "keingintahuan": [
-        "Jelajahi jalur aneh dan paradoks: cari wawasan baru (urgensi {urg:.2f})",
-        "Eksploitasi sudut pandang yang belum dicoba untuk memahami situasi (urgensi {urg:.2f})",
+        "Jelajahi jalur aneh dan paradoks: cari wawasan baru",
+        "Eksploitasi sudut pandang yang belum dicoba untuk memahami situasi",
     ],
     "penguasaan": [
-        "Raih kompetensi: ulangi aksi yang pernah berhasil dan kuasai domain (urgensi {urg:.2f})",
-        "Wujudkan kemenangan kecil untuk membangun kepercayaan diri (urgensi {urg:.2f})",
+        "Raih kompetensi: ulangi aksi yang pernah berhasil dan kuasai domain",
+        "Wujudkan kemenangan kecil untuk membangun kepercayaan diri",
     ],
     "afiliasi": [
-        "Cari outcome win-win: dampak positif pada pihak lain dan sistem sendiri (urgensi {urg:.2f})",
-        "Bangun kepercayaan dengan memperhatikan perspektif pihak lain (urgensi {urg:.2f})",
+        "Cari outcome win-win: dampak positif pada pihak lain dan sistem sendiri",
+        "Bangun kepercayaan dengan memperhatikan perspektif pihak lain",
     ],
     "koherensi": [
-        "Kalibrasi model: uji prediksi dan konsolidasikan yang terbukti benar (urgensi {urg:.2f})",
-        "Bersihkan kacau dan konsistensi dalam representasi memori (urgensi {urg:.2f})",
+        "Kalibrasi model: uji prediksi dan konsolidasikan yang terbukti benar",
+        "Bersihkan kacau dan konsistensi dalam representasi memori",
     ],
 }
 

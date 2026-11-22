@@ -314,7 +314,7 @@ def _organik_ucap(original, self, kepada=None, topik=None, *a, **k):
         teks = ent.get("teks", "")
         if not teks:
             return ent
-        bentuk = o.tutur.bentuk(teks, o.rng)
+        bentuk = o.tutur.bentuk(teks, o.rng, komponen=komp)
         n = getattr(self, "naluri", None)
         o.tutur.catat(teks, bentuk, kel, komp, tick=_naluri_tick(n))
         ent["teks_terbentuk"] = teks
@@ -992,9 +992,10 @@ def _organik_lanjut_ucap(original, self, kepada=None, topik=None, *a, **k):
             cat = _catat_interupsi(n, ev)
             if ev.get("proses") == "mual":
                 teks = str(ent.get("teks", ""))
-                potong = max(1, len(teks) // 2)
+                # H3: potong di batas kata, bukan di tengah kata
+                from pycos.bahasa.teks import potong_batas_kata
                 ent["teks_sebelum_interupsi"] = teks
-                ent["teks"] = teks[:potong].rstrip() + "—"
+                ent["teks"] = potong_batas_kata(teks, max(1, len(teks) // 2)) + "—"
                 ent["terpotong_internal"] = "mual"
                 sebab.append("detak_mual")
                 cat["ucapan_dipotong"] = True
