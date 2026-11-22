@@ -1867,10 +1867,11 @@ class Presentasi:
             generatif = bool(self._tutur is not None)
         # batasi verbositas (kalimat)
         verb = max(0.2, self._p("presentasi_verbositas"))
-        kalimat = [k.strip() for k in teks.split(". ") if k.strip()]
+        from pycos.bahasa.teks import pecah_kalimat as _pecah
+        kalimat = _pecah(teks)
         batas = max(1, int(round(1 + 1.5 * verb)))
         if len(kalimat) > batas:
-            teks = ". ".join(kalimat[:batas]).rstrip(".") + "."
+            teks = " ".join(kalimat[:batas])
         if direct is None:
             # F1: satu pasangan pronomina per percakapan; ujaran yang
             # dipilih sadar (direct) tidak diubah.

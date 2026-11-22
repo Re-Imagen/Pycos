@@ -82,6 +82,83 @@ class TindakTuturSkorTest(unittest.TestCase):
         self.assertGreaterEqual(skor.get("pujian", 0.0), 0.5)
 
 
+class PenolakanTuturTest(unittest.TestCase):
+    """H1: bentuk penolakan per sebab — komponen harus diteruskan."""
+
+    def test_takut_memutus_kalimat(self):
+        import random
+        from pycos.mandiri import PenolakanTutur
+        r = PenolakanTutur()
+        hasil = r.bentuk("Aku ingin sekali pergi", random.Random(1),
+                         komponen={"takut": -1.4, "malu": -0.1})
+        self.assertIn("aku tidak", hasil)
+
+    def test_malu_mengalihkan(self):
+        import random
+        from pycos.mandiri import PenolakanTutur
+        r = PenolakanTutur()
+        hasil = r.bentuk("Aku ingin sekali pergi", random.Random(1),
+                         komponen={"malu": -1.4, "takut": -0.1})
+        self.assertNotIn("Aku", hasil)  # pengalihan, bukan potongan kepala
+        self.assertTrue(hasil)
+
+
+class PotongBatasKataTest(unittest.TestCase):
+    """H3: pemotongan dilakukan di batas kata, bukan di tengah kata."""
+
+    def test_potong_di_spasi(self):
+        from pycos.bahasa.teks import potong_batas_kata
+        self.assertEqual("ini", potong_batas_kata(
+            "ini kalimat yang cukup panjang untuk dipotong", 10))
+
+    def test_kata_panjang_tetap_dipotong(self):
+        from pycos.bahasa.teks import potong_batas_kata
+        self.assertEqual("supercalif",
+                         potong_batas_kata("supercalifragilistic", 10))
+
+
+class GoalTemplateTest(unittest.TestCase):
+    """H5: statement goal tidak memuat residu teknis."""
+
+    def test_templates_tanpa_placeholder_teknis(self):
+        from pycos.inti._konfigurasi import GOAL_TEMPLATES
+        for drive, tpls in GOAL_TEMPLATES.items():
+            for tpl in tpls:
+                self.assertNotIn("{urg", tpl)
+                self.assertNotIn("urgensi", tpl.lower())
+
+
+class AlurE0Test(unittest.TestCase):
+    """Tahap 0: alur INPUT → FILTER → FORMATION → OUTPUT terhubung & terlacak."""
+
+    def _npc(self):
+        from pycos.inti import Naluri
+        n = Naluri(name="Nara", rng_seed=41,
+                   params={"enable_gejala": True, "presentasi_trace": True})
+        n.enable_kesadaran(semua=True)
+        n.enable_presentasi(semua=True)
+        return n
+
+    def test_dengar_mengubah_keadaan_batin(self):
+        n = self._npc()
+        efek = n.presentasi.dengar("Aku benci kamu", dari="Rama").get("efek", {})
+        self.assertTrue(efek.get("drive") or efek.get("emosi") or efek.get("tindak"),
+                        "ujaran masuk harus menggerakkan keadaan batin (FILTER)")
+
+    def test_ucap_membawa_jejak_formation_delapan_faktor(self):
+        n = self._npc()
+        ent = n.presentasi.ucap(kepada="Rama", topik="api",
+                                act="menyatakan", diam_boleh=False)
+        trace = ent.get("trace") or []
+        e0 = next((x["E0"] for x in trace if isinstance(x, dict) and "E0" in x), None)
+        self.assertIsNotNone(e0, "jejak E0 harus ada saat presentasi_trace aktif")
+        self.assertEqual(
+            {"keadaan_internal", "pengetahuan", "situasi_lingkungan",
+             "sosial_audiens", "bahasa_kognisi", "biologis_fisiologis",
+             "medium_saluran", "konteks_percakapan"},
+            set(e0["formation"].keys()))
+
+
 class PertanyaanBalikTest(unittest.TestCase):
     """E9: balikan dibangun dari isi ujaran, bukan satu template tetap."""
 
