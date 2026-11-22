@@ -1,6 +1,6 @@
 {
   "format": "impak/1",
-  "sumber_sha256": "3d66e1b17b86e170d5f5bd197e591ba18f74cf260bec917873f2f11056318cd0",
+  "sumber_sha256": "13eae7a1c711de4e2d2faf80f73fa0ddd6d8752776d487394faf6a2c22dc6e82",
   "aturan_tipe": {
     "TAKUT": {
       "keamanan": -0.3
@@ -50,6 +50,18 @@
     },
     "EDIBLE": {
       "energi": 0.15
+    },
+    "LELAH": {
+      "energi": -0.2
+    },
+    "BINGUNG": {
+      "koherensi": -0.15
+    },
+    "CURIGA": {
+      "keamanan": -0.1
+    },
+    "HARU": {
+      "afiliasi": 0.15
     }
   },
   "kelompok": [
@@ -1879,7 +1891,7 @@
         "keamanan": -0.3
       },
       "waswas": {
-        "keamanan": -0.3
+        "keamanan": -0.1
       },
       "senang": {
         "energi": 0.15,
@@ -2001,7 +2013,7 @@
         "penguasaan": 0.15
       },
       "pesimis": {
-        "penguasaan": 0.15
+        "koherensi": -0.15
       },
       "sunyi": {
         "afiliasi": -0.3
@@ -2016,14 +2028,13 @@
         "keamanan": 0.25
       },
       "lelah": {
-        "energi": -0.15,
-        "afiliasi": -0.15
+        "energi": -0.2
       },
       "gelisah": {
         "keamanan": -0.3
       },
       "curiga": {
-        "keamanan": -0.3
+        "keamanan": -0.1
       },
       "iri": {
         "afiliasi": -0.35
@@ -2032,19 +2043,17 @@
         "afiliasi": -0.35
       },
       "haru": {
-        "energi": -0.15,
-        "afiliasi": -0.15
+        "afiliasi": 0.15
       },
       "iba": {
-        "energi": -0.15,
-        "afiliasi": -0.15
+        "afiliasi": 0.15
       },
       "minder": {
         "afiliasi": -0.15,
         "penguasaan": -0.1
       },
       "gugup": {
-        "keamanan": -0.3
+        "koherensi": -0.15
       },
       "tegang": {
         "keamanan": -0.3
@@ -2122,11 +2131,10 @@
         "keamanan": 0.25
       },
       "terharu": {
-        "energi": -0.15,
-        "afiliasi": -0.15
+        "afiliasi": 0.15
       },
       "siaga": {
-        "keamanan": -0.3
+        "keamanan": -0.1
       },
       "ketakutan": {
         "keamanan": -0.3
@@ -2369,7 +2377,7 @@
         "koherensi": 0.2
       },
       "kalut": {
-        "keamanan": -0.3
+        "koherensi": -0.15
       },
       "ragu-ragu": {
         "koherensi": -0.15
@@ -2393,7 +2401,7 @@
         "keamanan": -0.3
       },
       "kewaswasan": {
-        "keamanan": -0.3
+        "keamanan": -0.1
       },
       "kesenangan": {
         "energi": 0.15,
@@ -2495,7 +2503,7 @@
         "keamanan": -0.3
       },
       "kecurigaan": {
-        "keamanan": -0.3
+        "keamanan": -0.1
       },
       "keirian": {
         "afiliasi": -0.35
@@ -2504,19 +2512,17 @@
         "afiliasi": -0.35
       },
       "keharuan": {
-        "energi": -0.15,
-        "afiliasi": -0.15
+        "afiliasi": 0.15
       },
       "keibaan": {
-        "energi": -0.15,
-        "afiliasi": -0.15
+        "afiliasi": 0.15
       },
       "keminderan": {
         "afiliasi": -0.15,
         "penguasaan": -0.1
       },
       "kegugupan": {
-        "keamanan": -0.3
+        "koherensi": -0.15
       },
       "ketegangan": {
         "keamanan": -0.3
@@ -2573,10 +2579,10 @@
         "afiliasi": -0.3
       },
       "kewaspadaan": {
-        "keamanan": -0.3
+        "keamanan": -0.1
       },
       "kesiagaan": {
-        "keamanan": -0.3
+        "keamanan": -0.1
       },
       "kegetiran": {
         "energi": -0.15,
@@ -2738,7 +2744,7 @@
         "keamanan": 0.25
       },
       "kekalutan": {
-        "keamanan": -0.3
+        "koherensi": -0.15
       }
     },
     "en": {
@@ -3752,8 +3758,7 @@
         "afiliasi": 0.15
       },
       "moved": {
-        "energi": -0.15,
-        "afiliasi": -0.15
+        "afiliasi": 0.15
       },
       "peace": {
         "keamanan": 0.25

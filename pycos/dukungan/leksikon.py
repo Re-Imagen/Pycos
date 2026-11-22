@@ -74,6 +74,25 @@ def periksa() -> Dict[str, Any]:
     for label, words in (("id", LEXICON), ("en", LEXICON_EN),
                          ("tag_id", TAG_LEXICON), ("tag_en", TAG_LEXICON_EN)):
         validasi_entri(words, label)
+    # C1: tolak konflik tanda antara leksikon utama dan daftar ciri.
+    # LeksikonCiri positif/negatif tidak boleh berlawanan valensi lema
+    # yang sama di leksikon utama.
+    from pycos.bahasa.tutur import LEKSIKON_CIRI_BAWAAN
+    peta_valensi = {str(e.get("lema", "")).lower(): float(e.get("valensi", 0) or 0)
+                    for e in json.loads(raw)["leksikon"]
+                    if e.get("bahasa") == "id"}
+    for kata in LEKSIKON_CIRI_BAWAAN.positif:
+        valensi = peta_valensi.get(str(kata).lower())
+        if valensi is not None and valensi < 0:
+            raise ValueError(
+                "konflik tanda: '{}' positif di daftar ciri, "
+                "tetapi valensi {} di leksikon".format(kata, valensi))
+    for kata in LEKSIKON_CIRI_BAWAAN.negatif:
+        valensi = peta_valensi.get(str(kata).lower())
+        if valensi is not None and valensi > 0:
+            raise ValueError(
+                "konflik tanda: '{}' negatif di daftar ciri, "
+                "tetapi valensi {} di leksikon".format(kata, valensi))
     id_single = sum(" " not in k for k in LEXICON)
     en_single = sum(" " not in k for k in LEXICON_EN)
     if id_single < 400 or en_single < 200:
