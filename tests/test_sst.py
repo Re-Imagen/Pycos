@@ -251,6 +251,7 @@ CAKUPAN_API: Dict[str, str] = {
     "kandidat_dasar": "bahasa.teks", "cakupan_negasi": "bahasa.teks",
     "jenis_kalimat": "bahasa.teks", "jenis_pertanyaan": "bahasa.teks",
     "urai_subjek_predikat": "bahasa.teks", "tindak_tutur_skor": "bahasa.teks",
+    "VERBA_UMUM": "bahasa.teks", "G1_KERAS": "bahasa.teks", "G1_LEMAK": "bahasa.teks",
     "ekstrak_entitas": "bahasa.teks", "ekstrak_topik": "bahasa.teks",
     "deteksi_bahasa": "bahasa.teks", "kemiripan": "bahasa.teks",
     "koreksi_ejaan": "bahasa.teks", "periksa_gramatika": "bahasa.teks",

@@ -175,11 +175,15 @@ _PELINDUNG_UJIAN: Dict[str, str] = {
     "uji_logika": (r"\bbuktikan\s+(?:bahwa\s+)?(?:kamu|kau|engkau|anda)\b"
                    r"|\b(?:kamu|kau|engkau|anda)\s+(?:itu\s+)?(?:pasti\s+)?"
                    r"(?:salah|keliru|berbohong|bohong)\b"
-                   r"|\bhitung\s+ini\b|\bteka-teki\b"
+                   r"|\bhitung\s+ini\b[^.!?\n]*\b(?:kamu|kau|engkau|anda)\b"
+                   r"|\b(?:kamu|kau|engkau|anda)\b[^.!?\n]*\bhitung\s+ini\b"
+                   r"|\bteka-teki\b[^.!?\n]*\b(?:kamu|kau|engkau|anda)\b"
+                   r"|\b(?:kamu|kau|engkau|anda)\b[^.!?\n]*\bteka-teki\b"
+                   r"|\b(?:tes\s+)?turing\b[^.!?\n]*\b(?:kamu|kau|engkau|anda)\b"
+                   r"|\b(?:kamu|kau|engkau|anda)\b[^.!?\n]*\bturing\b"
                    r"|\b(?:tes|uji)\s+(?:kamu|kau|engkau|anda)\b"
                    r"|\bjika\s+(?:kamu|kau|engkau|anda)\s+benar\b"
-                   r"|\bkalau\s+(?:kamu|kau|engkau|anda)\s+benar\b"
-                   r"|\bturing\b"),
+                   r"|\bkalau\s+(?:kamu|kau|engkau|anda)\s+benar\b"),
 }
 
 # Penyaring Meta: tidak ada angka, tag internal, atau istilah teknis yang

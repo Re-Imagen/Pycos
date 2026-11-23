@@ -494,15 +494,40 @@ _NAMA_STOP = {"aku", "kamu", "dia", "mereka", "kita", "kami", "ini", "itu",
 
 
 def _nama_dari_teks(teks):
-    hasil = []
-    for m in re.finditer(r"\b([A-Z][a-z]{2,})\b", str(teks or "")):
-        nama = m.group(1)
-        if m.start() == 0:
-            continue
-        if nama.lower() in _NAMA_STOP:
-            continue
-        hasil.append(nama)
-    return hasil
+    """Nama diri dari teks (D7): delegasi ke pengacu bersama.
+
+    `ekstrak_entitas` mengenali nama diri di awal kalimat (bila diikuti
+    verba/pronomina/to be), nama diri bukan di awal, sapaan, & kata ganti —
+    sesuatu yang pola lama `[A-Z][a-z]{2,}` di luar awal kalimat melewatkan.
+    """
+    try:
+        from pycos.bahasa.teks import ekstrak_entitas
+        teks_str = str(teks or "")
+        out = []
+        for e in (ekstrak_entitas(teks_str) or []):
+            if e.get("jenis") != "nama_diri":
+                continue
+            nm = str(e.get("teks", ""))
+            if not nm or nm.lower() in _NAMA_STOP:
+                continue
+            # pertahankan penghitungan kemunculan (kandidat slot berdasar
+            # frekuensi); ekstrak_entitas sendiri mendedup sebut satu kali.
+            out.extend([nm] * len(re.findall(r"\b" + re.escape(nm) + r"\b",
+                                             teks_str)))
+        return out
+    except Exception as _galat_diagnostik_266:
+        _diag.catat('naluri._nama_dari_teks',
+                    "galat pada jalur fallback",
+                    galat=_galat_diagnostik_266, jalur=266)
+        hasil = []
+        for m in re.finditer(r"\b([A-Z][a-z]{2,})\b", str(teks or "")):
+            nama = m.group(1)
+            if m.start() == 0:
+                continue
+            if nama.lower() in _NAMA_STOP:
+                continue
+            hasil.append(nama)
+        return hasil
 
 
 def auto_deteksi_slot(self, min_kemunculan=1):

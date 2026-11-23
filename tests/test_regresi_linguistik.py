@@ -258,6 +258,208 @@ class AlurE0Test(unittest.TestCase):
             set(e0["formation"].keys()))
 
 
+class ParserSection3Test(unittest.TestCase):
+    """D4: pengurai transitif aktif tidak lagi membaca objek sebagai predikat."""
+
+    def test_transitif_aktif_tanpa_leksikon(self):
+        from pycos.bahasa import teks
+        u = teks.urai_subjek_predikat(teks.tokenisasi("Dia makan nasi"))
+        self.assertEqual("dia", u["subjek"])
+        self.assertEqual("makan", u["predikat"])
+        self.assertEqual("nasi", u["objek"])
+
+    def test_transitif_aktif_dengan_leksikon(self):
+        import json
+        from pycos.bahasa import teks
+        from pycos.dukungan.sumber import jalur_leksikon
+        from pycos.bahasa.tutur import Leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            leks = Leksikon(json.load(f))
+        u = teks.urai_subjek_predikat(teks.tokenisasi("Nisa membaca buku"),
+                                      leks)
+        self.assertEqual("nisa", u["subjek"])
+        self.assertEqual("membaca", u["predikat"])
+        self.assertEqual("buku", u["objek"])
+
+    def test_tolong_bukan_predikat(self):
+        from pycos.bahasa import teks
+        u = teks.urai_subjek_predikat(teks.tokenisasi("Tolong buka pintu"))
+        self.assertEqual("kamu", u["subjek"])
+        self.assertEqual("buka", u["predikat"])
+        self.assertEqual("pintu", u["objek"])
+
+
+class TransitiveG1Test(unittest.TestCase):
+    """G1: false positive pada bentuk -i dibunuh; -kan berbasis stem+leksikon."""
+
+    def test_mengerti_lolos(self):
+        from pycos.bahasa.teks import periksa_gramatika
+        self.assertEqual([], periksa_gramatika("Aku tidak mengerti."))
+
+    def test_preposisi_ganda_tetap_tertangkap(self):
+        from pycos.bahasa.teks import periksa_gramatika
+        self.assertIn("preposisi_ganda",
+                      periksa_gramatika("aku tersesat di di hutan."))
+
+    def test_g1_keras_lemah_terekspor(self):
+        import pycos.bahasa as b
+        self.assertIn("tanda_baca_ganda", b.G1_KERAS)
+        self.assertIn("verba_transitif_tanpa_objek", b.G1_LEMAK)
+
+
+class UjianSection3Test(unittest.TestCase):
+    """D14: balasan ujian wajib menyasar pendengar, bukan kata kunci telanjang."""
+
+    def _pola_logika(self):
+        import re
+        from pycos.inti.ekstensi.pelindung import _PELINDUNG_UJIAN
+        return re.compile(_PELINDUNG_UJIAN["uji_logika"])
+
+    def test_kata_kunci_telanjang_tidak_memicu(self):
+        pola = self._pola_logika()
+        for ujaran in ["hitung ini", "teka-teki", "turing", "turing test",
+                       "tes program ini", "uji coba saja"]:
+            self.assertIsNone(pola.search(ujaran), ujaran)
+
+    def test_menyerang_pendengar_memicu(self):
+        pola = self._pola_logika()
+        for ujaran in ["hitung ini, kamu pintar tidak?",
+                       "kamu suka turing ya?",
+                       "tes kamu dulu",
+                       "jika kamu benar, buktikan"]:
+            self.assertIsNotNone(pola.search(ujaran), ujaran)
+
+
+class EntitasSection3Test(unittest.TestCase):
+    """D7: pengacu bersama menggantikan pola lama [A-Z][a-z]{2,}."""
+
+    def test_nama_di_awal_kalimat_dikenali(self):
+        from pycos.inti.ekstensi.organik import _nama_dari_teks
+        self.assertIn("Budi", _nama_dari_teks("Budi pergi ke pasar"))
+
+    def test_frekuensi_kemunculan_dipertahankan(self):
+        from pycos.inti.ekstensi.organik import _nama_dari_teks
+        self.assertEqual(["Budi", "Budi", "Andi"],
+                         _nama_dari_teks("Budi menipu. Budi mencuri. "
+                                         "Andi datang."))
+
+
+class JawabanSection3Test(unittest.TestCase):
+    """E2: act menjawab diisi dari sumber Pycos; tidak tahu disebut halnya."""
+
+    def _npc(self):
+        from pycos.inti import Naluri
+        n = Naluri(name="Nara", rng_seed=41,
+                   params={"enable_gejala": False})
+        n.enable_kesadaran(semua=True)
+        n.enable_presentasi(semua=True)
+        return n
+
+    def _tanya(self, teks):
+        n = self._npc()
+        n.presentasi.dengar(teks, dari="Rama")
+        return n.presentasi.balas(dari="Rama").get("teks", "")
+
+    def test_identitas_dijawab_nama(self):
+        self.assertEqual("Aku Nara.", self._tanya("siapa nama kamu?"))
+        self.assertEqual("Aku Nara.", self._tanya("nama kamu siapa?"))
+
+    def test_jam_dijawab_jujur(self):
+        self.assertEqual("Aku tidak tahu jam berapa sekarang.",
+                         self._tanya("jam berapa sekarang?"))
+
+    def test_tidak_tahu_menyebut_fokus(self):
+        self.assertEqual("Aku tidak tahu kenapa.",
+                         self._tanya("kenapa dia pergi?"))
+        self.assertEqual("Aku tidak tahu di mana.",
+                         self._tanya("di mana kamu tinggal?"))
+        self.assertEqual("Aku tidak tahu berapa.",
+                         self._tanya("berapa harga tiket?"))
+
+
+class DiamE4Test(unittest.TestCase):
+    """E4: tanpa dasar untuk bertutur, jalur ucap menghasilkan diam."""
+
+    def _npc(self):
+        from pycos.inti import Naluri
+        n = Naluri(name="Nara", rng_seed=41,
+                   params={"enable_gejala": False,
+                           "presentasi_generatif": False})
+        n.enable_kesadaran(semua=True)
+        n.enable_presentasi(semua=True)
+        # paksa keadaan tanpa isi pikiran: tak ada dasar bertutur
+        n.presentasi._inner_speech = lambda: ""
+        n.self_intent = lambda: ""
+        return n
+
+    def test_isi_ucap_kosong_tanpa_dasar(self):
+        n = self._npc()
+        self.assertEqual("", n.presentasi._isi_ucap("menyatakan",
+                                                    "Rama", None))
+
+    def test_ucap_menjadi_diam(self):
+        n = self._npc()
+        keluar = n.presentasi.ucap(kepada="Rama", topik=None,
+                                   diam_boleh=False)
+        self.assertEqual("diam", keluar.get("act"))
+        self.assertEqual("", keluar.get("teks"))
+
+
+class TopikE3Test(unittest.TestCase):
+    """E3: topik pending adalah frasa nomina hasil pemahaman, bukan teks mentah."""
+
+    def _npc(self):
+        from pycos.inti import Naluri
+        n = Naluri(name="Nara", rng_seed=41,
+                   params={"enable_gejala": False})
+        n.enable_kesadaran(semua=True)
+        n.enable_presentasi(semua=True)
+        return n
+
+    def test_topik_bukan_verbatim_lawan(self):
+        n = self._npc()
+        n.presentasi.dengar("kenapa kamu menjauh?", dari="Rama")
+        top = getattr(n.presentasi, "_pending_topic", None)
+        self.assertIsNotNone(top)
+        self.assertNotIn("kenapa", str(top).lower())
+
+
+class ActE1Test(unittest.TestCase):
+    """E1: giliran lawan bukan perintah untuk membalas dengan act pasangan."""
+
+    def test_ajakan_lawan_tidak_menular(self):
+        from pycos.inti import Naluri
+        n = Naluri(name="Nara", rng_seed=41,
+                   params={"enable_gejala": False})
+        n.enable_kesadaran(semua=True)
+        n.enable_presentasi(semua=True)
+        n.presentasi.dengar("ayo perang kita sekarang", dari="Rama")
+        keluar = n.presentasi.balas(dari="Rama")
+        self.assertNotIn(keluar.get("act"), ("ajakan", "perintah"))
+
+
+class AgenSection3Test(unittest.TestCase):
+    """F3: kandidat dipilih yang bersih G1 dari keadaan yang sama."""
+
+    def _npc(self):
+        from pycos.inti import Naluri
+        n = Naluri(name="Nara", rng_seed=41,
+                   params={"enable_gejala": False, "presentasi_trace": True})
+        n.enable_kesadaran(semua=True)
+        n.enable_presentasi(semua=True)
+        return n
+
+    def test_delapan_ucapan_tidak_ada_masalah_keras(self):
+        from pycos.bahasa.teks import periksa_gramatika, G1_KERAS
+        n = self._npc()
+        for _ in range(8):
+            keluar = n.presentasi.ucap(kepada="Rama", topik="api",
+                                       diam_boleh=False)
+            hard = [m for m in periksa_gramatika(keluar.get("teks", ""))
+                    if m in G1_KERAS]
+            self.assertEqual([], hard, keluar.get("teks"))
+
+
 class PertanyaanBalikTest(unittest.TestCase):
     """E9: balikan dibangun dari isi ujaran, bukan satu template tetap."""
 
