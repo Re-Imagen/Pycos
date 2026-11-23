@@ -34,7 +34,7 @@ __all__ = [
     "NEGATOR_PROHIBITIF", "PENGURANG", "ABSORBER_NEGASI",
     "TRANSPARAN_NEGASI", "PENGUAT", "PELUNAK",
     "KATA_TANYA", "PENANDA_IMPERATIF", "PRONOMINA", "PREPOSISI",
-    "IDIOM_SENTIMEN", "SINGKATAN",
+    "IDIOM_SENTIMEN", "SINGKATAN", "VERBA_UMUM", "G1_KERAS", "G1_LEMAK",
 ]
 
 # ===========================================================================
@@ -154,6 +154,12 @@ FUNGSI_EN: Set[str] = frozenset({
     "he", "she", "it", "this", "that", "with", "for", "to", "of", "in",
     "on", "at", "a", "an", "do", "does", "did", "can", "could", "will",
     "would", "what", "who", "when", "where", "why", "how",
+})
+
+VERBA_UMUM: Set[str] = frozenset({
+    "tahu", "ada", "mau", "ingin", "bisa", "perlu",
+    "suka", "datang", "pulang", "berangkat", "belajar",
+    "bekerja", "main", "kembali", "hidup", "mati", "tunggu",
 })
 
 # Verba imperatif umum (cadangan bila leksikon tidak tersedia).
@@ -620,6 +626,23 @@ def jenis_pertanyaan(teks: str, tokens: Optional[Sequence[Token]] = None) -> Dic
 # ===========================================================================
 # D4 — pengurai dangkal subjek–predikat–objek–keterangan
 # ===========================================================================
+def _awalan_verba(bentuk: str) -> bool:
+    """True bila bentuk berawalan verba khas Indonesia.
+
+    Dipakai bila leksikon tidak memberi kelas kata (fallback tanpa leksikon).
+    Kata pronomina/stopword/preposisi tidak boleh lolos lewat "me-" di awal.
+    """
+    b = (bentuk or "").lower()
+    if len(b) <= 3:
+        return False
+    if b in PRONOMINA or b in STOPWORDS or b in PREPOSISI:
+        return False
+    if b.startswith(("mem", "men", "meng", "meny", "ber", "ter", "per", "di")):
+        return True
+    # prefiks telanjang "me" hanya sebelum l/r/w/y ("melihat")
+    return b.startswith("me") and b[2] in "lryw"
+
+
 def urai_subjek_predikat(tokens: Sequence[Token],
                          leksikon: Any = None) -> Dict[str, Any]:
     """Uraian dangkal berbasis kelas kata (D4); pasif `di-` ditangani."""
@@ -628,12 +651,29 @@ def urai_subjek_predikat(tokens: Sequence[Token],
     if not bentuk:
         return {"subjek": None, "predikat": None, "objek": None,
                 "keterangan": None}
-    # predikat: verba pertama, lalu adjektiva, lalu kata isi terakhir
+    # predikat: verba pertama; tanpa leksikon pakai verba umum / afiks
     idx_pred: Optional[int] = None
-    for i, b in enumerate(bentuk):
-        if "V" in _kelas_dari(leksikon, b):
-            idx_pred = i
-            break
+    if leksikon is not None:
+        for i, b in enumerate(bentuk):
+            if ("V" in _kelas_dari(leksikon, b)
+                    and b not in PENANDA_IMPERATIF):
+                idx_pred = i
+                break
+    if idx_pred is None:
+        for i, b in enumerate(bentuk):
+            if b in VERBA_IMPERATIF_UMUM and b not in PENANDA_IMPERATIF:
+                idx_pred = i
+                break
+    if idx_pred is None:
+        for i, b in enumerate(bentuk):
+            if b in VERBA_UMUM:
+                idx_pred = i
+                break
+    if idx_pred is None:
+        for i, b in enumerate(bentuk):
+            if _awalan_verba(b) and b not in PENANDA_IMPERATIF:
+                idx_pred = i
+                break
     if idx_pred is None:
         for i, b in enumerate(bentuk):
             if "ADJ" in _kelas_dari(leksikon, b):
@@ -662,9 +702,12 @@ def urai_subjek_predikat(tokens: Sequence[Token],
             if b not in PENANDA_IMPERATIF and b not in PREPOSISI and b not in STOPWORDS:
                 subjek = b
                 break
-    if subjek is None and sebelum:
+    if subjek is None:
         # imperatif tanpa subjek eksplisit → subjek implisit "kamu"
-        if bentuk[0] in PENANDA_IMPERATIF or _adalah_verba(leksikon, bentuk[0]):
+        if (not sebelum
+                or bentuk[0] in PENANDA_IMPERATIF
+                or (bentuk[0] in VERBA_IMPERATIF_UMUM)
+                or _adalah_verba(leksikon, bentuk[0])):
             subjek = "kamu"
     # objek: nomina setelah predikat sebelum preposisi
     objek: Optional[str] = None
@@ -898,6 +941,14 @@ def koreksi_ejaan(kata: str, kosakata: Sequence[str]) -> Optional[str]:
 # ===========================================================================
 # G1 — pemeriksa kegramatikalan keluaran
 # ===========================================================================
+# Kode G1 yang bersifat keras (bukti bentuk rusak, hampir pasti salah) —
+# dipakai F3 untuk menolak kandidat ujaran; kode lain dianggap lemah.
+G1_KERAS: Tuple[str, ...] = ("tanda_baca_ganda", "kata_berulang",
+                             "preposisi_ganda", "adjektiva_bahwa",
+                             "afiks_tak_valid", "kalimat_tanpa_predikat")
+G1_LEMAK: Tuple[str, ...] = ("verba_transitif_tanpa_objek",)
+
+
 def periksa_gramatika(teks: str, leksikon: Any = None) -> List[str]:
     """Daftar kode masalah gramatika (G1); kosong berarti lolos.
 
@@ -931,13 +982,16 @@ def periksa_gramatika(teks: str, leksikon: Any = None) -> List[str]:
         if b == "bahwa" and i > 0 and kata[i - 1] in EMOSI_ADJ:
             masalah.append("adjektiva_bahwa")
             break
-    # verba -kan/-i transitif di akhir tanpa objek
-    if kata:
+    # verba transitif -kan di akhir tanpa objek (hanya dengan leksikon:
+    # akhiran -i digugurkan karena terlalu banyak positif palsu — mis.
+    # "pergi", "mengerti"; transitivitas tidak dapat dipastikan dari
+    # bentuk surface saja).
+    if kata and leksikon is not None:
         last = kata[-1]
-        if (last.endswith("kan") or last.endswith("i")) and len(last) > 4:
-            # verba berimbuhan di akhir kalimat tanpa nomina sesudahnya
-            if "V" in _kelas_dari(leksikon, last) or last.startswith(
-                    ("me", "mem", "men", "meng", "meny", "di", "pe")):
+        if last.endswith("kan") and len(last) > 4:
+            # batang diperiksa lewat stemmer tervalidasi, bukan kelas kata
+            # mentah, agar "memperbaiki" dst ikut dikenali bila leksikonnya.
+            if "V" in _kelas_dari(leksikon, stem(last)):
                 masalah.append("verba_transitif_tanpa_objek")
     # afiks tak valid: "ii"/"uu" akhir, "yy", prefiks Indonesia + Inggris
     for b in kata:

@@ -57,6 +57,9 @@ _SUBMODUL: Dict[str, str] = {
     "tindak_tutur_skor": "teks",
     "tokenisasi": "teks",
     "urai_subjek_predikat": "teks",
+    "VERBA_UMUM": "teks",
+    "G1_KERAS": "teks",
+    "G1_LEMAK": "teks",
     "analisis_teks": "tutur",
     "konteks_dari_presentasi": "tutur",
     "sa_sp": "tutur",
@@ -74,6 +77,7 @@ if TYPE_CHECKING:  # hanya untuk pemeriksa jenis, tidak dieksekusi
                         analisis_teks, konteks_dari_presentasi, sa_sp,
                         sa_sp_literal, sa_sp_pragmatik, token_dari)
     from .teks import (Token, JejakLinguistik, analisis_ujaran,
+                     G1_KERAS, G1_LEMAK, VERBA_UMUM,
                      deteksi_bahasa, cakupan_negasi, ekstrak_entitas,
                      ekstrak_topik, jenis_kalimat, jenis_pertanyaan,
                      jejak_pembentukan, kandidat_dasar, koreksi_ejaan,

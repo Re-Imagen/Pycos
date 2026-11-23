@@ -1475,6 +1475,34 @@ class Presentasi:
             if emo:
                 return f"aku merasa {emo[0]}{sapaan}."
             return f"{keadaan_singkat()}{sapaan}."
+        # --- varian pertanyaan identitas: nama/panggilan ---
+        nama_ku = str(getattr(self.naluri, "name", "") or "").strip()
+        if nama_ku and re.search(
+                r"\b(nama|panggilan)\b[^.!?]*\b(kamu|kau|dirimu|mu)\b"
+                r"|\b(kamu|kau|dirimu)\b[^.!?]*\b(nama|panggil)\b"
+                r"|\b(kamu|kau)\s+siapa\b", teks):
+            return f"aku {nama_ku}{sapaan}."
+        # --- jam/tanggal: Pycos tidak punya akses ke jam dinding ---
+        if re.search(r"\bjam\b", teks):
+            return f"aku tidak tahu jam berapa sekarang{sapaan}."
+        if re.search(r"\btanggal\b", teks):
+            return f"aku tidak tahu tanggal berapa sekarang{sapaan}."
+        # --- tidak tahu, tetapi sebut HAL yang tidak diketahui (E2) ---
+        frasa = None
+        try:
+            from pycos.bahasa.teks import jenis_pertanyaan
+            jenis = (jenis_pertanyaan(teks) or {}).get("jenis")
+            frasa = {"siapa": "siapa itu", "apa": "apa yang kau maksud",
+                     "dimana": "di mana", "kapan": "kapan",
+                     "kenapa": "kenapa", "bagaimana": "bagaimana",
+                     "berapa": "berapa", "pilihan": "yang mana"}.get(jenis)
+        except Exception as _galat_diagnostik_124:
+            _diag.catat('naluri.Presentasi._jawaban_keadaan',
+                        "galat pada jalur fallback",
+                        galat=_galat_diagnostik_124, jalur=124)
+            frasa = None
+        if frasa:
+            return f"aku tidak tahu {frasa}{sapaan}."
         return None
 
     def _pronomina(self, kepada: Any) -> Tuple[str, str]:
@@ -1692,7 +1720,11 @@ class Presentasi:
             niat = ""
         if inner:
             return inner
-        return f"{sapaan + ' ' if sapaan else ''}{niat or 'aku sedang mengamati keadaan'}."
+        if niat:
+            # E4: hanya ungkapkan niat yang MEMANG terbentuk; tanpa niat,
+            # jangan mengarang — biarkan jalur memanggil diam.
+            return f"{sapaan + ' ' if sapaan else ''}{niat}."
+        return ""
 
     def _bingkai_relasi(self, teks: str, kepada: Any) -> str:
         """Sisipkan referensi sejarah bersama / pronomina bila relevan."""
@@ -1839,32 +1871,76 @@ class Presentasi:
                 teks += "."
             niat_teks = teks
         else:
-            # anti-pengulangan: coba beberapa varian sebelum menerima ujaran yang
-            # persis sama dengan yang baru diucapkan (variasi = tanda hidup).
+            # F3 + anti-pengulangan: hasilkan beberapa variasi dari keadaan
+            # & pikiran yang SAMA; pilih yang (a) bukan pengulangan dan
+            # (b) lolos pemeriksa gramatika G1 — tanpa mengubah isi batin.
+            leks_f3 = None
+            try:
+                _eng_f3 = self.tutur_engine()
+                leks_f3 = getattr(_eng_f3, "leks", None)
+            except Exception as _galat_diagnostik_108:
+                _diag.catat('naluri.Presentasi.ucap',
+                            "galat pada jalur fallback",
+                            galat=_galat_diagnostik_108, jalur=108)
+                leks_f3 = None
+            pilihan_teks = None
+            pilihan_inti = None
+            masalah_pilihan: List[str] = []
             for _coba in range(6):
                 inti = self._generatif(act, kepada, topik, masuk=masuk,
                                        coba=_coba)
                 if inti is None:
                     inti = self._isi_ucap(act, kepada, topik)
                 inti = self._bingkai_relasi(inti, kepada)
-                niat_teks = str(inti)
-                teks = self._warnai(inti, act)
+                calon = self._warnai(inti, act)
                 if role_style:
                     prefix = str(style.get("awalan", style.get("prefix", "")) or "").strip()
                     suffix = str(style.get("akhiran", style.get("suffix", "")) or "").strip()
-                    if prefix and not teks.lower().startswith(prefix.lower()):
-                        teks = prefix + " " + teks
-                    if suffix and not teks.lower().endswith(suffix.lower()):
-                        teks = teks.rstrip(" .!?…") + " " + suffix
+                    if prefix and not calon.lower().startswith(prefix.lower()):
+                        calon = prefix + " " + calon
+                    if suffix and not calon.lower().endswith(suffix.lower()):
+                        calon = calon.rstrip(" .!?…") + " " + suffix
                     replacements = style.get("kata", style.get("penggantian_kata", {}))
                     if isinstance(replacements, Mapping):
                         for source, target_word in list(replacements.items())[:8]:
                             if str(source).strip() and str(target_word).strip():
-                                teks = re.sub(r"\b" + re.escape(str(source)) + r"\b",
-                                              str(target_word), teks, flags=re.IGNORECASE)
-                if teks not in self._recent_texts:
+                                calon = re.sub(r"\b" + re.escape(str(source)) + r"\b",
+                                               str(target_word), calon,
+                                               flags=re.IGNORECASE)
+                if not str(calon or "").strip():
+                    # E4: tak ada dasar untuk bertutur — kandidat hampa.
+                    masalah = ["kandidiat_hampa"]
+                else:
+                    try:
+                        from pycos.bahasa.teks import (periksa_gramatika as
+                                                       _pgm, G1_KERAS)
+                        g1 = _pgm(str(calon), leks_f3)
+                        masalah = [m for m in g1 if m in G1_KERAS]
+                        masalah += [m for m in g1 if m not in G1_KERAS]
+                    except Exception as _galat_diagnostik_109:
+                        _diag.catat('naluri.Presentasi.ucap',
+                                    "galat pada jalur fallback",
+                                    galat=_galat_diagnostik_109, jalur=109)
+                        masalah = []
+                if calon in self._recent_texts:
+                    masalah = list(masalah) + ["pengulangan_terbaru"]
+                if (pilihan_inti is None
+                        or len(masalah) < len(masalah_pilihan)):
+                    pilihan_teks, pilihan_inti = calon, str(inti)
+                    masalah_pilihan = list(masalah)
+                if not masalah and str(calon or "").strip():
+                    # kandidat bersih & segar → tidak perlu mencoba lagi
                     break
+            teks = pilihan_teks or ""
+            niat_teks = pilihan_inti or ""
+            if masalah_pilihan:
+                self._tutur_trace = list(getattr(self, "_tutur_trace", []) or []) + [
+                    {"F3": {"dipilih": teks, "masalah": masalah_pilihan}}]
             generatif = bool(self._tutur is not None)
+        # E4: bila tak ada dasar untuk bertutur, jangan menyodorkan teks —
+        # diam atau perilaku nonverbal saja.
+        if direct is None and not str(teks or "").strip():
+            return self._beat_diam(kepada)
         # batasi verbositas (kalimat)
         verb = max(0.2, self._p("presentasi_verbositas"))
         from pycos.bahasa.teks import pecah_kalimat as _pecah
