@@ -338,7 +338,6 @@ class Node:
     polaritas: str = "+"
     intensitas: float = 0.5
     anchor: Optional[str] = None
-    komplemen: Optional[str] = None
     lema: Optional[str] = None  # predikat leksikal (opsional)
 
     def arg(self, peran: str) -> Optional[Arg]:
@@ -1090,14 +1089,16 @@ class L3:
         return self.leks.nasalisasi(d)
 
     def bentuk_partikel(self, kata: str, partikel: str) -> str:
+        """Sufiks partikel: klitik posesif (-ku/-mu/-nya) & penegas (-lah/-kah).
+
+        Ortografi: tanpa tanda hubung — "tanganku", "pergilah", "apakah".
+        Bila `partikel` berupa sufiks tanpa tanda hubung, langsung ditempel.
+        """
         if not partikel:
             return kata
-        if partikel == "-nya":
-            return kata + "nya"
-        if partikel == "-lah":
-            return kata + "lah"
-        if partikel == "-kah":
-            return kata + "kah"
+        suf = partikel.lstrip("-")
+        if suf in ("ku", "mu", "nya", "lah", "kah", "pun"):
+            return kata + suf
         return kata
 
     # -- frasa nomina -----------------------------------------------------
@@ -1145,8 +1146,30 @@ class L3:
                 return "seorang " + s
             if "HEWAN" in tipe:
                 return "seekor " + s
-            if tipe & {"BENDA", "EDIBLE", "TAK_EDIBLE", "ALAT", "MAKANAN"}:
-                return "sebuah " + s
+            if tipe & {"BENDA", "EDIBLE", "TAK_EDIBLE", "ALAT", "MAKANAN",
+                       "FISIK"}:
+                # bagian tubuh: posesif (tanpa penggolong) — sudut pandang
+                # pembicara; bila pembicara menyebut orang ketiga → -nya.
+                if "FISIK" in tipe:
+                    orang_ketiga = any(
+                        _norm(x).split()[-1] in ("dia", "ia")
+                        for x in tuple(ctx.timeline) + tuple(ctx.spotlight)
+                        if x)
+                    suf = "-nya" if orang_ketiga else "-ku"
+                    return self.bentuk_partikel(s, suf)
+                kepala = "sebuah " + s
+                # pewatas adjektiva dari sikap pembicara (B9): sumber adalah
+                # keadaan Pycos, bukan klaim sifat objektif.
+                if ctx.valensi <= -0.35:
+                    kepala += " buruk"
+                elif ctx.valensi >= 0.35:
+                    kepala += " baik"
+                # anaphora: disebut sebelumnya → definit (itu/ini)
+                disebut = any(_norm(x) == s for x in
+                              tuple(ctx.timeline) + tuple(ctx.core))
+                if disebut:
+                    kepala += " ini" if ctx.dekat else " itu"
+                return kepala
         return s
 
     def frasa_adjektiva(self, isi: Any, ctx: GenContext,
@@ -1229,10 +1252,23 @@ class L3:
             out = out.rstrip(".!…") + "?"
         return out
 
-    def _verba(self, node: Node, ctx: GenContext) -> str:
-        """Bentuk verba aktif dari lema yang dipilih L2 (fallback: lema frame)."""
+    @staticmethod
+    def _dasar(lema: str) -> str:
+        from pycos.bahasa.teks import stem as _stem
+        return _stem(lema.split()[0]) if lema else lema
+
+    def _verba(self, node: Node, ctx: GenContext,
+               voice: Optional[str] = None) -> str:
+        """Bentuk verba aktif dari lema yang dipilih L2 (fallback: lema frame).
+
+        B7: bila `voice` diberikan, diatesis direalisasikan — pasif di-,
+        pelaku orang pertama "ku-"/orang kedua "kau-" (dengan objek di
+        depan klausa), ter- tak sengaja, ke-…-an adversatif.
+        """
         lema = node.lema or (self.leks.predikat.get(node.predikat) or {}).get("lema") \
             or node.predikat.lower()
+        if voice and voice not in ("aktif",):
+            return self.bentuk_verba(self._dasar(lema), voice, node.modus)
         if " " in _norm(lema) or "-" in lema:
             return lema
         # lema yang sudah berimbuhan jangan diberi prefiks lagi
@@ -1242,8 +1278,39 @@ class L3:
             return lema
         return self.leks.nasalisasi(lema)
 
+    def _diatesis_objek(self, subj: str, obj: str, dasar: str,
+                        voice: str, ctx: GenContext) -> Optional[str]:
+        """Klausa pasif dengan objek di depan (B7).
+
+        pasif biasa:  "Api dilihat oleh aku." (peta formal: "oleh" dipertahankan)
+        pasif 1/2:    "Api kulihat." / "Api kaulihat." (objek bergeser ke depan)
+        ter-:         "Api terlihat oleh aku." (tanpa pelaku: "Api terlihat.")
+        """
+        subj = _norm(subj) or "aku"
+        subj_asal = subj
+        if voice == "pasif":
+            if subj in ("aku", "saya", "daku"):
+                voice = "pasif_1"
+            elif subj in ("kamu", "kau", "anda"):
+                voice = "pasif_2"
+        if voice in ("pasif_1", "pasif_2"):
+            klitik = "ku" if voice == "pasif_1" else "kau"
+            return f"{obj} {klitik}{dasar}."
+        if voice == "pasif":
+            oleh = "" if subj_asal in ("",) else f" oleh {subj_asal}"
+            return f"{obj} di{dasar}{oleh}."
+        if voice == "ter":
+            if ctx and ctx.doubt >= 0.6:
+                return f"{obj} ter{dasar}."
+            return f"{obj} ter{dasar} oleh {subj_asal}."
+        if voice == "kean":
+            return f"{subj_asal} ke{dasar}an {obj}."
+        return None
+
     # -- klausa (rekursi maks 1 tingkat) ---------------------------------
-    def klausa(self, node: Node, ctx: GenContext, nested: bool = False) -> str:
+    def klausa(self, node: Node, ctx: GenContext, nested: bool = False,
+               voice: Optional[str] = None,
+               urutan: Optional[Sequence[str]] = None) -> str:
         spec = self.leks.predikat.get(node.predikat) or {}
         pred_lema = node.lema or spec.get("lema") or node.predikat.lower()
         # susun slot → teks
@@ -1252,7 +1319,15 @@ class L3:
             if a.kosong():
                 continue
             if isinstance(a.isi, Node):
-                bagian[a.peran] = self.klausa(a.isi, ctx, nested=True)
+                sub = self.klausa(a.isi, ctx, nested=True).rstrip(".!?…")
+                # B9: klausa relatif — kepala nomina disebut sebelum "yang"
+                if getattr(a, "tanda", "") == "relatif":
+                    kepala = _pertahankan_kapitalisasi(
+                        str(a.literal or a.peran or "")).strip()
+                    bagian[a.peran] = (f"{kepala} yang {sub}" if kepala
+                                       else f"yang {sub}")
+                else:
+                    bagian[a.peran] = sub
             elif a.tipe in ("EMOSI", "KUALITAS", "TAKUT", "SENANG", "SEDIH",
                             "MARAH", "MALU", "CINTA", "BENCI", "KESEPIAN",
                             "TENANG", "HARAP", "TERKEJUT", "JIJIK",
@@ -1275,14 +1350,16 @@ class L3:
                 bagian[a.peran] = self.frasa_nomina(
                     isi, ctx, topik=(a.peran == "TOPIK"))
         # kalimat inti per predikat
-        inti = self._kalimat_predikat(node, pred_lema, bagian, ctx)
+        inti = self._kalimat_predikat(node, pred_lema, bagian, ctx,
+                                      voice=voice)
         # modus tanya: pastikan ada tanda tanya (tanpa menggandakan)
         if node.modus == "tanya" and not inti.rstrip().endswith("?"):
             inti = inti.rstrip(".?!") + "?"
         return inti
 
     def _kalimat_predikat(self, node: Node, pred: str, b: Dict[str, str],
-                          ctx: GenContext) -> str:
+                          ctx: GenContext,
+                          voice: Optional[str] = None) -> str:
         P = node.predikat
         neg = "tidak " if node.polaritas == "-" or node.modus == "ingkar" else ""
         # predikat tak-konvensional (idiom/metafora) dirender dari template frame
@@ -1311,7 +1388,7 @@ class L3:
             ob = b.get("OBJEK", "")
             sebab = b.get("SEBAB") or getattr(node.arg("SEBAB"), "isi", "")
             sebab = str(sebab).strip().rstrip(" .!?;:")
-            v = self._verba(node, ctx)
+            v = self._verba(node, ctx, voice)
             # Objek berupa kalimat diringkas; tanpa objek pakai "sana".
             if ob and " " in ob:
                 from pycos.bahasa.teks import ekstrak_topik as _et2
@@ -1325,7 +1402,7 @@ class L3:
         if P == "MENOLAK":
             t = b.get("TINDAKAN", "")
             al = b.get("ALASAN", "")
-            v = self._verba(node, ctx)
+            v = self._verba(node, ctx, voice)
             s = f"tidak, aku {v}"
             if t:
                 s += f" {t}"
@@ -1337,7 +1414,7 @@ class L3:
             subj = b.get("EXPERIENCER", "aku")
             ep = b.get("EPISODE", "")
             ob = b.get("OBJEK", "")
-            v = self._verba(node, ctx)
+            v = self._verba(node, ctx, voice)
             anchor = (" malam tadi" if node.anchor == "malam tadi" else "")
             if ep:
                 # B11: penanda aspek disisipkan jalur linearisasi
@@ -1453,12 +1530,29 @@ class L3:
             if ctx.act == "menyapa_proaktif":
                 return ("kau belum berkata apa-apa sejak tadi." if not ob
                         else "kau terlihat melamun. Ada yang mengganggumu?")
-            v = self._verba(node, ctx)
+            v = self._verba(node, ctx, voice)
+            if voice and voice not in ("aktif",) and ob:
+                from pycos.bahasa.teks import stem as _stem_b7mg
+                dasar = _stem_b7mg(node.lema or "lihat")
+                _pasif = self._diatesis_objek("aku", ob, dasar, voice, ctx)
+                if _pasif:
+                    return _pasif
             return f"aku {v} {ob}." if ob else f"aku {v} sesuatu."
         # --- cabang valensi untuk predikat tanpa cabang khusus (E11) ---
         _obj = (b.get("OBJEK", "") or b.get("STIMULUS", "")
                 or b.get("TARGET", "") or b.get("TOPIK", ""))
         _subj = b.get("EXPERIENCER", b.get("AGENT", "aku"))
+        # B7: diatesis diwujudkan untuk verba berimbuhan transitif — objek
+        # pindah ke depan ("Api dilihat oleh aku." / "Api kulihat.").
+        if voice and voice not in ("aktif",) and _obj and pred:
+            from pycos.bahasa.teks import stem as _stem_b7
+            lema_b7 = node.lema or pred
+            if " " not in _norm(lema_b7):
+                dasar = _stem_b7(lema_b7)
+                if dasar and not any(ch.isupper() for ch in lema_b7[:1]):
+                    _pasif = self._diatesis_objek(_subj, _obj, dasar, voice, ctx)
+                    if _pasif:
+                        return _pasif
         if P == "ADA":
             return f"ada {_obj}." if _obj else "ada sesuatu."
         if P == "ADALAH":
@@ -1487,13 +1581,18 @@ class L3:
             return f"aku merasa {_obj}." if _obj else "aku merasa sesuatu."
         if P in ("MENGKHIANATI", "MEMBUNUH", "MENINGGALKAN", "MEMAKAN",
                  "MENDENGAR", "MEMBUNUH"):
-            v = self._verba(node, ctx)
+            v = self._verba(node, ctx, voice)
             return f"aku {v} {_obj or 'itu'}."
         if P == "YAKIN":
             return f"aku yakin tentang {_obj}." if _obj else "aku yakin."
         if P == "TAHU":
             return f"aku tahu {_obj}." if _obj else "aku tahu."
         # fallback generik dari kerangka (objek bawaan untuk verba transitif)
+        if urutan and "TUJUAN" in urutan:
+            _tujuan = b.get("TUJUAN", "") or b.get("PENERIMA", "")
+            if _tujuan:
+                return (f"{_subj} {neg}{pred} {_obj or 'itu'}"
+                        f" kepada {_tujuan}.")
         if pred.endswith("kan") and not _obj:
             _obj = "itu"
             return f"{_subj} {neg}{pred} {_obj}."
@@ -1573,7 +1672,8 @@ class L3:
 
     def linearisasi(self, kerangka: Kerangka, ctx: GenContext) -> str:
         node = kerangka.node
-        inti = self.klausa(node, ctx)
+        inti = self.klausa(node, ctx, voice=kerangka.voice,
+                           urutan=kerangka.urutan)
         inti = self._sisipkan_penanda(inti, node, ctx, kerangka.voice)
         # topik depan: "apinya, aku takut" — pengalaman yang dirasakan pemain
         # (hindari pengulangan: bila topik sudah ada di inti, jangan tambah).
@@ -1638,7 +1738,7 @@ class Orkestrator:
                 salinan = Node(node.predikat,
                                [a for j, a in enumerate(node.args) if j != i],
                                node.modus, node.aspek, node.polaritas,
-                               node.intensitas, node.anchor, node.komplemen,
+                               node.intensitas, node.anchor,
                                node.lema)
                 alternatif.append(salinan)
         for depth, kandidat in enumerate(alternatif):

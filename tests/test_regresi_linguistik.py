@@ -659,3 +659,113 @@ class KataKunciG4G5Test(unittest.TestCase):
             intended="Aku takut dan aku butuh bantuan.")
         self.assertEqual(1.0,
                          audisi["niat_vs_realisasi"]["kesenjangan"])
+
+
+class PassiveB7Test(unittest.TestCase):
+    """B7: diatesis objek berpindah ke depan; ku-/kau- untuk orang 1/2."""
+
+    def _leks(self):
+        from pycos.dukungan.sumber import jalur_leksikon
+        import json
+        from pycos.bahasa.tutur import Leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            return Leksikon(json.load(f))
+
+    def test_topik_objek_menjadi_pasif_kuat(self):
+        from pycos.bahasa.tutur import TuturEngine, GenContext
+        eng = TuturEngine(None, leksikon=self._leks())
+        ctx = GenContext(act="menyatakan", bahasa="id", register="netral",
+                         topik="api", seed=0, spotlight=("kamu",))
+        t = eng.ucap(ctx)
+        self.assertIsNotNone(t)
+        # "api ku<verba>." — objek di depan, pelaku orang pertama tersirat
+        self.assertRegex(t.teks, r"^api ku[a-z]+\.$")
+
+    def test_spotlight_aku_tetap_aktif(self):
+        from pycos.bahasa.tutur import TuturEngine, GenContext
+        eng = TuturEngine(None, leksikon=self._leks())
+        ctx = GenContext(act="menyatakan", bahasa="id", register="netral",
+                         topik="api", seed=0, spotlight=("aku",))
+        t = eng.ucap(ctx)
+        self.assertIsNotNone(t)
+        self.assertNotRegex(t.teks, r"^api ku")
+
+    def test_diatesis_objek_langsung(self):
+        from pycos.bahasa.tutur import L3, Leksikon
+        import json
+        import random as _r
+        leks = self._leks()
+        from pycos.bahasa.tutur import GenContext
+        l3 = L3(leks, _r.Random(1))
+        self.assertEqual("api kulihat.",
+                         l3._diatesis_objek("aku", "api", "lihat",
+                                            "pasif", GenContext()))
+        self.assertEqual("api dilihat oleh dia.",
+                         l3._diatesis_objek("dia", "api", "lihat",
+                                            "pasif", GenContext()))
+        self.assertEqual("api terlihat.",
+                         l3._diatesis_objek("dia", "api", "lihat",
+                                            "ter", GenContext(doubt=0.7)))
+
+
+class FrasaNominaB9Test(unittest.TestCase):
+    """B9: posesif, demonstrativa anaphora, penggolong, pewatas, relatif."""
+
+    def _l3(self):
+        from pycos.bahasa.tutur import L3, Leksikon
+        import random as _r
+        from pycos.dukungan.sumber import jalur_leksikon
+        import json
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            return L3(Leksikon(json.load(f)), _r.Random(1))
+
+    def test_posesif_milik_tubuh(self):
+        from pycos.bahasa.tutur import GenContext
+        l3 = self._l3()
+        ctx = GenContext(bahasa="id", register="netral", seed=1)
+        self.assertEqual("tanganku", l3.frasa_nomina("tangan", ctx, topik=True))
+        ctx = GenContext(bahasa="id", register="netral", seed=1,
+                         timeline=("tadi ia mengangkat tangan",),
+                         spotlight=("dia",))
+        self.assertEqual("tangannya", l3.frasa_nomina("tangan", ctx, topik=True))
+
+    def test_anaphora_demonstrativa(self):
+        from pycos.bahasa.tutur import GenContext
+        l3 = self._l3()
+        ctx = GenContext(bahasa="id", register="netral", seed=1,
+                         timeline=("rumah",))
+        self.assertEqual("sebuah rumah itu",
+                         l3.frasa_nomina("rumah", ctx, topik=True))
+        ctx_dekat = GenContext(bahasa="id", register="netral", seed=1,
+                               timeline=("rumah",), dekat=True)
+        self.assertEqual("sebuah rumah ini",
+                         l3.frasa_nomina("rumah", ctx_dekat, topik=True))
+
+    def test_pewatas_sikap(self):
+        from pycos.bahasa.tutur import GenContext
+        l3 = self._l3()
+        ctx = GenContext(bahasa="id", register="netral", seed=1,
+                         valensi=-0.5)
+        self.assertIn("buruk", l3.frasa_nomina("rumah", ctx, topik=True))
+        ctx = GenContext(bahasa="id", register="netral", seed=1,
+                         valensi=0.5)
+        self.assertIn("baik", l3.frasa_nomina("rumah", ctx, topik=True))
+
+    def test_klausa_relatif_yang(self):
+        from pycos.bahasa.tutur import L3, Leksikon, GenContext, Node, Arg
+        import random as _r
+        from pycos.dukungan.sumber import jalur_leksikon
+        import json
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            leks = Leksikon(json.load(f))
+        l3 = L3(leks, _r.Random(1))
+        node = Node("MELIHAT", [Arg("AGENT", "ANIMAT", isi="aku")],
+                    lema="membakar")
+        ctx = GenContext(bahasa="id", register="netral", seed=1)
+        sub = l3.klausa(node, ctx, nested=True)
+        self.assertTrue(sub)
+        # NP kepala + "yang" + klausa (lewat jalur Arg relativ)
+        ada = Node("ADA", [Arg("TOPIK", "ENTITAS", isi=node,
+                               literal="rumah", tanda="relatif")])
+        isi = l3.klausa(ada, ctx)
+        self.assertIn("rumah yang ", isi)
