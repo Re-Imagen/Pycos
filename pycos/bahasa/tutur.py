@@ -380,6 +380,9 @@ class Node:
     intensitas: float = 0.5
     anchor: Optional[str] = None
     lema: Optional[str] = None  # predikat leksikal (opsional)
+    # E6: hubungan pikiran yang mendahului klausa inti — sebab | konsesi |
+    # kontras | urutan | elaborasi. None → "karena" (sebab) untuk ALASAN.
+    hubungan: Optional[str] = None
 
     def arg(self, peran: str) -> Optional[Arg]:
         for a in self.args:
@@ -577,7 +580,7 @@ class L0:
                 Arg("ALASAN", "PROPOSISI",
                     isi=(ctx.values[0] if ctx.values else None),
                     opsional=not ctx.values),
-            ], intensitas=0.55)
+            ], intensitas=0.55, hubungan="konsesi")
             if not ctx.values:
                 turun.append("alasan_dibuang")
             return node, turun
@@ -1381,6 +1384,8 @@ class L3:
                 # frasa nomina (E3) — jangan tempel kalimat mentah.
                 isi = a.isi
                 if isinstance(isi, str) and " " in _norm(isi) and \
+                        a.peran not in ("EPISODE", "ALASAN", "SEBAB",
+                                        "PROPOSISI") and \
                         a.tipe in ("ENTITAS", "ANIMAT", "FISIK", "BENDA",
                                    "EDIBLE", "TAK_EDIBLE", "MAKHLUK",
                                    "INANIMAT", "ORANG", "HEWAN", "TUMBUHAN",
@@ -1420,11 +1425,17 @@ class L3:
             if lema not in ("ragu", "bimbang", "waswas", "ragu-ragu",
                             "gamang", "dilema", "ragu-ragu"):
                 lema = "ragu"
+            al = b.get("ALASAN", "")
             neg = "tidak " if node.modus == "ingkar" else ""
             if prop:
-                return f"{subj} {neg}{lema} apakah {prop}."
-            return f"{subj} {neg}{lema} sekarang." if not neg \
-                else f"{subj} {lema} untuk percaya."
+                s = f"{subj} {neg}{lema} apakah {prop}"
+            elif not neg:
+                s = f"{subj} {lema} sekarang"
+            else:
+                s = f"{subj} {lema} untuk percaya"
+            if al:
+                s += f", soalnya {al}"
+            return s + "."
         if P == "PERINGATAN":
             ob = b.get("OBJEK", "")
             sebab = b.get("SEBAB") or getattr(node.arg("SEBAB"), "isi", "")
@@ -1447,10 +1458,15 @@ class L3:
             s = f"tidak, aku {v}"
             if t:
                 s += f" {t}"
-            s += "."
             if al:
-                s += f" {al.capitalize()}."
-            return s
+                # E6: pikiran yang aktif bersamaan dihubungkan sesuai
+                # hubungan yang memang ada — bukan kalimat baru dipaku.
+                hub = {"sebab": "karena", "konsesi": "meski",
+                       "kontras": "tapi", "urutan": "lalu",
+                       "elaborasi": "soalnya"}.get(node.hubungan or "sebab",
+                                                    "karena")
+                s += f" {hub} {al}"
+            return s + "."
         if P == "INGAT":
             subj = b.get("EXPERIENCER", "aku")
             ep = b.get("EPISODE", "")
@@ -1460,7 +1476,10 @@ class L3:
             if ep:
                 # B11: penanda aspek disisipkan jalur linearisasi
                 # (node.aspek == "pengalaman" → "pernah"), bukan template.
-                return f"{subj} {v}{anchor}: {ep}."
+                s = f"{subj} {v}{anchor}: {ep}"
+                if ob:
+                    s += f", soal {ob}"
+                return s + "."
             if ob:
                 return f"{subj} masih memikirkan {ob}."
             return f"{subj} {v} sesuatu, tapi kabur."
@@ -1720,16 +1739,38 @@ class L3:
         # (hindari pengulangan: bila topik sudah ada di inti, jangan tambah).
         topik = ctx.topik_aktif()
         if topik and kerangka.topik_front:
+            import re as _re_e8
             arg = node.arg(kerangka.topik_front)
             kata_inti = {w.strip(".,!?;:…—–\"'") for w in inti.split()}
             if arg and isinstance(arg.isi, str) and " " not in _norm(arg.isi):
                 front = _norm(arg.isi)
-                if front and front not in ("aku", "kamu", "kau", "dia", "kita") \
-                        and front not in kata_inti:
-                    if ctx.bahasa == "en":
-                        inti = f"about {front} — {inti}"
-                    else:
-                        inti = f"soal {front} — {inti}"
+                if front and front not in ("aku", "kamu", "kau", "dia", "kita",
+                                           "ia", "mereka", "kami"):
+                    # E8: penyebutan pertama penuh, penyebutan berikutnya
+                    # kata ganti — orang → "dia", benda → "itu".
+                    tipe = set(str(arg.tipe or "").upper().split())
+                    ganti = ("dia" if tipe & {"ORANG", "MANUSIA", "ANIMAT",
+                                              "HEWAN", "MAKHLUK"} else "itu")
+                    pasif_front = kerangka.voice in ("pasif", "pasif_1",
+                                                     "pasif_2") \
+                        and front in kata_inti
+                    if not pasif_front:
+                        if front in kata_inti:
+                            # Jangan ganti kemunculan setelah preposisi
+                            # ("ke api" → "ke itu" tidak gramatikal); cukup
+                            # ganti bila ada kemunculan bebas yang aman.
+                            pola = (r"(?i)(?<![\w])"
+                                    + r"(?<!ke )(?<!di )(?<!dari )(?<!pada )"
+                                    + r"(?<!tentang )(?<!kepada )(?<!terhadap )"
+                                    + r"(?<!oleh )(?<!dengan )(?<!untuk )"
+                                    + _re_e8.escape(front) + r"(?![\w])")
+                            inti_baru = _re_e8.sub(pola, ganti, inti, count=1)
+                            if inti_baru != inti:
+                                inti = inti_baru
+                        if ctx.bahasa == "en":
+                            inti = f"about {front} — {inti}"
+                        else:
+                            inti = f"soal {front} — {inti}"
         # penahanan sadar: ujaran terbentuk, tapi tak habis diucapkan.
         if ctx.menahan >= 0.6 and inti and inti[-1] not in "…!?":
             inti = inti.rstrip(".") + "…"

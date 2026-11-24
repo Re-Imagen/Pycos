@@ -83,6 +83,44 @@ PRESENTASI_DEFAULTS: Dict[str, Any] = {
 
 
 
+
+# E5: pengetahuan tentang bentuk/fungsi tindak tutur yang tersedia — BUKAN
+# planner yang menciptakan isi. Setiap act memetakan: fungsi ilokusi; sumber
+# isi yang BOLEH dipakainya (keadaan Pycos yang terbentuk lebih dulu).
+# Penambahan act di sini tidak boleh menjadi penambahan alasan/isi batin
+# lewat tabel templat: bila isi tidak terbentuk, larik dialog menutup
+# (diam), bukan mengarang. Sinkron dengan L0 (pycos/bahasa/tutur.py).
+_ACT_FUNGSI = {
+    "menyatakan":      ("menyatakan pikiran/sikap yang terbentuk", "keadaan"),
+    "menjawab":        ("menjawab dari sumber relevan (keadaan/memori/relasi)", "keadaan+memori"),
+    "bertanya":        ("bertanya yang muncul dari keingintahuan/keraguan", "keadaan+epistemik"),
+    "mengamati":       ("menyebut pengamatan atas spotlight yang ada", "keadaan+perhatian"),
+    "menolak":         ("penolakan yang muncul dari batas/nilai", "keadaan+nilai"),
+    "akrab":           ("keakraban yang muncul dari relasi/perasaan", "keadaan+relasi"),
+    "menantang":       ("menantang yang muncul dari marah/curiga", "keadaan+emosi"),
+    "menegur":         ("menegur yang muncul dari marah/keprihatinan", "keadaan+emosi+relasi"),
+    "peringatan":      ("memperingatkan yang muncul dari takut/peduli", "keadaan+emosi+relasi"),
+    "ragu":            ("keraguan yang muncul dari ketidakpastian", "keadaan+epistemik"),
+    "waspada":         ("kewaspadaan yang muncul dari takut", "keadaan+emosi"),
+    "mengenang":       ("mengenang episode yang benar-benar ada", "keadaan+memori"),
+    "eksistensial":    ("kesadaran eksistensial yang muncul dari keadaan", "keadaan+mortalitas"),
+    "rasionalisasi":   ("katahati atas disonansi yang ada", "keadaan+disonansi"),
+    "mimpi":           ("isi mimpi yang terbentuk saat lelah", "keadaan+memori+kelelahan"),
+    "menimbang":       ("jeda berpikir sebelum bertutur", "keadaan"),
+    "kembali":         ("sapaan balik atas kembalinya lawan (situasi)", "situasi+relasi"),
+    "menyapa_proaktif": ("menyapa lebih dulu (situasi diam)", "situasi+relasi"),
+    "diam":            ("diam bermakna — tanpa teks", "keadaan"),
+}
+
+def _skema_act(act: str) -> Dict[str, str]:
+    """E5: bentuk/fungsi act sebagai pengetahuan; kosong bila tidak dikenal."""
+    ent = _ACT_FUNGSI.get(str(act or "").strip().lower())
+    if ent is None:
+        return {}
+    fungsi, sumber = ent
+    return {"fungsi": fungsi, "sumber_isi": sumber}
+
+
 class Presentasi:
     """Penyaji perilaku Pycos: dari angka internal → adegan yang terbaca.
 
@@ -1859,6 +1897,15 @@ class Presentasi:
         act = act or ("menjawab" if direct is not None else
                       role_act if role_act in valid_acts else
                       self._pilih_act(kepada, topik, masuk=masuk))
+        # E5: skema act adalah pengetahuan bentuk/fungsi, bukan planner yang
+        # menciptakan isi. Act di luar skema diturunkan ke "menyatakan" —
+        # bentuk umum keadaan — bukan dipaksakan lewat templat.
+        if act not in _ACT_FUNGSI:
+            self._tutur_trace = list(getattr(self, "_tutur_trace", []) or []) + [
+                {"E5": {"act_tak_dikenal": act, "diturunkan_ke": "menyatakan"}}]
+            act = "menyatakan"
+        skema = _skema_act(act)
+        self._skema_act_terakhir = skema
         teks = ""
         niat_teks = ""
         generatif = False
