@@ -769,3 +769,95 @@ class FrasaNominaB9Test(unittest.TestCase):
                                literal="rumah", tanda="relatif")])
         isi = l3.klausa(ada, ctx)
         self.assertIn("rumah yang ", isi)
+
+
+class PolisemC6Test(unittest.TestCase):
+    """C6: polisemi ditandai; makna dipilih dari kelas kata tetangga."""
+
+    def _leks(self):
+        import json
+        from pycos.dukungan.sumber import jalur_leksikon
+        from pycos.bahasa.tutur import Leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            return Leksikon(json.load(f))
+
+    def test_bisa_mampu_vs_racun(self):
+        leks = self._leks()
+        self.assertEqual(["V"], leks.pilih_makna("id", "bisa", ["V"])["kelas"])
+        self.assertEqual(["N"], leks.pilih_makna("id", "bisa", ["DET"])["kelas"])
+
+    def test_tahu_mengetahui_vs_makanan(self):
+        leks = self._leks()
+        self.assertEqual(["V"], leks.pilih_makna("id", "tahu", ["V"])["kelas"])
+        self.assertEqual(["N"], leks.pilih_makna("id", "tahu", ["DET"])["kelas"])
+
+    def test_catatan_polisemi_otomatis(self):
+        leks = self._leks()
+        for e in leks.senses("tahu"):
+            notes = " ".join(e.get("catatan_konteks") or [])
+            self.assertIn("polisemi", notes)
+
+
+class KerangkaValensiC7Test(unittest.TestCase):
+    """C7: seluruh verba id punya kerangka_valensi yang valid."""
+
+    def test_semua_verba_id_punya_kerangka(self):
+        import json
+        from pycos.dukungan.sumber import jalur_leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            dok = json.load(f)
+        valid = {"transitif", "intransitif", "dwitransitif",
+                 "komplemen_klausa"}
+        kosong = [e["lema"] for e in dok["leksikon"]
+                  if e.get("bahasa") == "id" and "V" in e.get("kelas", [])
+                  and e.get("kerangka_valensi") not in valid]
+        self.assertEqual([], kosong)
+
+    def test_dwitransitif_berisi_tujuan(self):
+        import json
+        from pycos.dukungan.sumber import jalur_leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            dok = json.load(f)
+        dwi = [e["lema"] for e in dok["leksikon"]
+               if e.get("bahasa") == "id"
+               and e.get("kerangka_valensi") == "dwitransitif"]
+        self.assertIn("beri", dwi)
+        self.assertIn("mengirimkan", dwi)
+
+    def test_mengirimkan_restriksi_obj_entitas(self):
+        import json
+        from pycos.dukungan.sumber import jalur_leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            dok = json.load(f)
+        for lema in ("mengirimkan", "mengajarkan"):
+            e = next(x for x in dok["leksikon"]
+                     if x["bahasa"] == "id" and x["lema"] == lema)
+            self.assertEqual(["ENTITAS"], (e.get("restriksi") or {}).get("obj"))
+
+
+class IdiomC8Test(unittest.TestCase):
+    """C8: idiom multi-kata sebagai entri leksikon; sumber tunggal IDIOM_SENTIMEN."""
+
+    IDIOM = ["tak sabar", "tidak apa-apa", "baik-baik saja", "putus asa",
+             "makan hati", "angkat tangan", "tidak tahu", "mana mungkin"]
+
+    def test_idiom_ada_di_leksikon_dengan_catatan(self):
+        import json
+        from pycos.dukungan.sumber import jalur_leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            dok = json.load(f)
+        ada = {e["lema"] for e in dok["leksikon"] if e["bahasa"] == "id"}
+        for lema in self.IDIOM:
+            self.assertIn(lema, ada)
+            e = next(x for x in dok["leksikon"]
+                     if x["bahasa"] == "id" and x["lema"] == lema)
+            notes = " ".join(e.get("catatan_konteks") or [])
+            self.assertIn("idiom:", notes)
+
+    def test_idiom_sentimen_dari_leksikon(self):
+        import pycos.bahasa.teks as t
+        for lema, tanda in (("tak sabar", "negatif"),
+                            ("makan hati", "negatif"),
+                            ("angkat tangan", "netral"),
+                            ("terima kasih", "positif")):
+            self.assertEqual(tanda, t.IDIOM_SENTIMEN[lema])

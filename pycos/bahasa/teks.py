@@ -128,20 +128,118 @@ SINGKATAN: Dict[str, str] = {
     "d": "di", "k": "ke", "g": "tidak",
 }
 
+def _idiom_dari_leksikon() -> Dict[str, str]:
+    """C8: idiom sebagai entri leksikon (catatan_konteks awalan "idiom:").
+
+    Sumber tunggal adalah leksikon_pycos.json; daftar di bawah ini hanya
+    cadangan bila berkas leksikon tidak dapat dimuat.
+    """
+    bawaan = {
+        "tak sabar": "negatif",
+        "tidak sabar": "negatif",
+        "tak sabar hati": "negatif",
+        "tidak apa-apa": "netral",
+        "tidak apa apa": "netral",
+        "baik-baik saja": "positif",
+        "putus asa": "negatif",
+        "makan hati": "negatif",
+        "angkat tangan": "netral",
+        "terima kasih": "positif",
+        "tidak tahu": "netral",
+        "mana mungkin": "netral",
+    }
+    try:
+        import json
+        from pathlib import Path as _P
+        p = _P(__file__).resolve().parent.parent / "sumber_daya" / "leksikon_pycos.json"
+        with open(p, encoding="utf-8") as f:
+            dok = json.load(f)
+    except Exception as exc:  # pragma: no cover - cadangan
+        try:
+            from pycos.dukungan import diagnostik as _diag
+            _diag.catat("idiom_leksikon", f"gagal memuat leksikon: {exc!r}")
+        except Exception:
+            pass
+        return bawaan
+    peta: Dict[str, str] = {}
+    for e in dok.get("leksikon", []):
+        if e.get("bahasa") != "id":
+            continue
+        idiom = None
+        for c in e.get("catatan_konteks") or ():
+            if isinstance(c, str) and c.startswith("idiom:"):
+                idiom = c
+                break
+        if not idiom:
+            continue
+        lema = str(e.get("lema", "")).strip()
+        try:
+            v = float(e.get("valensi", 0.0) or 0.0)
+        except (TypeError, ValueError):
+            v = 0.0
+        if v > 0.15:
+            tanda = "positif"
+        elif v < -0.15:
+            tanda = "negatif"
+        else:
+            tanda = "netral"
+        peta[lema] = tanda
+    for k, v in bawaan.items():
+        peta.setdefault(k, v)
+    return peta
+
+
 # Idiom multi-kata dengan makna utuh (C8). Nilai: "positif"/"negatif"/"netral".
-IDIOM_SENTIMEN: Dict[str, str] = {
-    "tak sabar": "negatif",
-    "tidak sabar": "negatif",
-    "tidak apa-apa": "netral",
-    "tidak apa apa": "netral",
-    "baik-baik saja": "positif",
-    "putus asa": "negatif",
-    "makan hati": "negatif",
-    "angkat tangan": "netral",
-    "terima kasih": "positif",
-    "tidak tahu": "netral",
-    "mana mungkin": "netral",
-}
+# Dibangun malas (bukan saat import) agar `import pycos.bahasa.teks` tetap ringan.
+class _IdiomSentimen(dict):
+    """Mapping malas: dibangun dari leksikon pada akses pertama."""
+
+    _dibangun = False
+
+    def _bangun(self) -> None:
+        if self._dibangun:
+            return
+        self._dibangun = True
+        self.update(_idiom_dari_leksikon())
+
+    def __getitem__(self, k):
+        self._bangun()
+        return dict.__getitem__(self, k)
+
+    def __missing__(self, k):
+        self._bangun()
+        return dict.__getitem__(self, k)
+
+    def __iter__(self):
+        self._bangun()
+        return dict.__iter__(self)
+
+    def items(self):
+        self._bangun()
+        return dict.items(self)
+
+    def keys(self):
+        self._bangun()
+        return dict.keys(self)
+
+    def values(self):
+        self._bangun()
+        return dict.values(self)
+
+    def __len__(self):
+        self._bangun()
+        return dict.__len__(self)
+
+    def __contains__(self, k):
+        self._bangun()
+        return dict.__contains__(self, k)
+
+    def get(self, k, default=None):
+        self._bangun()
+        return dict.get(self, k, default)
+
+
+IDIOM_SENTIMEN: Dict[str, str] = _IdiomSentimen()
 
 # Kata fungsi untuk deteksi bahasa (D12).
 FUNGSI_ID: Set[str] = frozenset({

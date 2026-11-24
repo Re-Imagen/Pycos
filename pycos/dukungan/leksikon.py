@@ -78,18 +78,22 @@ def periksa() -> Dict[str, Any]:
     # LeksikonCiri positif/negatif tidak boleh berlawanan valensi lema
     # yang sama di leksikon utama.
     from pycos.bahasa.tutur import LEKSIKON_CIRI_BAWAAN
-    peta_valensi = {str(e.get("lema", "")).lower(): float(e.get("valensi", 0) or 0)
-                    for e in json.loads(raw)["leksikon"]
-                    if e.get("bahasa") == "id"}
+    # polisem-aware: kumpulkan SEMUA valensi per lema; konflik hanya bila
+    # seluruh makna berlawanan dengan daftar ciri.
+    peta_valensi: Dict[str, list] = {}
+    for e in json.loads(raw)["leksikon"]:
+        if e.get("bahasa") == "id":
+            peta_valensi.setdefault(str(e.get("lema", "")).lower(),
+                                    []).append(float(e.get("valensi", 0) or 0))
     for kata in LEKSIKON_CIRI_BAWAAN.positif:
         valensi = peta_valensi.get(str(kata).lower())
-        if valensi is not None and valensi < 0:
+        if valensi is not None and all(v < 0 for v in valensi):
             raise ValueError(
                 "konflik tanda: '{}' positif di daftar ciri, "
-                "tetapi valensi {} di leksikon".format(kata, valensi))
+                "tetapi semua valensi {} di leksikon".format(kata, valensi))
     for kata in LEKSIKON_CIRI_BAWAAN.negatif:
         valensi = peta_valensi.get(str(kata).lower())
-        if valensi is not None and valensi > 0:
+        if valensi is not None and all(v > 0 for v in valensi):
             raise ValueError(
                 "konflik tanda: '{}' negatif di daftar ciri, "
                 "tetapi valensi {} di leksikon".format(kata, valensi))
