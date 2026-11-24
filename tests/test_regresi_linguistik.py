@@ -861,3 +861,95 @@ class IdiomC8Test(unittest.TestCase):
                             ("angkat tangan", "netral"),
                             ("terima kasih", "positif")):
             self.assertEqual(tanda, t.IDIOM_SENTIMEN[lema])
+
+
+class HubunganE6Test(unittest.TestCase):
+    """E6: pikiran yang aktif bersamaan dihubungkan sesuai hubungannya."""
+
+    def _l3(self, seed=1):
+        import random as _r
+        import json
+        from pycos.dukungan.sumber import jalur_leksikon
+        from pycos.bahasa.tutur import L3, Leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            return L3(Leksikon(json.load(f)), _r.Random(seed))
+
+    def _node(self, *hub_args, **hub_kw):
+        from pycos.bahasa.tutur import Node, Arg
+        node = Node("MENOLAK", [Arg("AGENT", "ANIMAT", isi="aku")], **hub_kw)
+        node.args.append(Arg("TINDAKAN", "TINDAKAN", isi="menyesali api"))
+        if hub_args:
+            node.args.append(Arg("ALASAN", "PROPOSISI", isi=hub_args[0]))
+        return node
+
+    def test_alasan_sebab_gabung_karena(self):
+        from pycos.bahasa.tutur import GenContext
+        l3 = self._l3()
+        t = l3.klausa(self._node("jujur"), GenContext(bahasa="id", seed=1))
+        self.assertIn("karena jujur", t)
+        self.assertNotIn("Jujur.", t)
+
+    def test_alasan_konsesi_gabung_meski(self):
+        from pycos.bahasa.tutur import GenContext
+        l3 = self._l3()
+        t = l3.klausa(self._node("jujur", hubungan="konsesi"),
+                      GenContext(bahasa="id", seed=1))
+        self.assertIn("meski jujur", t)
+
+    def test_episode_utuh_tidak_diringkas(self):
+        from pycos.bahasa.tutur import L3, Leksikon, GenContext, Node, Arg
+        import json
+        import random as _r
+        from pycos.dukungan.sumber import jalur_leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            leks = Leksikon(json.load(f))
+        l3 = L3(leks, _r.Random(1))
+        node = Node("INGAT", [Arg("EXPERIENCER", "ANIMAT", isi="aku"),
+                              Arg("EPISODE", "PERISTIWA",
+                                  isi="malam tadi api membesar")])
+        t = l3.klausa(node, GenContext(bahasa="id", seed=1))
+        self.assertIn("malam tadi api membesar", t)
+
+class RepairE10Test(unittest.TestCase):
+    """E10: repair dengan empat strategi — bukan satu kalimat tetap."""
+
+    def _kes(self):
+        from pycos.inti.naluri import Naluri
+        n = Naluri(name="Rama", rng_seed=7, params={
+            "enable_kesadaran": True, "enable_presentasi": True,
+            "enable_pragmatics": True,
+        })
+        return n.kesadaran
+
+    def test_minta_ulang(self):
+        ks = self._kes()
+        e = ks.repair("salah_dengar")
+        self.assertEqual("minta_ulang", e["strategi"])
+        self.assertIn("diulang", e["frasa"])
+
+    def test_konfirmasi_echo(self):
+        ks = self._kes()
+        e = ks.repair("pemahaman", konteks={"teks": "api semakin besar"})
+        self.assertEqual("konfirmasi", e["strategi"])
+        self.assertEqual("maksudmu api semakin besar?", e["frasa"])
+
+    def test_koreksi_diri(self):
+        ks = self._kes()
+        e = ks.repair("lupa", konteks={"salah": "sepuluh",
+                                       "koreksi": "seribu"})
+        self.assertEqual("koreksi_diri", e["strategi"])
+        self.assertIn("eh, bukan sepuluh maksudku", e["frasa"])
+        self.assertIn("seribu", e["frasa"])
+
+    def test_klarifikasi_bagian(self):
+        ks = self._kes()
+        e = ks.repair("pemahaman", konteks={"bagian": "hutang"})
+        self.assertEqual("konfirmasi", e["strategi"])  # jenis > konteks
+        e2 = ks.repair("apa gitu", konteks={"bagian": "hutang"})
+        self.assertEqual("klarifikasi", e2["strategi"])
+        self.assertIn("hutang", e2["frasa"])
+
+    def test_default_minta_ulang(self):
+        ks = self._kes()
+        e = ks.repair("entah")
+        self.assertEqual("minta_ulang", e["strategi"])

@@ -2155,11 +2155,83 @@ class Kesadaran:
             self.backchannels = self.backchannels[-32:]
         return entry
 
-    def repair(self, jenis: str, sebab: str = "") -> Dict[str, Any]:
-        """Perbaikan percakapan: salah dengar, lupa, terpotong."""
+    # E10: strategi perbaikan percakapan yang tersedia — pengetahuan tentang
+    # bentuk/fungsi, dipilih dari jenis & sebab, bukan satu kalimat tetap.
+    _STRATEGI_REPAIR: Dict[str, Any] = {
+        "minta_ulang": {
+            "fungsi": "meminta pengulangan bila lawan tak terdengar/kabur",
+            "frasa": lambda k: "bisa diulang?",
+        },
+        "konfirmasi": {
+            "fungsi": "mengonfirmasi pemahaman: 'maksudmu …?'",
+            "frasa": lambda k: ("maksudmu " + str(k.get("teks", "")).strip()[:60]
+                                + "?").rstrip("?").rstrip() + "?",
+        },
+        "koreksi_diri": {
+            "fungsi": "mengoreksi ucapan sendiri: 'eh, bukan … maksudku …'",
+            "frasa": lambda k: (
+                "eh, bukan " + str(k.get("salah", "")).strip()[:40]
+                + " maksudku"
+                + (" — " + str(k.get("koreksi", "")).strip()[:60] if k.get("koreksi") else "")
+                + "." if k.get("salah") else "eh, bukan begitu maksudku."),
+        },
+        "klarifikasi": {
+            "fungsi": "meminta bagian yang tak dipahami diperjelas",
+            "frasa": lambda k: (
+                ("maksudmu yang '" + str(k.get("bagian", "")).strip()[:40]
+                 + "' itu?") if k.get("bagian")
+                else "bagian mana yang kamu maksud?"),
+        },
+    }
+    _JENIS_KE_STRATEGI: Dict[str, str] = {
+        "salah_dengar": "minta_ulang",
+        "terpotong": "minta_ulang",
+        "lupa": "koreksi_diri",
+        "pemahaman": "konfirmasi",
+        "giliran": "klarifikasi",
+    }
+
+    def repair(self, jenis: str, sebab: str = "",
+               konteks: Optional[Mapping[str, Any]] = None,
+               strategi: Optional[str] = None) -> Dict[str, Any]:
+        """Perbaikan percakapan: salah dengar, lupa, terpotong.
+
+        E10: empat strategi — minta ulang, konfirmasi pemahaman
+        ("maksudmu …?"), koreksi diri ("eh, bukan … maksudku …"), dan
+        klarifikasi bagian yang tak dipahami. Dipilih dari `strategi`
+        eksplisit bila diberikan, dari `jenis` bila dikenal, lalu dari
+        kata kunci `sebab`, dengan cadangan "minta_ulang".
+        """
+        konteks = dict(konteks or {})
+        pilih = strategi if strategi in self._STRATEGI_REPAIR else None
+        if pilih is None:
+            pilih = self._JENIS_KE_STRATEGI.get(str(jenis).strip().lower())
+        if pilih is None:
+            # konteks terstruktur adalah sinyal: bagian tak dipahami →
+            # klarifikasi; kesalahan ucap sendiri → koreksi_diri; teks yang
+            # digemakan → konfirmasi.
+            if konteks.get("bagian"):
+                pilih = "klarifikasi"
+            elif konteks.get("salah") or konteks.get("koreksi"):
+                pilih = "koreksi_diri"
+            elif konteks.get("teks"):
+                pilih = "konfirmasi"
+        if pilih is None:
+            s_low = str(sebab).lower()
+            if any(w in s_low for w in ("kurang jelas", "bising", "kabur",
+                                        "tak terdengar", "terpotong")):
+                pilih = "minta_ulang"
+            elif any(w in s_low for w in ("maaf", "eh", "salah")):
+                pilih = "koreksi_diri"
+            elif any(w in s_low for w in ("maksud", "paham", "erti")):
+                pilih = "konfirmasi"
+            else:
+                pilih = "minta_ulang"
+        frasa = self._STRATEGI_REPAIR[pilih]["frasa"](konteks)
         entry = {"tick": self._tick(), "jenis": str(jenis)[:40],
                  "sebab": str(sebab)[:80],
-                 "frasa": "maaf, maksudku tadi..."}
+                 "strategi": pilih,
+                 "frasa": frasa[:120]}
         self.repairs.append(entry)
         if len(self.repairs) > 32:
             self.repairs = self.repairs[-32:]
