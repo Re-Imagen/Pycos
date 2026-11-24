@@ -1874,6 +1874,39 @@ class Presentasi:
             # F3 + anti-pengulangan: hasilkan beberapa variasi dari keadaan
             # & pikiran yang SAMA; pilih yang (a) bukan pengulangan dan
             # (b) lolos pemeriksa gramatika G1 — tanpa mengubah isi batin.
+            def _masalah_selaras(calon: str) -> List[str]:
+                """G3: kandidat melanggar pantangan/persona dihindari.
+
+                Bila ada kandidat lain dari keadaan yang sama yang lolos,
+                pemakaian `for _coba` yang memilihnya — evaluasi kandidat
+                berikutnya dari lingkaran revisi G3, tanpa mengubah isi
+                pikiran Pycos.
+                """
+                persona_g3 = (getattr(self, "persona", None)
+                              or getattr(self.naluri, "persona", None))
+                if persona_g3 is None:
+                    return []
+                try:
+                    from pycos.inti.persona import Keadaan
+                    from pycos.refleksi.nurani import nilai_selaras
+                    keadaan_g3 = Keadaan.dari_mood(self.naluri.mood(),
+                                                   ketidakpastian=self._doubt())
+                    rep = nilai_selaras(
+                        persona_g3, keadaan_g3, calon,
+                        ujaran_lawan=str(self._ucapan_terakhir or "") or None,
+                        giliran_sebelumnya=(self._recent_texts[-1]
+                                            if self._recent_texts else None))
+                    if rep.status == "melanggar_pantangan":
+                        return ["melanggar_pantangan"]
+                    if rep.status == "tidak_selaras":
+                        return ["tidak_selaras"]
+                    return []
+                except Exception as _galat_diagnostik_110:
+                    _diag.catat('naluri.Presentasi.ucap',
+                                "galat pada jalur fallback",
+                                galat=_galat_diagnostik_110, jalur=110)
+                    return []
+
             leks_f3 = None
             try:
                 _eng_f3 = self.tutur_engine()
@@ -1911,12 +1944,16 @@ class Presentasi:
                     # E4: tak ada dasar untuk bertutur — kandidat hampa.
                     masalah = ["kandidiat_hampa"]
                 else:
+                    # G3 (batas): pantangan/selaras + G1 memakai jalur
+                    # yang sama — kandidat melanggar ditandai; loop
+                    # memilih kandidat terbersih.
+                    masalah = _masalah_selaras(str(calon))
                     try:
                         from pycos.bahasa.teks import (periksa_gramatika as
                                                        _pgm, G1_KERAS)
                         g1 = _pgm(str(calon), leks_f3)
-                        masalah = [m for m in g1 if m in G1_KERAS]
-                        masalah += [m for m in g1 if m not in G1_KERAS]
+                        masalah = list(masalah) + [m for m in g1 if m in G1_KERAS]
+                        masalah = list(masalah) + [m for m in g1 if m not in G1_KERAS]
                     except Exception as _galat_diagnostik_109:
                         _diag.catat('naluri.Presentasi.ucap',
                                     "galat pada jalur fallback",

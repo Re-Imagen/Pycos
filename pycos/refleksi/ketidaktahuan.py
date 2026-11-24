@@ -271,10 +271,19 @@ def _episodik(npc: Any, query: Tuple[str, ...]) -> Dict[str, Any]:
 def _affective_signature(text: Any) -> Optional[int]:
     # Identik dengan Nurani.keywords/context_signature, tetapi dihitung lokal:
     # context_signature mengisi cache dan karena itu tidak boleh dipanggil.
-    words = set(_AFFECTIVE_WORD_RE.findall(_text(text).lower()))
-    if not words:
+    # Nurani.keywords adalah fungsi murni atas isi teks (tanpa menyentuh
+    # _sig_cache); signature = crc32 atas lema tergabung persis seperti
+    # context_signature, sehingga slot tersimpan selalu cocok.
+    try:
+        from pycos.refleksi.nurani import Nurani
+        keywords = Nurani.keywords(_text(text))
+    except Exception:
+        words = set(_AFFECTIVE_WORD_RE.findall(_text(text).lower()))
+        if not words:
+            return None
+        keywords = tuple(sorted(words)[:8])
+    if not keywords:
         return None
-    keywords = sorted(words)[:8]
     return zlib.crc32("|".join(keywords).encode("utf-8")) & 0xFFFFFFFF
 
 

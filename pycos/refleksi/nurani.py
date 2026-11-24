@@ -584,15 +584,71 @@ class Nurani:
             return float(NURANI_DEFAULTS[key])
         return float(v)
 
+    # frekuensi korpus internal (log-frekuensi, semakin kecil semakin
+    # informatif). Diekstrak dari leksikon utama saat pertama dipakai;
+    # kata di luar leksikon diperlakukan sebagai sangat langka.
+    _FREK_LEKSIKON: Dict[str, float] = {}
+    _FREK_SIAP: bool = False
+
+    @classmethod
+    def _muat_frekuensi(cls) -> None:
+        if cls._FREK_SIAP:
+            return
+        try:
+            import json as _json
+            from pycos.dukungan.sumber import jalur_leksikon
+            with open(jalur_leksikon(), encoding="utf-8") as f:
+                dok = _json.load(f)
+            fr: Dict[str, float] = {}
+            for e in dok.get("leksikon", ()):
+                if e.get("bahasa") == "id":
+                    fr[str(e.get("lema", "")).lower()] = max(
+                        float(e.get("frekuensi", 0.0) or 0.0), 1e-3)
+            cls._FREK_LEKSIKON = fr
+        except Exception:
+            cls._FREK_LEKSIKON = {}
+        cls._FREK_SIAP = True
+
     # ==================== PILAR A — memori afektif ====================
     @staticmethod
-    def keywords(text: str) -> Tuple[str, ...]:
-        """<=8 kata kunci unik (kata huruf kecil, panjang min 4 = stopword
-        pendek terbuang) dari sebuah deskripsi, terurut agar stabil."""
+    def _bobot_kata(kata: str, posisi: int, jumlah: int) -> float:
+        """Kepentingan kata (G4): kelangkaan korpus + posisi awal.
+
+        Semakin jarang di leksikon, semakin besar bobot; token di paruh
+        awal teks sedikit lebih menentukan signature konteks.
+        """
+        fr = Nurani._FREK_LEKSIKON.get(kata, 1e-3)
+        kelangkaan = -math.log10(fr)          # 0..3
+        posisi_bobot = 0.35 if posisi < max(1, jumlah // 2) else 0.0
+        return kelangkaan + posisi_bobot
+
+    @classmethod
+    def keywords(cls, text: str) -> Tuple[str, ...]:
+        """<=8 kata kunci terpenting (G4) dari isi sebuah deskripsi.
+
+        Dulu: urutan abjad dipotong 8. Sekarang: lema hasil stemming
+        (dari `_lexical_words` yang sama dipakai anticipate_words),
+        diberi bobot kelangkaan korpus dan posisi, terurut menurun;
+        tie-break abjad agar stabil lintas proses.
+        """
         if not text:
             return ()
-        kata = {w for w in re.findall(r"[a-z]{4,}", str(text).lower())}
-        return tuple(sorted(kata)[:8])
+        cls._muat_frekuensi()
+        kata = Nurani._lexical_words(text)
+        if not kata:
+            return ()
+        try:
+            from pycos.bahasa.teks import stem as _stem
+            lemmas = [_stem(w) for w in kata]
+        except Exception:
+            lemmas = list(kata)
+        unik = list(dict.fromkeys(lemmas))
+        n = len(unik)
+        berbobot = sorted(
+            enumerate(unik), key=lambda ix: (-cls._bobot_kata(ix[1], ix[0], n),
+                                             ix[1]))
+        pilih = [w for _, w in berbobot[:8]]
+        return tuple(sorted(pilih))
 
     def context_signature(self, text: str) -> int:
         """Signature 32-bit sebuah deskripsi (crc32, deterministik antar-proses)."""
@@ -649,22 +705,60 @@ class Nurani:
 
     @staticmethod
     def _lexical_words(text: str) -> Tuple[str, ...]:
-        """Token kata Unicode yang stabil untuk pembelajaran asosiasi kecil."""
+        """Token lema Unicode yang stabil untuk asosiasi kata→drive (G5).
+
+        * token di-stem ke lema ("menyerang" == "serang");
+        * token dalam cakupan negasi (D2) tidak ikut — "tidak senang"
+          tidak boleh memperkuat asosiasi "senang";
+        * bigram kata isi juga ditambahkan ("kepekaan sosial"), dibatasi
+          total 32 token.
+        """
         stop = {
             "yang", "dan", "atau", "untuk", "dari", "pada", "dengan", "ini", "itu",
             "akan", "telah", "dalam", "karena", "agar", "oleh", "saat", "jika",
+            "tidak", "bukan", "tak", "belum", "jangan", "tanpa",
+            "nggak", "enggak", "gak", "tiada", "iya",
+            # pronomina: tidak membawa muatan afektif
+            "aku", "saya", "daku", "kamu", "kau", "anda", "dia", "ia",
+            "kami", "kita", "mereka", "-ku", "-mu", "-nya",
             "the", "and", "or", "for", "from", "with", "this", "that", "was",
             "were", "are", "you", "your", "have", "has", "had", "into", "over",
         }
+        try:
+            from pycos.bahasa.teks import tokenisasi as _tok, cakupan_negasi as _cak, stem as _stem
+            potong = _tok(str(text or ""))
+            cakup = _cak(potong)
+            isi: List[str] = []
+            for i, t in enumerate(potong):
+                if t.jenis != "kata" or len(t.bentuk) < 3:
+                    continue
+                if cakup[i]:
+                    continue                      # dalam cakupan negasi
+                if t.bentuk in stop:
+                    continue
+                isi.append(_stem(t.bentuk))
+        except Exception:
+            isi = [w for w in re.findall(r"[^\W\d_]{3,}",
+                                         str(text or "").casefold(),
+                                         flags=re.UNICODE)
+                   if w not in stop]
         seen = set()
         words: List[str] = []
-        for word in re.findall(r"[^\W\d_]{3,}", str(text or "").casefold(), flags=re.UNICODE):
-            if word in stop or word in seen:
-                continue
-            seen.add(word)
-            words.append(word)
-            if len(words) >= 32:
-                break
+
+        def _tambah(w: str) -> bool:
+            if w in seen:
+                return False
+            seen.add(w)
+            words.append(w)
+            return len(words) < 32
+
+        for w in isi:
+            if not _tambah(w):
+                return tuple(words)
+        # bigram isi (dipakai bila kuota masih ada)
+        for a, b in zip(isi, isi[1:]):
+            if not _tambah(a + " " + b):
+                return tuple(words)
         return tuple(words)
 
     def _evict_word_delta(self, kini: int) -> None:
@@ -3524,13 +3618,45 @@ def _saran_dimensi(nama: str, obs: float, target: float) -> str:
             if kurang else "kurangi ungkapan ragu dan nyatakan lebih tegas")
 
 
+def _stem_bantu(kata: str) -> str:
+    try:
+        from pycos.bahasa.teks import stem as _stem
+        return _stem(kata)
+    except Exception:
+        return str(kata or "").lower()
+
+
+def _lemma_set(teks: str) -> set:
+    """Himpunan lema stemmed (minus kata fungsi) untuk kemiripan (G2/G5)."""
+    try:
+        from pycos.bahasa.teks import stem as _stem
+        from pycos.refleksi.nurani import Nurani as _N
+        return set(_N._lexical_words(teks)) | {
+            _stem(w) for w in re.findall(r"[^\W\d_]{3,}", str(teks or "").lower())}
+    except Exception:
+        return set(re.findall(r"[a-z]{4,}", str(teks or "").lower()))
+
+
+def _jaccard(a: set, b: set) -> float:
+    if not a or not b:
+        return 0.0
+    return len(a & b) / float(len(a | b))
+
+
 def nilai_selaras(persona: "Persona", keadaan: "Keadaan", teks: str,
-                  leksikon: Optional["LeksikonCiri"] = None) -> Laporan:
+                  leksikon: Optional["LeksikonCiri"] = None,
+                  ujaran_lawan: Optional[str] = None,
+                  giliran_sebelumnya: Optional[str] = None) -> Laporan:
     """Nilai `teks` terhadap `persona` dan `keadaan`. Tidak pernah mengubah input.
 
     `persona` dan `keadaan` duck-typed (cukup atribut `nama`/`sifat_of`/
     `register`/`pantangan` dan `valensi`/`gairah`/`ketidakpastian`). `leksikon`
     opsional; bila None, leksikon ciri bawaan `pycos.bahasa.tutur` dipakai.
+
+    G2: `ujaran_lawan` dan `giliran_sebelumnya` (opsional) menambah dimensi
+    relevansi terhadap ujaran lawan, koherensi dengan giliran sebelumnya, dan
+    konsistensi persona (kata favorit, bila persona menyediakannya). Pantangan
+    dicocokkan setelah stemming sehingga infleksi yang sama tetap tertangkap.
     """
     from pycos.bahasa.tutur import analisis_teks, token_dari
 
@@ -3562,10 +3688,57 @@ def nilai_selaras(persona: "Persona", keadaan: "Keadaan", teks: str,
     dimensi.append(_dimensi("keraguan", obs, tgt, 1.0,
                             "ujaran kosong" if obs is None else ""))
 
+    lema_teks = _lemma_set(teks)
+
+    def _dimensi_skala(nama, obs, skor, catatan):
+        return DimensiSkor(nama, round(obs, 3), None,
+                           round(jepit_01(skor) if abs(skor) > 1e-12 else 0.0, 3),
+                           "" if skor >= AMBANG_SELARAS else catatan)
+
+    # G2: relevansi terhadap ujaran lawan. Nol tumpang tindih = skor 0;
+    # tumpang tindih ≥ 0,30 dianggap relevan sepenuhnya (bukan menjiplak).
+    if ujaran_lawan:
+        sim_lawan = _jaccard(lema_teks, _lemma_set(ujaran_lawan))
+        dimensi.append(_dimensi_skala(
+            "relevansi", sim_lawan, min(1.0, sim_lawan / 0.30),
+            "tidak terkait ujaran lawan"))
+    # G2: koherensi dengan giliran sebelumnya — sebagian tumpang tindih
+    # ideal; identik = repetisi (skor 0).
+    if giliran_sebelumnya:
+        sim_sblm = _jaccard(lema_teks, _lemma_set(giliran_sebelumnya))
+        naik = min(1.0, sim_sblm / 0.15) if sim_sblm else 0.0
+        turun = 1.0 if sim_sblm <= 0.6 else max(0.0, 1.0 - (sim_sblm - 0.6) / 0.4)
+        dimensi.append(_dimensi_skala(
+            "koherensi", sim_sblm, naik * turun,
+            "giliran sebelumnya tidak dipakai"))
+    # G2: konsistensi persona — kata favorit persona yang memang dipakai.
+    kata_favorit = tuple(getattr(persona, "kata_favorit", ()) or ())
+    if kata_favorit:
+        dipakai = sum(1 for k in kata_favorit
+                      if _stem_bantu(k) in lema_teks)
+        rata = dipakai / float(len(kata_favorit))
+        dimensi.append(_dimensi_skala(
+            "konsistensi_persona", rata, min(1.0, rata * 2.0),
+            "kata favorit persona tidak tampak"))
+
     hasil_dimensi = tuple(dimensi)
-    token = " " + " ".join(token_dari(teks)) + " "
-    pelanggaran = tuple(p for p in persona.pantangan
-                        if " " + " ".join(token_dari(p)) + " " in token)
+    # pantangan: cocokkan SETELAH stemming (B4) — infleksi tetap tertangkap
+    try:
+        from pycos.bahasa.teks import stem as _stem_pantangan
+        lema_urutan = [_stem_pantangan(t) for t in token_dari(teks)]
+    except Exception:
+        lema_urutan = list(token_dari(teks))
+    token = " " + " ".join(lema_urutan) + " "
+    pelanggaran = []
+    for p in persona.pantangan:
+        try:
+            from pycos.bahasa.teks import stem as _stem_p
+            frasa = " ".join(_stem_p(t) for t in token_dari(p))
+        except Exception:
+            frasa = " ".join(token_dari(p))
+        if " " + frasa + " " in token:
+            pelanggaran.append(p)
+    pelanggaran = tuple(pelanggaran)
 
     nilai = [d.skor for d in dimensi if d.skor is not None]
     skor = round(sum(nilai) / len(nilai), 3) if nilai else None

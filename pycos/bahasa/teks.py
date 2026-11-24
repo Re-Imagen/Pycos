@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple
 __all__ = [
     "Token", "tokenisasi", "normalisasi_token", "normalisasi_teks",
     "pecah_kalimat", "stem", "kandidat_dasar", "cakupan_negasi",
+    "urai_reduplikasi", "reduplikasi", "REDUP_UBAH_BUNYI",
     "jenis_kalimat", "jenis_pertanyaan", "urai_subjek_predikat",
     "tindak_tutur_skor", "ekstrak_entitas", "ekstrak_topik",
     "deteksi_bahasa", "kemiripan", "koreksi_ejaan", "periksa_gramatika",
@@ -327,6 +328,12 @@ def kandidat_dasar(kata: str) -> List[str]:
     w = re.sub(r"(.)\1{2,}", r"\1", w)
     if not w:
         return []
+    # reduplikasi berubah bunyi (B6): tabel diprioritaskan
+    if w in REDUP_UBAH_BUNYI:
+        dasar = REDUP_UBAH_BUNYI[w]
+        if dasar == w:
+            return [w]
+        return list(dict.fromkeys([w, dasar] + kandidat_dasar(dasar)))
     # reduplikasi: "marah-marah" -> "marah"; "bolak-balik" -> tetap utuh dulu
     if "-" in w:
         parts = w.split("-")
@@ -441,6 +448,91 @@ def kosakata_bawaan() -> frozenset:
                          if e.get("bahasa") == "id" and e.get("lema"))
     except Exception:
         return frozenset()
+
+
+REDUP_UBAH_BUNYI: Dict[str, str] = {
+    # reduplikasi berubah bunyi → dasar (B6)
+    "bolak-balik": "bolak-balik",   # utuh sebagai lema, bukan dua kali "bolak"
+    "sayur-mayur": "sayur",
+    "warna-warni": "warna",
+    "lauk-pauk": "lauk",
+    "tetek-bengek": "tetek-bengek",
+    "gerak-gerik": "gerak",
+    "turun-temurun": "turun",
+    "mondar-mandir": "mondar-mandir",
+    "mundar-mandir": "mondar-mandir",
+    "selang-seling": "selang-seling",
+    "campur-baur": "campur",
+    "ramah-tamah": "ramah",
+    "sahut-sahutan": "sahut",
+    "huru-hara": "huru-hara",
+    "kacau-balau": "kacau",
+    "simpang-siur": "simpang",
+    "gilang-gemilang": "gilang",
+    "puji-pujian": "puji",
+    "caci-maki": "caci",
+    "huru-hara": "huru-hara",
+}
+
+_REDUP_TERBALIK: Dict[str, str] = {}
+for _utuh, _dasar in REDUP_UBAH_BUNYI.items():
+    if _dasar != _utuh:
+        _REDUP_TERBALIK.setdefault(_dasar, _utuh)
+
+
+def urai_reduplikasi(kata: str) -> List[str]:
+    """Urai reduplikasi dua arah (B6).
+
+    * penuh: "marah-marah" -> ["marah-marah", "marah"]
+    * berimbuhan: "menakut-nakuti" -> ["menakut-nakuti", "menakut", "takut"]
+    * berubah bunyi: "sayur-mayur" -> ["sayur-mayur", "sayur"]
+      ("bolak-balik" adalah lema utuh: tidak dipecah menjadi "bolak").
+
+    Kandidat pertama adalah bentuk asli (untuk validasi ke leksikon).
+    """
+    w = unicodedata.normalize("NFC", str(kata or "")).strip().lower()
+    w = re.sub(r"(.)\1{2,}", r"\1", w)
+    if not w:
+        return []
+    out: List[str] = [w]
+    if w in REDUP_UBAH_BUNYI:
+        dasar = REDUP_UBAH_BUNYI[w]
+        if dasar != w:
+            out.append(dasar)
+        return list(dict.fromkeys(out))
+    if "-" not in w:
+        return out
+    parts = w.split("-")
+    if len(parts) != 2 or not parts[0] or not parts[1]:
+        return out
+    a, b = parts
+    if a == b:
+        out.append(a)                      # reduplikasi penuh
+        return list(dict.fromkeys(out))
+    out.append(a)                          # berimbuhan: urai bagian pertama
+    if b.startswith("n") and a.endswith(b[1:]):
+        pass                                # "menakut-nakuti" sudah ditangani a
+    return list(dict.fromkeys(out))
+
+
+def reduplikasi(kata: str, makna: str = "jamak") -> str:
+    """Bangkitkan reduplikasi (B6): jamak, intensitas, atau 'agak'.
+
+    Qua bentuk permukaan ketiganya X-X; perbedaan maknanya berasal dari kelas
+    kata dan konteks (jamak untuk nomina, intensitas/agak untuk adjektiva —
+    "merah-merah" ≈ agak merah). Dasar yang punya reduplikasi berubah bunyi
+    memakainya (sayur → sayur-mayur); selain itu X-X.
+    """
+    w = unicodedata.normalize("NFC", str(kata or "")).strip().lower()
+    w = re.sub(r"(.)\1{2,}", r"\1", w)
+    if not w:
+        return ""
+    if makna not in ("jamak", "intensitas", "agak"):
+        raise ValueError("makna reduplikasi: jamak | intensitas | agak")
+    if w in REDUP_UBAH_BUNYI or "-" in w:
+        return w
+    ubah = _REDUP_TERBALIK.get(w)
+    return ubah if ubah else w + "-" + w
 
 
 def stem(kata: str, kosakata: Optional[Set[str]] = None) -> str:
