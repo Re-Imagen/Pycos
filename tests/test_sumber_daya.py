@@ -102,7 +102,7 @@ class IsiLeksikonTest(unittest.TestCase):
         self.assertEqual(len(self.data["leksikon"]),
                          int(meta["jumlah_lema"]),
                          "meta.jumlah_lema berbeda dari isi leksikon")
-        self.assertEqual(4229, len(self.data["leksikon"]))
+        self.assertEqual(4262, len(self.data["leksikon"]))
 
     def test_pembagian_bahasa_sesuai_metadata(self):
         meta = self.data["meta"]
@@ -112,7 +112,7 @@ class IsiLeksikonTest(unittest.TestCase):
             nyata[entri.get("bahasa", "?")] = nyata.get(
                 entri.get("bahasa", "?"), 0) + 1
         self.assertEqual({k: int(v) for k, v in per_bahasa.items()}, nyata)
-        self.assertEqual(4229, sum(nyata.values()))
+        self.assertEqual(4262, sum(nyata.values()))
 
 
 class TuturDanLeksikonTest(unittest.TestCase):
@@ -121,7 +121,7 @@ class TuturDanLeksikonTest(unittest.TestCase):
 
         engine = TuturEngine(path=jalur_leksikon())
         self.assertTrue(engine.tersedia())
-        self.assertEqual(4229, engine.info()["jumlah_lema"])
+        self.assertEqual(4262, engine.info()["jumlah_lema"])
         ujaran = engine.ucap(GenContext(act="menyatakan", topik="api",
                                         niat="aku melihat api", seed=2))
         self.assertIsNotNone(ujaran)

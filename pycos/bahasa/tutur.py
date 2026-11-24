@@ -196,6 +196,47 @@ class Leksikon:
     def ambil(self, bahasa: str, lema: str) -> Optional[Dict[str, Any]]:
         return self._by_lema.get((bahasa, _norm(lema)))
 
+    def pilih_makna(self, bahasa: str, lema: str,
+                    kelas_tetangga: Optional[Sequence[str]] = None
+                    ) -> Optional[Dict[str, Any]]:
+        """Disambiguasi polisem berdasar kelas kata tetangga (C6).
+
+        Aturan bobot (dokumentasi §C6): nomina/pronomina sebelum/sesudah → V;
+        determiner/numeralia sebelum nomina → N; nomina (/NP) → N;
+        adjektiva tetangga → ADJ (+1.5); tetangga verba → V bantu/modal (+1.0);
+        adverbalia → ADV (+0.75); interjeksi → INTJ (+0.5);
+        frekuensi leksikal ×0.5. Mengembalikan entri terpilih; bila hanya
+        satu entri, dia yang dipakai.
+        """
+        semua = self.senses(lema, bahasa)
+        if len(semua) <= 1:
+            return semua[0] if semua else None
+        tetangga = list(kelas_tetangga or ())
+        bobot: Dict[int, float] = {id(e): 0.0 for e in semua}
+        for e in semua:
+            kelas = set(e.get("kelas", []))
+            s = bobot[id(e)]
+            if "V" in kelas and any(t in ("N", "PRON") for t in tetangga):
+                s += 2.0          # nomina/pronomina di samping → V
+            if "N" in kelas and any(t in ("DET", "NUM") for t in tetangga):
+                s += 2.0          # determiner/numeralia sebelum nomina → N
+            if "N" in kelas and "N" in tetangga:
+                s += 0.75
+            if "ADJ" in kelas and any(t == "N" for t in tetangga):
+                s += 1.5
+            if "V" in kelas and any(t == "V" for t in tetangga):
+                s += 1.0          # bantu/modal verba + verba lain → V
+            if "ADV" in kelas and any(t in ("V", "ADJ", "ADV") for t in tetangga):
+                s += 0.75
+            if "INTJ" in kelas and not tetangga:
+                s += 0.5
+            try:
+                s += 0.5 * float(e.get("frekuensi", 0.5) or 0.5)
+            except (TypeError, ValueError):
+                s += 0.25
+            bobot[id(e)] = s
+        return max(semua, key=lambda e: bobot[id(e)])
+
     def kandidat(self, kelas: str, bahasa: str) -> List[Dict[str, Any]]:
         out = []
         for e in self._by_kelas.get(kelas, []):
