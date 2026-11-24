@@ -300,6 +300,14 @@ class Leksikon:
 # ===========================================================================
 # struktur semantik
 # ===========================================================================
+def _pertahankan_kapitalisasi(s: str) -> str:
+    """Kapitalisasi nama diri dipertahankan; yang lain dinormalkan (B10)."""
+    mentah = " ".join(str(s or "").strip().split())
+    if any(ch.isupper() for ch in mentah):
+        return mentah
+    return mentah.lower()
+
+
 @dataclass
 class Arg:
     """Argumen proposisi: berperan, bertipe, dan berisi rujukan.
@@ -307,6 +315,7 @@ class Arg:
     `mode` menentukan apakah isi sudah berupa RUJUKAN leksikal ("aku", "api",
     sebuah episode) atau masih berupa SPESIFIKASI semantik yang harus dipilihkan
     lema oleh L2. Ini yang membedakan "biografi sebagai argumen" dari template.
+    `tanda` membawa penanda khusus (mis. "nama_diri") tanpa mengubah isi.
     """
     peran: str
     tipe: str
@@ -314,6 +323,7 @@ class Arg:
     literal: Any = None        # nilai (mis. tingkat 0.6)
     opsional: bool = False
     mode: str = "rujuk"        # rujuk | isi
+    tanda: str = ""            # B10: mis. "nama_diri" — kapital dipertahankan
 
     def kosong(self) -> bool:
         return self.isi is None and self.literal is None
@@ -388,7 +398,9 @@ class GenContext:
     tubuh: Tuple[str, ...] = ()
 
     def topik_aktif(self) -> str:
-        return _norm(self.topik)
+        # B10: nama diri (kapital) dipertahankan; selebihnya dinormalkan
+        mentah = " ".join(str(self.topik or "").split())
+        return mentah if any(ch.isupper() for ch in mentah) else mentah.lower()
 
 
 @dataclass
@@ -1100,7 +1112,8 @@ class L3:
             return self.klausa(isi, ctx, nested=True)
         if not isinstance(isi, str):
             return str(isi or "")
-        s = _norm(isi)
+        s = _pertahankan_kapitalisasi(isi) if any(
+            ch.isupper() for ch in str(isi)) else _norm(isi)
         if not s:
             return ""
         # rujukan pronominal
@@ -1327,7 +1340,9 @@ class L3:
             v = self._verba(node, ctx)
             anchor = (" malam tadi" if node.anchor == "malam tadi" else "")
             if ep:
-                return f"{subj} masih {v}{anchor}: {ep}."
+                # B11: penanda aspek disisipkan jalur linearisasi
+                # (node.aspek == "pengalaman" → "pernah"), bukan template.
+                return f"{subj} {v}{anchor}: {ep}."
             if ob:
                 return f"{subj} masih memikirkan {ob}."
             return f"{subj} {v} sesuatu, tapi kabur."
@@ -1485,9 +1500,81 @@ class L3:
         return f"{_subj} {neg}{pred}."
 
     # -- linearisasi dengan pemindahan topik ------------------------------
+    _PENANDA_ASPEK = {"selesai": "sudah", "sedang": "sedang",
+                      "akan": "akan", "pengalaman": "pernah",
+                      "pernah": "pernah", "masih": "masih",
+                      "baru": "baru saja"}
+
+    def _penanda_aspek_modal(self, node: Node, ctx: GenContext,
+                             voice: Optional[str]) -> str:
+        """Negasi > modal epistemik > aspek — maks satu penanda (B11).
+
+        Aspek berasal dari `Node.aspek` (diisi L0 dari keadaan: INGAT tersetel
+        "pengalaman" dsb.); modal "mungkin" dipicu keraguan nyata (doubt≥0.55).
+        Aspek "sedang" adalah penanda nol — dalam bahasa Indonesia aspek
+        berlangsung yang lazim tidak ditandai; aspek lain (selesai→sudah,
+        akan→akan, pengalaman/pernah→pernah, masih→masih, baru→baru saja)
+        ditandai bila L0 menyetelnya.
+        """
+        if node.modus == "tanya":
+            return ""
+        penanda: Optional[str] = None
+        if ctx.doubt >= 0.55 and node.modus == "nyata":
+            penanda = "mungkin"
+        else:
+            aspek = node.aspek or "sedang"
+            if aspek != "sedang":
+                penanda = self._PENANDA_ASPEK.get(aspek)
+        return (penanda + " ") if penanda else ""
+
+    def _sisipkan_penanda(self, teks: str, node: Node, ctx: GenContext,
+                          voice: Optional[str]) -> str:
+        pm = self._penanda_aspek_modal(node, ctx, voice)
+        if not pm:
+            return teks
+        import re as _re_b11p
+        if _re_b11p.search(r"\b(sudah|sedang|akan|masih|pernah|mungkin|baru saja)\b",
+                           teks):
+            return teks
+        spec = self.leks.predikat.get(node.predikat) or {}
+        dasar = node.lema or spec.get("lema") or node.predikat.lower()
+        dasar_norm = _norm(dasar)
+        kandidat: List[str] = []
+        if voice and voice not in ("aktif",) and dasar_norm:
+            try:
+                from pycos.bahasa.teks import stem as _stem_b11
+                d = _stem_b11(dasar_norm.split()[0])
+                kandidat += ["di" + d, "ku" + d, "kau" + d, "ter" + d]
+            except Exception:
+                pass
+        if voice in (None, "aktif") and dasar_norm:
+            try:
+                kandidat.append(
+                    dasar_norm if dasar_norm.startswith(
+                        ("mem", "men", "meng", "meny", "menge", "ber", "me",
+                         "di", "ter")) else
+                    self.leks.nasalisasi(dasar_norm.split()[0]))
+            except Exception:
+                kandidat.append(dasar_norm)
+        kandidat.append(dasar_norm)
+        import re as _re_b11
+        for v in kandidat:
+            if not v:
+                continue
+            m = _re_b11.search(r"(?<![A-Za-zÀ-ÿ])" + _re_b11.escape(v)
+                               + r"(?![A-Za-zÀ-ÿ])", teks)
+            if m:
+                return teks[:m.start()] + pm + teks[m.start():]
+        # tidak menemukan verba permukaan: letakkan setelah kata ganti subjek
+        m = _re_b11.match(r"^(aku|saya|kau|kamu|dia|ia|kita|kami|mereka|-?\w{2,}) ", teks)
+        if m:
+            return teks[:m.end()] + pm + teks[m.end():]
+        return pm + teks
+
     def linearisasi(self, kerangka: Kerangka, ctx: GenContext) -> str:
         node = kerangka.node
         inti = self.klausa(node, ctx)
+        inti = self._sisipkan_penanda(inti, node, ctx, kerangka.voice)
         # topik depan: "apinya, aku takut" — pengalaman yang dirasakan pemain
         # (hindari pengulangan: bila topik sudah ada di inti, jangan tambah).
         topik = ctx.topik_aktif()

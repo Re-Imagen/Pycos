@@ -816,8 +816,20 @@ class Kesadaran:
                 if isinstance(intended, Mapping) else
                 str(intended) if intended is not None else "")
         niat = niat.strip()[:240]
-        heard_terms = self._withholding_terms(heard)
-        intent_terms = self._withholding_terms(niat) if niat else set()
+        # G5: keselarasan dihitung atas lema hasil stemming + bigram kata
+        # isi (bukan token permukaan yang sama persis) — "menyerang" dan
+        # "serang" dihitung sama.
+        try:
+            from pycos.refleksi.nurani import Nurani as _Nurani
+            heard_terms = set(_Nurani._lexical_words(heard))
+            intent_terms = (set(_Nurani._lexical_words(niat)) if niat
+                            else set())
+        except Exception as _galat_diagnostik_60:
+            _diag.catat('naluri.Kesadaran.audition_self',
+                        "galat pada jalur fallback",
+                        galat=_galat_diagnostik_60, jalur=60)
+            heard_terms = self._withholding_terms(heard)
+            intent_terms = self._withholding_terms(niat) if niat else set()
         kesenjangan = 0.0
         keselarasan = None
         if niat:

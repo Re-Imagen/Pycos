@@ -490,3 +490,172 @@ class PertanyaanBalikTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class RedupB6Test(unittest.TestCase):
+    """B6: reduplikasi dua arah — penuh, berimbuhan, berubah bunyi."""
+
+    def test_urai_penuh(self):
+        from pycos.bahasa.teks import urai_reduplikasi
+        self.assertEqual(["marah-marah", "marah"], urai_reduplikasi("marah-marah"))
+
+    def test_urai_berimbuhan(self):
+        from pycos.bahasa.teks import urai_reduplikasi
+        self.assertEqual(["menakut-nakuti", "menakut"],
+                         urai_reduplikasi("menakut-nakuti"))
+
+    def test_urai_berubah_bunyi(self):
+        from pycos.bahasa.teks import urai_reduplikasi, stem
+        self.assertEqual(["sayur-mayur", "sayur"],
+                         urai_reduplikasi("sayur-mayur"))
+        self.assertEqual("sayur", stem("sayur-mayur"))
+        # "bolak-balik" adalah lema utuh, bukan dua kali "bolak"
+        self.assertEqual(["bolak-balik"], urai_reduplikasi("bolak-balik"))
+        self.assertEqual("bolak-balik", stem("bolak-balik"))
+
+    def test_bangkit_redup(self):
+        from pycos.bahasa.teks import reduplikasi
+        self.assertEqual("buku-buku", reduplikasi("buku", "jamak"))
+        self.assertEqual("senang-senang", reduplikasi("senang", "intensitas"))
+        self.assertEqual("merah-merah", reduplikasi("merah", "agak"))
+        self.assertEqual("sayur-mayur", reduplikasi("sayur", "jamak"))
+        with self.assertRaises(ValueError):
+            reduplikasi("buku", "tidak-ada")
+
+
+class AspekModalB11Test(unittest.TestCase):
+    """B11: aspek & modal dari keadaan internal → penanda tersisip."""
+
+    def test_modal_mungkin_dari_keraguan(self):
+        from pycos.bahasa.tutur import TuturEngine, GenContext
+        eng = TuturEngine(None, leksikon=self._leks())
+        ctx = GenContext(act="menyatakan", bahasa="id", register="netral",
+                         topik="api", seed=3, doubt=0.7)
+        t = eng.ucap(ctx)
+        self.assertIsNotNone(t)
+        self.assertIn("mungkin", t.teks)
+
+    def test_tanpa_keraguan_tanpa_mungkin(self):
+        from pycos.bahasa.tutur import TuturEngine, GenContext
+        eng = TuturEngine(None, leksikon=self._leks())
+        ctx = GenContext(act="menyatakan", bahasa="id", register="netral",
+                         topik="api", seed=3, doubt=0.0)
+        t = eng.ucap(ctx)
+        self.assertIsNotNone(t)
+        self.assertNotIn("mungkin", t.teks)
+
+    def test_aspek_pengalaman_jadi_pernah(self):
+        from pycos.bahasa.tutur import TuturEngine, GenContext
+        eng = TuturEngine(None, leksikon=self._leks())
+        ctx = GenContext(act="mengenang", bahasa="id", register="netral",
+                         core=("saat kami di pantai",), seed=1)
+        t = eng.ucap(ctx)
+        self.assertIsNotNone(t)
+        self.assertIn("pernah", t.teks)
+
+    @staticmethod
+    def _leks():
+        from pycos.dukungan.sumber import jalur_leksikon
+        import json
+        from pycos.bahasa.tutur import Leksikon
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            return Leksikon(json.load(f))
+
+
+class KapitalNamaDiriB10Test(unittest.TestCase):
+    """B10: kapitalisasi nama diri dipertahankan sampai akhir pipeline."""
+
+    def test_topik_nama_dipertahankan(self):
+        from pycos.bahasa.tutur import TuturEngine, GenContext, Leksikon
+        from pycos.dukungan.sumber import jalur_leksikon
+        import json
+        with open(jalur_leksikon(), encoding="utf-8") as f:
+            leks = Leksikon(json.load(f))
+        eng = TuturEngine(None, leksikon=leks)
+        ctx = GenContext(act="menyatakan", bahasa="id", register="netral",
+                         topik="Rama", seed=0)
+        t = eng.ucap(ctx)
+        self.assertIn("Rama", t.teks)
+
+    def test_topik_aktif_pertahankan_kapital(self):
+        from pycos.bahasa.tutur import GenContext
+        ctx = GenContext(topik="Rama")
+        self.assertEqual("Rama", ctx.topik_aktif())
+        ctx = GenContext(topik="api besar")
+        self.assertEqual("api besar", ctx.topik_aktif())
+
+
+class SelekSiG2Test(unittest.TestCase):
+    """G2: relevansi/koherensi/konsistensi + pantangan setelah stemming."""
+
+    def test_pantangan_setelah_stemming(self):
+        from pycos.refleksi.nurani import nilai_selaras
+
+        class _M:
+            valence = 0.1
+            arousal = 0.3
+        from pycos.inti.persona import Persona, Keadaan
+        p = Persona(nama="Rani", sifat={"hangat": 0.8},
+                    register="santai", pantangan=("bodoh",))
+        k = Keadaan.dari_mood(_M())
+        self.assertEqual(("bodoh",),
+                         nilai_selaras(p, k, "bodohnya orang itu").pelanggaran)
+
+    def test_relevansi_terkait_vs_tidak(self):
+        from pycos.refleksi.nurani import nilai_selaras
+        from pycos.inti.persona import Persona, Keadaan
+
+        class _M:
+            valence = 0.1
+            arousal = 0.3
+        p = Persona(nama="Rani", sifat={"hangat": 0.8}, register="santai")
+        k = Keadaan.dari_mood(_M())
+        rel = nilai_selaras(p, k, "api membakar rumah aku",
+                            ujaran_lawan="api membakar rumah siapa")
+        tak = nilai_selaras(p, k, "aku pergi ke bulan",
+                            ujaran_lawan="api membakar rumah siapa")
+        obs = {d.nama: d.skor for d in rel.dimensi}
+        obs_tak = {d.nama: d.skor for d in tak.dimensi}
+        self.assertGreater(obs["relevansi"], obs_tak["relevansi"])
+
+    def test_koherensi_ulangan_penuh_rendah(self):
+        from pycos.refleksi.nurani import nilai_selaras
+        from pycos.inti.persona import Persona, Keadaan
+
+        class _M:
+            valence = 0.1
+            arousal = 0.3
+        p = Persona(nama="Rani", sifat={"hangat": 0.8}, register="santai")
+        k = Keadaan.dari_mood(_M())
+        rep = nilai_selaras(p, k, "aku baik saja",
+                            giliran_sebelumnya="aku baik saja")
+        koh = next(d.skor for d in rep.dimensi if d.nama == "koherensi")
+        self.assertLessEqual(koh, 0.05)
+
+
+class KataKunciG4G5Test(unittest.TestCase):
+    """G4/G5: keywords menurut kepentingan; vocab lema + bigram + negasi."""
+
+    def test_keywords_tidak_urut_abjad_saja(self):
+        from pycos.refleksi.nurani import Nurani
+        kw = Nurani.keywords("api membakar rumah tua itu")
+        self.assertLessEqual(len(kw), 8)
+        # "membakar"/"rumah" lebih informatif daripada kata fungsi
+        self.assertIn("bakar", kw)
+        self.assertIn("rumah", kw)
+
+    def test_kata_negasi_tidak_mengasosiasikan_kutub_lawan(self):
+        from pycos.refleksi.nurani import Nurani
+        kata = Nurani._lexical_words("aku tidak senang dengan api")
+        self.assertNotIn("senang", kata)
+
+    def test_audition_dihitung_atas_lema(self):
+        n = Naluri(name="Nara", rng_seed=41,
+                   params={"enable_kesadaran": True,
+                           "enable_gejala": False})
+        n.enable_kesadaran("self_audition")
+        audisi = n.kesadaran.audition_self(
+            "Aku baik-baik saja.",
+            intended="Aku takut dan aku butuh bantuan.")
+        self.assertEqual(1.0,
+                         audisi["niat_vs_realisasi"]["kesenjangan"])

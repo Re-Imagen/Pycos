@@ -150,9 +150,13 @@ class PenilaiTest(unittest.TestCase):
         self.assertLessEqual(laporan.skor, 0.4)
         self.assertIn("hapus kata pantangan: sialan", laporan.saran)
 
-    def test_pantangan_cocok_per_token_bukan_substring(self):
-        # "bodohnya" tidak sama dengan "bodoh" sebagai token utuh
+    def test_pantangan_cocok_setelah_stemming_g2(self):
+        # G2 (Tahap 3): pantangan dicocokkan setelah stemming, sehingga
+        # infleksi/klitik yang berbagi lema tetap tertangkap — "bodohnya"
+        # adalah "bodoh". Token yang berbeda lemas tetap tidak cocok.
         laporan = nilai_selaras(SANTAI_HANGAT, Keadaan(), "bodohnya orang itu")
+        self.assertEqual(("bodoh",), laporan.pelanggaran)
+        laporan = nilai_selaras(SANTAI_HANGAT, Keadaan(), "bodoamat orang itu")
         self.assertEqual((), laporan.pelanggaran)
 
     def test_persona_netral_tidak_menilai_register(self):
