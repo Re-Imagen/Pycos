@@ -115,6 +115,8 @@ class Lattice:
 # leksikon
 # ===========================================================================
 # Pengecualian leksikal nasalisasi (B3): bentuk yang tidak mengikuti tabel umum.
+import re as _re_mod
+
 _PENGECUALIAN_NASAL: Dict[str, str] = {
     "tahu": "mengetahui",
     "punya": "mempunyai",
@@ -439,6 +441,13 @@ class GenContext:
     menahan: float = 0.0
     # sensasi tubuh dominan, mis. ("tegang",) — tubuh mendahului kognisi.
     tubuh: Tuple[str, ...] = ()
+    # --- idiolek persona (F7); dipetakan dari Persona oleh
+    #     `konteks_dari_presentasi`. Semua opsional & bawaan netral. ---
+    kata_favorit: Tuple[str, ...] = ()
+    panjang_kalimat: str = "netral"          # pendek | sedang | panjang | netral
+    partikel_persona: Tuple[str, ...] = ()
+    sapaan: Tuple[str, ...] = ()
+    keterusterangan: str = "netral"          # langsung | lunak | netral
 
     def topik_aktif(self) -> str:
         # B10: nama diri (kapital) dipertahankan; selebihnya dinormalkan
@@ -794,14 +803,14 @@ class L1:
                     a = node.arg(alt)
                     if a is not None:
                         break
-            if a is not None and not a.kosong():
+            if a is not None and (not a.kosong() or a.mode == "isi"):
                 s.isi = a
                 s.terisi = True
                 if a in sisa:
                     sisa.remove(a)
         # argumen sisa → slot opsional kosong yang cocok tipenya
         for a in sisa:
-            if a.kosong():
+            if a.kosong() and a.mode != "isi":
                 continue
             for s in slots:
                 if s.terisi:
@@ -920,7 +929,46 @@ class L2:
             align_topik = 1.0
         elif topik and any(_norm(s) == topik for s in (e.get("sinonim") or [])):
             align_topik = 0.6
-        align_fokus = 1.0 if (fokus and _norm(e["lema"]) == fokus) else 0.0
+        if fokus and _norm(e["lema"]) == fokus:
+            align_fokus = 1.0
+        elif fokus and any(_norm(s) == fokus for s in (e.get("sinonim") or [])):
+            # sinonim fokus juga selaras (F4)
+            align_fokus = 0.6
+        else:
+            align_fokus = 0.0
+        # kolokasi (F4): lema yang berkolokasi dengan isi konteks aktif
+        # (topik/spotlight/core/timeline/inner) disukai.
+        konteks_kata = set()
+        sumber_konteks = ([topik] + list(ctx.spotlight) + list(ctx.core)
+                          + list(ctx.timeline) + [ctx.inner])
+        for teks in sumber_konteks:
+            for w in _norm(str(teks or "")).split():
+                w = w.strip(".,!?;:…—–-")
+                if len(w) >= 3:
+                    konteks_kata.add(w)
+        kolokasi = {_norm(k) for k in (e.get("kolokasi") or [])}
+        kolokasi_hit = len(konteks_kata & kolokasi)
+        kolokasi_bonus = min(0.8, 0.4 * kolokasi_hit)
+        # antonim (F4): bertolak belakang dengan konteks aktif — dihindari,
+        # kecuali act yang memang menolak/menantang/menegur.
+        aksi_bertolak = ctx.act in ("menolak", "menantang", "menegur")
+        antonim = {_norm(a) for a in (e.get("antonim") or [])}
+        antonim_hit = bool(konteks_kata & antonim)
+        if not antonim_hit and self.leks is not None:
+            # cek dua arah: antonim entri konteks mengandung lema kandidat
+            for kata in list(konteks_kata)[:24]:
+                entri_prev = self.leks.ambil(ctx.bahasa, kata)
+                if entri_prev and _norm(e["lema"]) in {
+                        _norm(a) for a in (entri_prev.get("antonim") or [])}:
+                    antonim_hit = True
+                    break
+        if antonim_hit:
+            antonim_skor = 0.3 if aksi_bertolak else -0.6
+        else:
+            antonim_skor = 0.0
+        # kata favorit idiolek (F7): afiliasi ringan ke pilihan khas persona
+        favorit = {_norm(k) for k in (ctx.kata_favorit or ())}
+        favorit_bonus = 0.5 if favorit and _norm(e["lema"]) in favorit else 0.0
         # Kelelahan mengaburkan pemetaan topik/fokus tanpa mengganti drive atau
         # afek aktual; kata generik/frekuen relatif lebih mudah lolos.
         align_topik *= clarity
@@ -954,15 +1002,17 @@ class L2:
              + 0.15 * float(e.get("intensitas_bawaan", 0.0)) * ctx.arousal
              + 0.15 * float(e.get("daya_tekan", 0.0)) * ctx.urgency
              + 0.4 * emosi_align
-             + 0.2 * beban * float(e.get("frekuensi", 0.5)))
+             + 0.2 * beban * float(e.get("frekuensi", 0.5))
+             + kolokasi_bonus
+             + antonim_skor
+             + favorit_bonus)
         if kabur:
             s -= 0.25 * emosi_align
-        # Penalti frekuensi lebih panjang agar pilihan tidak berosilasi pada
-        # dua lema yang sama. Domain/kelas tetap ditentukan hard filter.
-        s -= 0.30 * self.riwayat[-32:].count(e["lema"])
-        if e["lema"] in self.riwayat[-8:]:
-            idx = self.riwayat[-8:][::-1].index(e["lema"])
-            s -= 0.35 * (1.0 - idx / 8.0)
+        # Penalti riwayat berpeluruhan 0.80^langkah (F4): pengulangan yang
+        # baru saja terjadi lebih murah dihindari daripada yang lama; maks 32.
+        for langkah, kata in enumerate(reversed(self.riwayat[-32:])):
+            if kata == e["lema"]:
+                s -= 0.30 * (0.80 ** langkah)
         return s
 
     def _pilih_beragam(self, lolos: List[Tuple[float, Dict[str, Any]]],
@@ -1678,7 +1728,15 @@ class L3:
         if node.modus == "tanya":
             return ""
         penanda: Optional[str] = None
-        if ctx.doubt >= 0.55 and node.modus == "nyata":
+        # F7/B11: keterusterangan langsung meniadakan 'mungkin'; lunak
+        # menurunkan ambang keraguan menjadi 0.45.
+        if ctx.keterusterangan == "langsung":
+            ambang_mungkin = 2.0          # tidak pernah terpicu
+        elif ctx.keterusterangan == "lunak":
+            ambang_mungkin = 0.45
+        else:
+            ambang_mungkin = 0.55
+        if ctx.doubt >= ambang_mungkin and node.modus == "nyata":
             penanda = "mungkin"
         else:
             aspek = node.aspek or "sedang"
@@ -1730,11 +1788,114 @@ class L3:
             return teks[:m.end()] + pm + teks[m.end():]
         return pm + teks
 
+    def _variasikan_struktur(self, teks: str, node: Node,
+                             ctx: GenContext) -> str:
+        """F5 — variasi struktur menurut emosi & register (bukan sinonim).
+
+        * inversi predikat–subjek ("merinding aku") bila santai, arousal
+          tinggi (>= 0.55) dan ada emosi dominan;
+        * elipsis subjek ("merinding") bila santai dan (|valensi| >= 0.5
+          atau arousal >= 0.6); ambang diambil dari `panjang_kalimat`
+          ("pendek" → 0.4, selain itu 0.25).
+
+        Topik-depan ditangani B7/B9; pasif oleh voice L1; frasa yang sudah
+        sangat pendek tidak diapa-apakan lagi.
+        """
+        if not teks or ctx.register == "formal":
+            return teks
+        m_subj = _re_mod.match(r"^(aku|saya) ", teks)
+        if not m_subj:
+            return teks
+        sisa = teks[m_subj.end():]
+        emosi = bool(ctx.emosi)
+        # inversi: predikat pindah ke depan ("merinding aku")
+        if (ctx.register == "akrab" and ctx.arousal >= 0.55 and emosi
+                and node.modus != "tanya"):
+            m_verb = _re_mod.match(r"^(\S+)", sisa)
+            if m_verb and m_verb.group(1).startswith(
+                    ("me", "mem", "men", "meng", "meny", "ber", "ter")):
+                verb = m_verb.group(1)
+                sisa2 = sisa[m_verb.end():].lstrip()
+                return (verb + " " + m_subj.group(1)
+                        + ((" " + sisa2) if sisa2 else "")).strip()
+        # elipsis subjek
+        ambang = 0.4 if ctx.panjang_kalimat == "pendek" else 0.25
+        if (ctx.register == "akrab"
+                and (abs(ctx.valensi) >= 0.5 or ctx.arousal >= 0.6)
+                and self.rng.random() < ambang):
+            return sisa
+        return teks
+
+    def _sisipkan_partikel(self, teks: str, node: Node,
+                           ctx: GenContext) -> str:
+        """F6 — partikel wacana dengan fungsi pragmatik; maks satu per ujaran.
+
+        Posisi & syarat: ``lho`` (awal, act peringatan) · ``kok`` (akhir,
+        emosi heran/takjub) · ``dong`` (akhir, peringatan/menegur/menantang) ·
+        ``kan`` (tanya, akrab+dekat) · ``sih`` (setelah subjek, menyatakan/
+        menjawab/mengenang, 35%) · ``nih``/``tuh`` (akhir, akrab) · ``deh``
+        (akhir, valensi < −0.35 & agency <= 0.35). Register formal tidak
+        mendapat partikel. Partikel idiolek persona diutamakan bila tersedia.
+        """
+        if not teks or ctx.register != "akrab":
+            return teks
+        act = ctx.act
+        emosi = {str(e).upper() for e in (ctx.emosi or ())}
+        tersedia: List[Tuple[str, str]] = []
+        if node.predikat == "PERINGATAN" or act == "peringatan":
+            tersedia.append(("lho", "awal"))
+        if emosi & {"HERAN", "TAKJUB"}:
+            tersedia.append(("kok", "akhir"))
+        if act in ("peringatan", "menegur", "menantang"):
+            tersedia.append(("dong", "akhir"))
+        if (ctx.dekat and ctx.register == "akrab"
+                and act in ("menyatakan", "menjawab", "akrab")):
+            tersedia.append(("kan", "akhir"))
+        if act in ("menyatakan", "menjawab", "mengenang"):
+            tersedia.append(("sih", "setelah_subjek"))
+        if ctx.register == "akrab":
+            tersedia.append(("nih", "akhir"))
+            tersedia.append(("tuh", "akhir"))
+        if ctx.valensi < -0.35 and ctx.agency <= 0.35:
+            tersedia.append(("deh", "akhir"))
+        if not tersedia:
+            return teks
+        persona_p = [t for t in tersedia
+                     if t[0] in {_norm(p) for p in (ctx.partikel_persona or ())}]
+        kolam = persona_p or tersedia
+        partikel, posisi = self.rng.choice(kolam)
+        # sih: hanya 35% dari waktu; bila tidak, jatuh ke pilihan akhir lain
+        if partikel == "sih" and self.rng.random() >= 0.35:
+            lainnya = [t for t in kolam if t[0] != "sih"]
+            if not lainnya:
+                return teks
+            partikel, posisi = self.rng.choice(lainnya)
+        if posisi == "awal":
+            return "lho " + teks
+        if posisi == "setelah_subjek":
+            bagian = teks.split(" ", 1)
+            if len(bagian) == 2:
+                return bagian[0] + " sih " + bagian[1]
+            return teks + " sih"
+        # akhir: sisipkan sebelum tanda baca penutup bila ada
+        m = _re_mod.match(r"^(.*?)([.!?…]*)$", teks)
+        if m:
+            return (m.group(1).rstrip() + " " + partikel + m.group(2))
+        return teks + " " + partikel
+
     def linearisasi(self, kerangka: Kerangka, ctx: GenContext) -> str:
         node = kerangka.node
         inti = self.klausa(node, ctx, voice=kerangka.voice,
                            urutan=kerangka.urutan)
         inti = self._sisipkan_penanda(inti, node, ctx, kerangka.voice)
+        inti = self._variasikan_struktur(inti, node, ctx)   # F5
+        inti = self._sisipkan_partikel(inti, node, ctx)     # F6
+        # prefix sapaan idiolek persona (F7) untuk act akrab proaktif
+        if (ctx.sapaan and ctx.act in ("kembali", "menyapa_proaktif")
+                and inti):
+            sapa = str(ctx.sapaan[0]).strip().rstrip(",")
+            if sapa:
+                inti = sapa + ", " + inti
         # topik depan: "apinya, aku takut" — pengalaman yang dirasakan pemain
         # (hindari pengulangan: bila topik sudah ada di inti, jangan tambah).
         topik = ctx.topik_aktif()
@@ -2287,6 +2448,22 @@ class TuturEngine:
     analyze_pragmatic_sa_sp = analisis_pragmatik_sa_sp
     analisis_maksud_kontekstual_sa_sp = analisis_pragmatik_sa_sp
 
+    def to_dict(self) -> Dict[str, Any]:
+        """State tutur yang dapat disimpan host (riwayat lema, maks 32)."""
+        return {"riwayat": list(self.riwayat[-32:])}
+
+    def muat_dict(self, data: Mapping[str, Any]) -> None:
+        """Muat state dari `to_dict`; riwayat disinkronkan ke orkestrator."""
+        if not isinstance(data, Mapping):
+            raise ValueError("data tutur wajib berbentuk Mapping")
+        riwayat = data.get("riwayat", ())
+        if not isinstance(riwayat, (list, tuple)):
+            raise ValueError("riwayat wajib daftar string")
+        tuan = [str(x) for x in list(riwayat)[-32:]]
+        self.riwayat = tuan
+        if self.orkestrator is not None:
+            self.orkestrator.riwayat = tuan
+
 
 def sa_sp(ujaran: Any, konteks: Any = None,
           leksikon: Optional[Leksikon] = None) -> Dict[str, Any]:
@@ -2434,12 +2611,19 @@ def konteks_dari_presentasi(p: Any, act: str, kepada: Any = None,
     # netral (tiga register persona dipetakan, bukan hanya akrab/netral).
     # Tanpa persona pada presentasi/naluri, ragam mengikuti relasi.
     reg = ""
-    for pembawa in (getattr(p, "persona", None),
-                    getattr(getattr(p, "naluri", None), "persona", None)):
-        reg_p = getattr(pembawa, "register", None) if pembawa is not None else None
+    persona_obj = None
+    _kandidat_persona = [pembawa for pembawa in (
+        getattr(p, "persona", None),
+        getattr(getattr(p, "naluri", None), "persona", None))
+        if pembawa is not None]
+    for pembawa in _kandidat_persona:
+        reg_p = getattr(pembawa, "register", None)
         if isinstance(reg_p, str) and reg_p.strip():
             reg = reg_p.strip().lower()
+            persona_obj = pembawa
             break
+    if persona_obj is None and _kandidat_persona:
+        persona_obj = _kandidat_persona[0]
     if reg == "formal":
         reg = "formal"
     elif reg == "santai":
@@ -2458,6 +2642,31 @@ def konteks_dari_presentasi(p: Any, act: str, kepada: Any = None,
             if b:
                 bahasa = b
                 break
+    # idiolek (F7): kata favorit, panjang kalimat, partikel, sapaan,
+    # keterusterangan — dibaca L2/L3/B11. Bila persona tidak ada atau belum
+    # punya bidang (Persona lama), nilai netral dipakai.
+    def _daftar_str(obj: Any, nama: str) -> Tuple[str, ...]:
+        nilai = getattr(obj, nama, ()) if obj is not None else ()
+        if isinstance(nilai, str):
+            return (nilai,) if nilai.strip() else ()
+        try:
+            return tuple(str(x) for x in nilai if str(x).strip())
+        except TypeError:
+            return ()
+
+    def _teks_persona(obj: Any, nama: str, bawaan: str) -> str:
+        if obj is None:
+            return bawaan
+        nilai = getattr(obj, nama, bawaan)
+        if isinstance(nilai, str) and nilai.strip():
+            return str(nilai)
+        return bawaan
+
+    kata_favorit = _daftar_str(persona_obj, "kata_favorit")
+    panjang_kalimat = _teks_persona(persona_obj, "panjang_kalimat", "netral")
+    partikel_persona = _daftar_str(persona_obj, "partikel")
+    sapaan = _daftar_str(persona_obj, "sapaan")
+    keterusterangan = _teks_persona(persona_obj, "keterusterangan", "netral")
     refusal = ""
     ref = _call("_refusal")
     if isinstance(ref, dict):
@@ -2484,6 +2693,9 @@ def konteks_dari_presentasi(p: Any, act: str, kepada: Any = None,
         emosi=tuple(emosi_lbl),
         apersepsi=apersepsi, apersepsi_kalimat=apersepsi_kalimat,
         tekanan=tekanan, menahan=menahan, tubuh=tuple(tubuh_lbl),
+        kata_favorit=kata_favorit, panjang_kalimat=panjang_kalimat,
+        partikel_persona=partikel_persona, sapaan=sapaan,
+        keterusterangan=keterusterangan,
     )
 
 

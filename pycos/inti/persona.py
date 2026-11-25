@@ -23,7 +23,8 @@ from pycos.dukungan.numerik import float_hingga, jepit
 
 __all__ = [
     "Keadaan", "Persona", "PERSONA_CONTOH",
-    "SIFAT_DIKENAL", "REGISTER_DIKENAL", "normalisasi_frasa",
+    "SIFAT_DIKENAL", "REGISTER_DIKENAL", "PANJANG_DIKENAL",
+    "KETERUSTERANGAN_DIKENAL", "normalisasi_frasa",
 ]
 
 
@@ -91,7 +92,12 @@ class Keadaan:
 
 SIFAT_DIKENAL: Tuple[str, ...] = ("ekspresif", "ragu", "hangat")
 REGISTER_DIKENAL: Tuple[str, ...] = ("formal", "santai", "netral")
-_KUNCI_PERSONA: Tuple[str, ...] = ("nama", "sifat", "register", "pantangan")
+PANJANG_DIKENAL: Tuple[str, ...] = ("pendek", "sedang", "panjang", "netral")
+KETERUSTERANGAN_DIKENAL: Tuple[str, ...] = ("langsung", "lunak", "netral")
+_KUNCI_PERSONA: Tuple[str, ...] = (
+    "nama", "sifat", "register", "pantangan",
+    "kata_favorit", "panjang_kalimat", "partikel", "sapaan", "keterusterangan",
+)
 
 
 def normalisasi_frasa(frasa: str) -> str:
@@ -112,12 +118,26 @@ class Persona:
     Register: ``formal`` (saya/anda), ``santai`` (aku/kamu), atau ``netral``
     (register tidak dinilai). Kata pantangan adalah kata atau frasa yang tidak
     boleh muncul dalam tutur persona ini.
+
+    Idiolek (F7), semuanya opsional dan bawaan netral/kosong:
+
+    * ``kata_favorit``    — kata yang sering dipakai persona (bonus L2);
+    * ``panjang_kalimat`` — ``pendek`` | ``sedang`` | ``panjang`` | ``netral``;
+    * ``partikel``        — kecenderungan partikel wacana (``nih``, ``dong``, …);
+    * ``sapaan``          — kebiasaan menyapa (nama/sapaan) pada act akrab;
+    * ``keterusterangan`` — ``langsung`` | ``lunak`` | ``netral``.
     """
 
     nama: str
     sifat: Mapping[str, float] = field(default_factory=dict)
     register: str = "netral"
     pantangan: Tuple[str, ...] = ()
+    # --- idiolek (F7) ---
+    kata_favorit: Tuple[str, ...] = ()      # kata yang sering dipakai persona
+    panjang_kalimat: str = "netral"         # pendek | sedang | panjang | netral
+    partikel: Tuple[str, ...] = ()          # kecenderungan partikel wacana
+    sapaan: Tuple[str, ...] = ()            # kebiasaan menyapa (nama/sapaan)
+    keterusterangan: str = "netral"         # langsung | lunak | netral
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "nama", teks_wajib(self.nama, "nama"))
@@ -136,6 +156,21 @@ class Persona:
         daftar = tuple(normalisasi_frasa(teks_wajib(p, "pantangan"))
                        for p in self.pantangan)
         object.__setattr__(self, "pantangan", tuple(dict.fromkeys(daftar)))
+        if self.panjang_kalimat not in PANJANG_DIKENAL:
+            raise ValueError("panjang_kalimat {!r} tidak dikenal; pilihan: {}".format(
+                self.panjang_kalimat, ", ".join(PANJANG_DIKENAL)))
+        if self.keterusterangan not in KETERUSTERANGAN_DIKENAL:
+            raise ValueError("keterusterangan {!r} tidak dikenal; pilihan: {}".format(
+                self.keterusterangan, ", ".join(KETERUSTERANGAN_DIKENAL)))
+        for nama_daftar, nilai in (("kata_favorit", self.kata_favorit),
+                                   ("partikel", self.partikel),
+                                   ("sapaan", self.sapaan)):
+            if isinstance(nilai, str):
+                raise ValueError("{} harus daftar string, bukan satu string"
+                                 .format(nama_daftar))
+            object.__setattr__(self, nama_daftar,
+                               tuple(str(x).strip() for x in nilai
+                                     if str(x).strip()))
 
     def sifat_of(self, kunci: str) -> Optional[float]:
         """Nilai sifat bila ditetapkan, selain itu None (tidak ada preferensi)."""
@@ -143,7 +178,12 @@ class Persona:
 
     def to_dict(self) -> Dict[str, Any]:
         return {"nama": self.nama, "sifat": dict(self.sifat),
-                "register": self.register, "pantangan": list(self.pantangan)}
+                "register": self.register, "pantangan": list(self.pantangan),
+                "kata_favorit": list(self.kata_favorit),
+                "panjang_kalimat": self.panjang_kalimat,
+                "partikel": list(self.partikel),
+                "sapaan": list(self.sapaan),
+                "keterusterangan": self.keterusterangan}
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "Persona":
@@ -152,7 +192,12 @@ class Persona:
             raise ValueError("data persona wajib memuat 'nama'")
         return cls(nama=data["nama"], sifat=dict(data.get("sifat", {})),
                    register=data.get("register", "netral"),
-                   pantangan=data.get("pantangan", ()))
+                   pantangan=data.get("pantangan", ()),
+                   kata_favorit=data.get("kata_favorit", ()),
+                   panjang_kalimat=data.get("panjang_kalimat", "netral"),
+                   partikel=data.get("partikel", ()),
+                   sapaan=data.get("sapaan", ()),
+                   keterusterangan=data.get("keterusterangan", "netral"))
 
 
 PERSONA_CONTOH = Persona(

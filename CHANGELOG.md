@@ -20,6 +20,12 @@ Versi paket saat ini `0.1.0`; belum ada riwayat rilis terverifikasi di dokumen i
   agar entry point showcase dan nama modul data tidak bertabrakan.
 - Kebijakan ekspor pada `docs/API_PUBLIK.md` serta tes klasifikasi seluruh
   nama subpaket, identitas alias, star import, cache, dan impor malas.
+- F4–F7 ANALISIS_LINGUISTIK: skor leksikal kontekstual (sinonim fokus,
+  kolokasi, antonim dua arah, kata favorit persona, penalti riwayat 0,80^langkah),
+  slot `mode="isi"` yang boleh diisi tanpa argumen, variasi struktur (inversi,
+  elipsis subjek), partikel wacana berpemisahan register, sapaan idiolek pada
+  act `kembali`/`menyapa_proaktif`, serta `TuturEngine.to_dict()`/`muat_dict()`
+  untuk riwayat lema (maks 32, disinkronkan ke orkestrator).
 
 - R5.5: adapter snapshot `pycos.konektor.observasi`/`aksi`, CLI JSON satu
   request, contoh Node Godot dan HTML HUD inspector lokal. Tidak mengubah
@@ -45,6 +51,11 @@ Versi paket saat ini `0.1.0`; belum ada riwayat rilis terverifikasi di dokumen i
   ke mesin/state; fasad Naluri dan format save tetap tersedia melalui API yang sama.
 - Kompatibilitas save: `pycos/inti/keadaan.py` — loader state diekstrak tanpa
   mengganti skema; validasi dan migrasi tetap dijalankan oleh lapisan pemilik.
+- Kompatibilitas save: `pycos/inti/persona.py` — `from_dict` mengenali lima
+  bidang idiolek baru (kata_favorit, panjang_kalimat, partikel, sapaan,
+  keterusterangan). Snapshot lama tanpa bidang ini tetap dimuat dengan nilai
+  bawaan (netral/daftar kosong). Tidak ada bidang lama yang dihapus; snapshot
+  dapat dimuat lalu disimpan ulang tanpa kehilangan data.
 
 ### Fixed
 
