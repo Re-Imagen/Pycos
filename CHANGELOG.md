@@ -20,6 +20,19 @@ Versi paket saat ini `0.1.0`; belum ada riwayat rilis terverifikasi di dokumen i
   agar entry point showcase dan nama modul data tidak bertabrakan.
 - Kebijakan ekspor pada `docs/API_PUBLIK.md` serta tes klasifikasi seluruh
   nama subpaket, identitas alias, star import, cache, dan impor malas.
+- H7/H9 ANALISIS_LINGUISTIK: `eskalasi_variasi` tingkat pertama meminta
+  kandidat baru dari mesin tutur dengan larangan bentuk yang baru dipakai
+  (`cara: kandidat_baru_mesin_tutur`), isi asal tetap dipertahankan, dan
+  pengakuan repetisi ditandai `langkah_terakhir`; `batas_identitas` dinilai
+  proporsional terhadap `kedekatan_identitas` (bukan pinalti −0,80 tetap).
+- H6/H8 ANALISIS_LINGUISTIK: `pycos/bahasa/teks.py` menyediakan `jejak_bentuk`
+  dan `kata_isi` (jejak makna: bentuk boleh berubah, pikiran asal tetap
+  dirujuk); `Presentasi.ucap` menyertakan `jejak_makna`/`pikiran_asal`, dan
+  gaya peran yang menghapus isi ditolak sebelum dipilih.
+- H8: modul `pycos/bahasa/keadaan.py` membangkitkan ujaran keadaan (act
+  `kegagalan`, `penahanan`, `apersepsi`, `ujian_tutur`) lewat mesin tutur;
+  `_PELINDUNG_WATAK`, buffer manusiawi, balasan ujian, penahanan sadar, dan
+  `pidato_gagal` memakai jalur ini dengan tabel lama sebagai cadangan.
 - F4–F7 ANALISIS_LINGUISTIK: skor leksikal kontekstual (sinonim fokus,
   kolokasi, antonim dua arah, kata favorit persona, penalti riwayat 0,80^langkah),
   slot `mode="isi"` yang boleh diisi tanpa argumen, variasi struktur (inversi,

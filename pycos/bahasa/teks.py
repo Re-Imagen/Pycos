@@ -31,6 +31,7 @@ __all__ = [
     "tindak_tutur_skor", "ekstrak_entitas", "ekstrak_topik",
     "deteksi_bahasa", "kemiripan", "koreksi_ejaan", "periksa_gramatika",
     "potong_batas_kata", "analisis_ujaran", "JejakLinguistik",
+    "jejak_bentuk", "kata_isi", "LANGKAH_BENTUK",
     "jejak_pembentukan", "STOPWORDS", "NEGATOR_LOGIS",
     "NEGATOR_PROHIBITIF", "PENGURANG", "ABSORBER_NEGASI",
     "TRANSPARAN_NEGASI", "PENGUAT", "PELUNAK",
@@ -1215,6 +1216,75 @@ def periksa_gramatika(teks: str, leksikon: Any = None) -> List[str]:
 # ===========================================================================
 # H3 — pemotongan batas kata
 # ===========================================================================
+# ===========================================================================
+# H6 — jejak makna: setiap pembungkus bentuk wajib memperlihatkan asalnya
+# ===========================================================================
+#: Langkah yang MENGUBAH BENTUK dan meninggalkan jejak; isi/pikiran asal
+#: tidak boleh hilang. Dipakai oleh `pycos.inti.presentasi`,
+#: `pycos.inti.ekstensi.organik`, dan `pycos.inti.ekstensi.pelindung`.
+LANGKAH_BENTUK = ("gaya", "prosodi", "penjagaan", "potong", "partikel",
+                  "struktur", "sapa", "variasi", "saring", "buffer")
+
+
+def jejak_bentuk(jejak: Optional[Sequence[Mapping[str, Any]]],
+                 langkah: str, sebelum: str, sesudah: str, **detail: Any
+                 ) -> List[Dict[str, Any]]:
+    """Tambahkan satu langkah pembungkus bentuk ke jejak makna (H6).
+
+    ``sebelum`` adalah pikiran/ujaran asal, ``sesudah`` bentuk yang akan
+    terlihat pemain. Bila keduanya sama, tidak ada entri baru: jejak hanya
+    mencatat perubahan yang benar-benar terjadi. Entri selalu memuat
+    ``asal`` sehingga tahap sesudahnya dapat dirujuk balik ke pikiran asal.
+    """
+    keluar = [dict(x) for x in (jejak or ())]
+    a = str(sebelum or "")
+    b = str(sesudah or "")
+    if a == b:
+        return keluar
+    entri: Dict[str, Any] = {
+        "langkah": str(langkah),
+        "asal": keluar[0]["asal"] if keluar else a,
+        "sebelum": a[:240],
+        "sesudah": b[:240],
+    }
+    if detail:
+        entri["detail"] = {str(k): v for k, v in detail.items()}
+    keluar.append(entri)
+    return keluar
+
+
+def kata_isi(teks: str, leksikon: Any = None) -> List[str]:
+    """Kata ISI (bukan kata fungsi) dari teks, urut seperti aslinya.
+
+    Dipakai sebagai bahan isi saat sebuah pembungkus harus menghasilkan
+    kalimat baru (H6/H8): kata fungsi tidak dianggap "pikiran". Leksikon
+    diperlakukan duck-typed (`kelas_dari`); tanpa leksikon, daftar kata
+    fungsi bahasa Indonesia bawaan dipakai.
+    """
+    toks = [t.bentuk for t in _kata_tokens(tokenisasi(teks))]
+    fungsi = {"yang", "dan", "atau", "di", "ke", "dari", "itu", "ini",
+              "adalah", "akan", "sudah", "telah", "sedang", "belum",
+              "juga", "pada", "dengan", "untuk", "kepada", "oleh", "dalam",
+              "kalau", "karena", "tapi", "tidak", "tak", "bukan", "aku",
+              "saya", "kamu", "kau", "dia", "ia", "kita", "kami", "mereka",
+              "apa", "siapa", "mana", "kenapa", "mengapa", "bagaimana"}
+    keluar: List[str] = []
+    for w in toks:
+        wl = w.lower()
+        if len(wl) < 3 or wl in fungsi or wl in STOPWORDS:
+            continue
+        if leksikon is not None:
+            try:
+                kelas = leksikon.kelas_dari(w, "id")
+            except Exception:
+                kelas = None
+            if kelas and str(kelas).upper() in (
+                    "PRON", "PREP", "PART", "CONJ", "DET", "AUX", "INT"):
+                continue
+        keluar.append(w)
+    return keluar
+
+
 def potong_batas_kata(teks: str, maks_karakter: int) -> str:
     """Potong di batas kata (bukan tengah kata); tanpa sufiks."""
     s = str(teks or "")

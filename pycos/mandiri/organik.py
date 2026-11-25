@@ -1052,8 +1052,16 @@ class PenolakanTutur:
             _koher = 1.0
         komp["disosiasi"] = -1.20 * max(0.0, 0.55 - float(_koher))
         komp["duka"] = -1.00 * max(0.0, float(k.get("duka", 0.0) or 0.0) - 0.25)
+        # H9: penolakan karena identitas sebanding dengan KEDEKATAN klaim
+        # dengan identitas inti (0..1), bukan pinalti -0,80 tetap setiap ada
+        # klaim. Klaim yang jauh dari inti tidak menekan tutur sama sekali.
+        kedekatan = _kclip(float(k.get("kedekatan_identitas", 0.0) or 0.0),
+                           0.0, 1.0)
         if k.get("batas_identitas"):
-            komp["identitas"] = -0.80
+            # kunci lama (True) tetap dihormati sebagai klaim kuat.
+            kedekatan = max(kedekatan, 0.8)
+        if kedekatan > 0.0:
+            komp["identitas"] = -0.95 * kedekatan
         skor = _kclip(1.0 + sum(komp.values()), 0.0, 1.0)
         return skor, komp
 

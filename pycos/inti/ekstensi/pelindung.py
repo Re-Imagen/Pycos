@@ -350,12 +350,53 @@ def _pelindung_init(p: Any) -> Any:
     p._pelindung_ingat_terakhir = None
     p._pelindung_konflik_terakhir = -1   # -1 = belum pernah diamati
     p._pelindung_monitor = None
+    # H7: struktur/bentuk yang BARU dipakai — larangan bagi eskalasi tingkat 1
+    # saat meminta kandidat baru dari mesin tutur (bukan sekadar ganti kata).
+    p._pelindung_bentuk_terpakai = []
     return p
 
 
 # ---------------------------------------------------------------------
 # 1/5. GAGAL-SEBAGAI-AKTING & TANDA-KEGAGALAN KEPRIBADIAN
 # ---------------------------------------------------------------------
+def _pelindung_ujaran_keadaan(self: Any, act: str, keadaan: str = "",
+                              topik: str = "", isi: Sequence[str] = (),
+                              motif: str = "", seed: Optional[int] = None,
+                              jumlah: int = 0) -> List[str]:
+    """H8: ujaran keadaan dari MESIN TUTUR, bukan 3–5 kalimat tetap.
+
+    Tabel watak hanya menyimpan *act* dan *keadaan* (watak), bukan kalimat.
+    Isi (`isi`) adalah kata yang benar-benar ada di kepala NPC. Bila mesin
+    tutur tidak tersedia/menyerah, daftar kosong dikembalikan dan pemanggil
+    memakai jalur lamanya — kegagalan mesin tidak boleh menelan ujaran.
+    """
+    from pycos.bahasa import keadaan as _keadaan
+    try:
+        eng = self.tutur_engine()
+    except Exception as _galat_diagnostik_265:
+        _diag.catat('naluri._pelindung_ujaran_keadaan',
+                    "galat pada jalur fallback",
+                    galat=_galat_diagnostik_265, jalur=265)
+        eng = None
+    if eng is None:
+        return []
+    benih = int(self._tick()) * 31 + sum(ord(c) for c in str(keadaan or act))
+    if seed is not None:
+        benih += int(seed)
+    kwarg: Dict[str, Any] = {}
+    if topik:
+        kwarg["topik"] = str(topik)
+    if act in ("kegagalan", "ujian_tutur", "apersepsi"):
+        kwarg["doubt"] = 0.62
+    if jumlah > 0:
+        return _keadaan.realisasi_daftar(
+            act, jumlah, engine=eng, keadaan=keadaan, isi=tuple(isi),
+            motif=motif, seed=benih, **kwarg)[:jumlah]
+    satu = _keadaan.realisasi(act, engine=eng, keadaan=keadaan,
+                              isi=tuple(isi), motif=motif, seed=benih, **kwarg)
+    return [satu] if satu else []
+
+
 def watak_kegagalan(self) -> Dict[str, Any]:
     """Mode kegagalan default watak ini (paranoid curiga, dingin diam, dst.)."""
     nama = str(getattr(self.naluri, "personality_name", "") or "").strip().lower()
@@ -368,8 +409,27 @@ def watak_kegagalan(self) -> Dict[str, Any]:
 
 
 def pidato_gagal(self, sebab: str = "umum", kepada: Any = None) -> str:
-    """Kalimat kegagalan yang HANYA bisa diucapkan NPC ini."""
+    """Kalimat kegagalan yang HANYA bisa diucapkan NPC ini (H8).
+
+    Urutan sumber: (1) mesin tutur dengan act khusus `kegagalan` atas isi yang
+    benar-benar ada di kepala NPC; (2) kalimat watak lama — bukan 3–5 tetap
+    per kasus, tetapi tetap milik watak ini.
+    """
     w = self.watak_kegagalan()
+    isi: List[str] = []
+    try:
+        from pycos.bahasa.teks import kata_isi as _kata_isi
+        isi = _kata_isi(" ".join(str(x) for x in
+                                (self._recent_texts or [])[-2:]))
+    except Exception as _galat_diagnostik_266:
+        _diag.catat('naluri.pidato_gagal', "galat pada jalur fallback",
+                    galat=_galat_diagnostik_266, jalur=266)
+        isi = []
+    dari_mesin = _pelindung_ujaran_keadaan(
+        self, "kegagalan", keadaan=str(w.get("gagal") or "ragu"),
+        isi=isi, motif=str(sebab or ""), jumlah=2)
+    if dari_mesin:
+        return str(dari_mesin[0])
     pilihan = list(w.get("kalimat_gagal") or [])
     teks = _pelindung_pilih_stabil(
         pilihan, f"{w['nama']}|{sebab}|{self._tick() // 5}")
@@ -412,13 +472,34 @@ _BUFFER_MANUSIAWI: Dict[str, Tuple[str, ...]] = {
 
 
 def buffer_manusiawi(self, jenis: Optional[str] = None) -> str:
-    """Kegagalan yang plausibel secara manusiawi (Player mengharapkannya)."""
+    """Kegagalan yang plausibel secara manusiawi (Player mengharapkannya).
+
+    H8: kalimat buffer dibangkitkan dari keadaan lewat mesin tutur (act
+    `kegagalan`, keadaan watak) bila tersedia; tabel lama hanya cadangan.
+    """
     _pelindung_init(self)
     jenis = str(jenis or "tak_paham").lower()
     if jenis not in _BUFFER_MANUSIAWI:
         jenis = "tak_paham"
     if not bool(self.params.get("pelindung_buffer_" + jenis, True)):
         return ""
+    w = self.watak_kegagalan()
+    keadaan = {"lupa": "ragu", "kontradiksi": "ragu"}.get(
+        jenis, str(w.get("gagal") or "ragu"))
+    isi: List[str] = []
+    try:
+        from pycos.bahasa.teks import kata_isi as _kata_isi
+        isi = _kata_isi(" ".join(str(x) for x in
+                                (self._recent_texts or [])[-2:]))
+    except Exception as _galat_diagnostik_267:
+        _diag.catat('naluri.buffer_manusiawi', "galat pada jalur fallback",
+                    galat=_galat_diagnostik_267, jalur=267)
+        isi = []
+    dari_mesin = _pelindung_ujaran_keadaan(
+        self, "kegagalan", keadaan=keadaan, isi=isi, motif=jenis,
+        seed=sum(ord(c) for c in jenis))
+    if dari_mesin:
+        return str(dari_mesin[0])
     return _pelindung_pilih_stabil(
         _BUFFER_MANUSIAWI[jenis], f"{jenis}|{self._tick() // 3}")
 
@@ -586,6 +667,7 @@ def eskalasi_variasi(self, teks: str, act: str, kepada: Any = None,
     if len(p._pelindung_act_terakhir) > 6:
         del p._pelindung_act_terakhir[:-6]
     kata = _pelindung_kata(teks)
+    _pelindung_catat_bentuk(p, teks)
     sim_lex = max([_pelindung_jaccard(kata, _pelindung_kata(t))
                    for t in riwayat] or [0.0])
     deteksi = {
@@ -625,6 +707,18 @@ def eskalasi_variasi(self, teks: str, act: str, kepada: Any = None,
     while posisi < len(urutan):
         tingkat = urutan[posisi]
         if tingkat == "leksikal":
+            # H7: tingkat pertama meminta KANDIDAT BARU dari mesin tutur
+            # dengan struktur yang baru dipakai dilarang — penggantian kata
+            # hanya cadangan bila mesin tidak menghasilkan kandidat baru.
+            larangan = list(getattr(p, "_pelindung_bentuk_terpakai", []) or [])
+            baru = _pelindung_kandidat_tutur(self, act, kepada, topik,
+                                             larangan, isi_asal=teks)
+            if baru and baru != teks:
+                info["tingkat"] = urutan.index(tingkat) + 1
+                info["nama"] = tingkat
+                info["cara"] = "kandidat_baru_mesin_tutur"
+                info["larangan_bentuk"] = larangan
+                return baru, act, info
             baru = self._ganti_kata(teks)
             if baru and baru != teks:
                 info["tingkat"] = urutan.index(tingkat) + 1
@@ -658,7 +752,10 @@ def eskalasi_variasi(self, teks: str, act: str, kepada: Any = None,
                     p._pelindung_anggaran_maks.get("pragmatis", 2))
                 return self._warnai(inti, act_baru), act_baru, info
         else:
+            # H7: pengakuan repetisi HANYA langkah terakhir, sesudah semua
+            # tingkat lain gagal menghasilkan bentuk baru.
             info["cara"] = "pengakuan_repetisi"
+            info["langkah_terakhir"] = True
             return self._pengakuan_repetisi(act), act, info
         posisi += 1
     return teks, act, info
@@ -762,6 +859,112 @@ def _ganti_kata(self, teks: str) -> str:
         return pilih
 
     return re.sub(r"\b[a-zA-Z]{4,}\b", ganti, str(teks))
+
+
+def _pelindung_isi_banding(teks: Any) -> set:
+    """Kata isi ber-stem untuk membandingkan ISI antar kandidat (H6/H7)."""
+    try:
+        from pycos.bahasa.teks import kata_isi as _ki, stem as _stem
+    except Exception as _galat_diagnostik_272:
+        _diag.catat('naluri._pelindung_isi_banding',
+                    "galat pada jalur fallback",
+                    galat=_galat_diagnostik_272, jalur=272)
+        return _pelindung_kata(teks)
+    return {_stem(w.lower()) for w in _ki(str(teks or "")) if len(w) >= 3}
+
+
+def _norm_banding(teks: Any) -> str:
+    """Bentuk banding untuk teks: huruf kecil, tanpa tanda baca akhir."""
+    return re.sub(r"[^a-z0-9 ]+", "", str(teks or "").lower()).strip()
+
+
+def _pelindung_catat_bentuk(p: Any, teks: str) -> None:
+    """Catat bentuk sintaksis ujaran yang keluar (H7, maks 8 terakhir)."""
+    bentuk = _pelindung_bentuk(teks)
+    if not bentuk:
+        return
+    daftar = getattr(p, "_pelindung_bentuk_terpakai", None)
+    if daftar is None:
+        daftar = p._pelindung_bentuk_terpakai = []
+    if not daftar or daftar[-1] != bentuk:
+        daftar.append(bentuk)
+        del daftar[:-8]
+
+
+def _pelindung_kandidat_tutur(self: Any, act: str, kepada: Any,
+                              topik: Optional[str], larangan: Sequence[str],
+                              isi_asal: str = "", coba: int = 4) -> str:
+    """H7: minta kandidat BARU dari mesin tutur (F3), bukan sinonim.
+
+    Isi tidak dipilih ulang oleh modul ini: `isi_asal` (ujaran/pikiran yang
+    sudah terbentuk) dimasukkan sebagai `niat`/`inner`/`spotlight` sehingga
+    mesin tutur merealisasikan PIKIRAN YANG SAMA dengan struktur berbeda.
+    `larangan` berisi bentuk sintaksis yang baru dipakai; kandidat dengan
+    bentuk itu ditolak di sini, sebelum dipilih. Kandidat juga wajib masih
+    memuat kata isi asal — variasi yang kehilangan isi bukan variasi (H6).
+    """
+    p = _pelindung_init(self)
+    asal = str(isi_asal or "").strip()
+    # Bandingkan ISI (kata isi ber-stem), bukan bentuk permukaan: "kulihat"
+    # dan "melihat" adalah isi yang sama, jadi kandidat berstruktur lain yang
+    # memakai verba itu tetap diterima sebagai variasi.
+    kata_lama = _pelindung_isi_banding(asal or (topik or ""))
+    eng = None
+    try:
+        eng = self.tutur_engine()
+    except Exception as _galat_diagnostik_270:
+        _diag.catat('naluri._pelindung_kandidat_tutur',
+                    "galat pada jalur fallback",
+                    galat=_galat_diagnostik_270, jalur=270)
+        eng = None
+    if eng is None or not asal:
+        return ""
+    import dataclasses as _dc
+    from pycos.inti.naluri import konteks_dari_presentasi as _konteks
+    from pycos.bahasa.teks import kata_isi as _kata_isi_k
+    isi = tuple(_kata_isi_k(asal))[:3]
+    # Act yang sama dicoba lebih dulu; bila mesin hanya menggemakan isi,
+    # act kerabat dipakai untuk merealisasikan ISI YANG SAMA dengan struktur
+    # lain (bukan memilih isi baru — isi tetap `asal`).
+    aktor = [str(act)]
+    kerabat = str(_PELINDUNG_ALTERNATIF_ACT.get(str(act), "menyatakan"))
+    for kandidat_act in (kerabat, "menyatakan", "mengamati"):
+        if kandidat_act not in aktor:
+            aktor.append(kandidat_act)
+    asal_norm = _norm_banding(asal)
+    calon_cadangan = ""
+    for act_coba in aktor[:2]:
+        for i in range(max(1, int(coba))):
+            try:
+                ctx = _konteks(self, act_coba, kepada, topik, False,
+                               seed_offset=i)
+                ctx = _dc.replace(ctx, niat=asal, inner=asal,
+                                  spotlight=isi or ctx.spotlight,
+                                  topik=ctx.topik or (isi[0] if isi else ""))
+                hasil = eng.ucap(ctx)
+            except Exception as _galat_diagnostik_271:
+                _diag.catat('naluri._pelindung_kandidat_tutur',
+                            "galat pada jalur fallback",
+                            galat=_galat_diagnostik_271, jalur=271)
+                hasil = None
+            calon = (str(getattr(hasil, "teks", "") or "").strip()
+                     if hasil else "")
+            if not calon or calon in p._pelindung_teks:
+                continue
+            if _norm_banding(calon) == asal_norm:
+                # penggemaran isi bukan variasi struktur (H7)
+                continue
+            # Struktur yang baru dipakai dilarang; bila SELURUH kandidat
+            # mesin berbentuk sama, variasi tetap lebih baik daripada
+            # pengakuan repetisi — asal-usulnya dicatat sebagai cadangan.
+            if _pelindung_bentuk(calon) in larangan:
+                calon_cadangan = str(calon)
+                continue
+            if kata_lama and not (_pelindung_isi_banding(calon) & kata_lama):
+                # isi asal hilang seluruhnya → kandidat ini bukan variasi
+                continue
+            return calon
+    return calon_cadangan
 
 
 def _ganti_struktur(self, teks: str) -> str:
@@ -895,9 +1098,19 @@ def serap_adversarial(self, teks: str) -> Optional[Dict[str, Any]]:
         return None
     w = self.watak_kegagalan()
     p = _pelindung_init(self)
-    balasan = _pelindung_pilih_stabil(
-        list(w.get("kalimat_ujian") or w.get("kalimat_gagal") or [""]),
-        f"ujian|{jenis}|{t[:24]}")
+    # H8: balasan ujian dibangkitkan dengan act khusus `ujian_tutur` dari
+    # keadaan; tabel watak hanya cadangan bila mesin tutur tidak tersedia.
+    from pycos.bahasa.teks import kata_isi as _kata_isi_u
+    isi_u = _kata_isi_u(str(teks or ""))[:3]
+    dari_mesin = _pelindung_ujaran_keadaan(
+        self, "ujian_tutur", keadaan=str(w.get("ujian") or "waspada"),
+        topik=str(teks or ""), isi=isi_u, motif=str(jenis or ""))
+    if dari_mesin:
+        balasan = str(dari_mesin[0])
+    else:
+        balasan = _pelindung_pilih_stabil(
+            list(w.get("kalimat_ujian") or w.get("kalimat_gagal") or [""]),
+            f"ujian|{jenis}|{t[:24]}")
     entri = {"jenis": jenis, "tick": self._tick(), "act": str(w.get("ujian", "ragu")),
              "balasan": str(balasan), "teks": t[:80],
              "cara": "diubah menjadi konten percakapan"}
@@ -1369,12 +1582,27 @@ def _penahanan_ucap(original, self, kepada: Any = None,
         jumlah = int(hasil_tahan.get("ditahan", 1))
         sakit = float(hasil_tahan.get("rasa_sakit", 0.0))
         kekuatan = float(tertahan.get("kekuatan", 0.65))
-        if jumlah == 1:
-            teks = "… Aku hampir mengatakan sesuatu. Bukan sekarang."
-        elif jumlah < 4:
-            teks = "Aku tahu kau bertanya. Tolong, biarkan aku menyimpannya dulu."
-        else:
-            teks = "Kata-katanya ada. Aku memilih untuk tidak mengeluarkannya."
+        # H8: isi yang ditahan TETAP ada (bukan diganti templat); mesin tutur
+        # mengucapkannya dengan act `penahanan`, dan pengakuan penahanan
+        # hanya menambah penanda — bukan mengganti pikiran.
+        from pycos.bahasa.teks import kata_isi as _kata_isi_t
+        isi_t = _kata_isi_t(" ".join(str(x) for x in (
+            tertahan.get("isi_tertahan"), tertahan.get("topik")) if x))[:3]
+        teks = ""
+        if isi_t:                    # hanya bila ada isi yang benar-benar ditahan
+            pilihan = _pelindung_ujaran_keadaan(
+                self, "penahanan", keadaan="diam", topik=str(pencarian or ""),
+                isi=isi_t, motif=str(tertahan.get("topik", "")),
+                seed=jumlah)
+            if pilihan:
+                teks = str(pilihan[0])
+        if not teks:
+            if jumlah == 1:
+                teks = "… Aku hampir mengatakan sesuatu. Bukan sekarang."
+            elif jumlah < 4:
+                teks = "Aku tahu kau bertanya. Tolong, biarkan aku menyimpannya dulu."
+            else:
+                teks = "Kata-katanya ada. Aku memilih untuk tidak mengeluarkannya."
         if entry.get("act") == "diam":
             entry["act"] = act or "menjawab"
         entry["teks"] = teks

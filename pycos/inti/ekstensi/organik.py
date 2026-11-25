@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import math
 import re
-from typing import Mapping
+from typing import Any, List, Mapping
 from pycos.dukungan import diagnostik as _diag
 from pycos.dukungan.patching import install_method, install_methods, optional_module, wrap_method
 from pycos.dukungan.numerik import jepit_01, jepit_drive
@@ -257,6 +257,49 @@ def _presentasi_organik(self):
     return _organik_dari(n, getattr(n, "rng_seed", 0) or 0)
 
 
+#: Kata isi yang menandai klaim identitas tentang DIRI (bukan sekadar
+#: menyebut dirinya). H9: kedekatan klaim dengan identitas inti diukur dari
+#: kata-kata ini + kemiripan dengan klaim yang sudah dipegang.
+_KLAIM_IDENTITAS_KATA = frozenset({
+    "aku", "saya", "diriku", "dirinya", "diri", "orang", "selalu", "tidak",
+    "tak", "bukan", "percaya", "mempercayai", "kepercayaan", "setia",
+    "jujur", "penjaga", "pelindung", "sendiri", "selamanya", "prinsip",
+    "sifat", "watak", "cara", "hidup", "mati", "tujuan", "janji",
+})
+
+
+def _kedekatan_identitas(pres: Any, klaim: str = "") -> float:
+    """H9: seberapa dekat klaim/pikiran ini dengan identitas inti [0..1].
+
+    Nilai BUKAN pinalti tetap: klaim yang hanya menyebut identitas sekejap
+    (0,0) tidak menekan tutur sama sekali, sedangkan klaim yang isinya
+    menyentuh identitas inti memakai nilai besar. Bahan: klaim identitas
+    yang sudah dipegang (`BatasIdentitas.klaim`), kata identitas pada
+    pikiran/topik saat ini, dan kemiripan leksikal (`kemiripan`) dengan
+    klaim lama.
+    """
+    n = getattr(pres, "naluri", None)
+    o = getattr(n, "_organik", None) if n is not None else None
+    inti = str(getattr(getattr(o, "identitas", None), "klaim", "") or "").strip()
+    teks = str(klaim or "").strip()
+    if not inti or not teks:
+        return 0.0
+    try:
+        from pycos.bahasa.teks import kemiripan as _mirip
+        similar = float(_mirip(teks, inti) or 0.0)
+    except Exception as _galat_diagnostik_268:
+        _diag.catat('naluri._kedekatan_identitas', "galat pada jalur fallback",
+                    galat=_galat_diagnostik_268, jalur=268)
+        similar = 0.0
+    kata = {w for w in re.findall(r"[a-z]{3,}", teks.lower())}
+    kepadatan = (len(kata & _KLAIM_IDENTITAS_KATA) / float(max(1, len(kata)))
+                 if kata else 0.0)
+    # kata identitas pada klaim inti memperkuat, bukan syarat
+    inti_kata = {w for w in re.findall(r"[a-z]{3,}", inti.lower())}
+    tumpang = (len(kata & inti_kata) / float(max(1, len(kata))) if kata else 0.0)
+    return jepit_01(0.55 * similar + 0.30 * kepadatan + 0.15 * tumpang)
+
+
 def _organik_konteks_tubuh(pres):
     n = getattr(pres, "naluri", None)
     if n is None:
@@ -273,16 +316,31 @@ def _organik_konteks_tubuh(pres):
     koher = 1.0 - max(0.0, -float(lv.get("koherensi", 0.0) or 0.0))
     o = getattr(n, "_organik", None)
     duka = 0.0
-    batas = False
+    kedekatan = 0.0
     if o is not None:
         k = len(o.topologi.kosong())
         if k:
             duka = min(1.0, 0.5 + 0.15 * k)
-        batas = bool(o.identitas.klaim)
+        # H9: klaim identitas hanya menekan tutur sejauh isinya menyentuh
+        # identitas inti — bukan pinalti tetap setiap ada klaim.
+        # bahan klaim: topik giliran ini + ujaran terakhir (yang sedang
+        # dibentuk/diucapkan) — bukan seluruh riwayat.
+        bahan: List[str] = []
+        for wadah in (getattr(pres, "_skema_act_terakhir", None),
+                      getattr(pres, "_recent_texts", None)):
+            if isinstance(wadah, str):
+                bahan.append(wadah)
+            elif isinstance(wadah, (list, tuple)) and wadah:
+                bahan.append(str(wadah[-1]))
+        pending = getattr(pres, "_pending_topic", None)
+        if pending:
+            bahan.append(str(pending))
+        kedekatan = _kedekatan_identitas(pres, " ".join(bahan))
     return {"arousal": arousal,
             "takut": float(em.get("takut", 0.0) or 0.0),
             "malu": float(em.get("malu", 0.0) or 0.0),
-            "koherensi": koher, "duka": duka, "batas_identitas": batas}
+            "koherensi": koher, "duka": duka,
+            "kedekatan_identitas": kedekatan}
 
 
 def kelayakan_tutur(self):
@@ -318,7 +376,13 @@ def _organik_ucap(original, self, kepada=None, topik=None, *a, **k):
         n = getattr(self, "naluri", None)
         o.tutur.catat(teks, bentuk, kel, komp, tick=_naluri_tick(n))
         ent["teks_terbentuk"] = teks
+        # H6: penjagaan tubuh mengubah BENTUK, bukan pikiran; jejak makna
+        # menyimpan asal agar pembungkus berikutnya tidak menimpanya buta.
+        from pycos.bahasa.teks import jejak_bentuk as _jejak_bentuk
         ent["teks"] = bentuk
+        ent["_jejak_makna"] = _jejak_bentuk(
+            ent.get("_jejak_makna"), "penjagaan", teks, bentuk,
+            sebab=o.tutur.jenis(komp))
         ent["disembunyikan"] = True
         ent["alasan_penolakan"] = "tubuh menolak"
         ent["kelayakan_tutur"] = round(kel, 3)
@@ -945,7 +1009,12 @@ def _organik_lanjut_ucap(original, self, kepada=None, topik=None, *a, **k):
         kata = str(ent["teks"]).split()
         batas = max(3, int(round(9 - 5 * tekanan_duka)))
         if len(kata) > batas:
+            from pycos.bahasa.teks import jejak_bentuk as _jejak_d
+            sebelum_potong = str(ent["teks"])
             ent["teks"] = " ".join(kata[:batas]).rstrip(".,;:") + "…"
+            ent["_jejak_makna"] = _jejak_d(
+                ent.get("_jejak_makna"), "potong", sebelum_potong,
+                ent["teks"], sebab="residu_duka", batas_kata=batas)
         pros = dict(ent.get("prosodi") or {})
         if "volume" in pros:
             pros["volume"] = max(0.0, float(pros["volume"]) *
@@ -1021,6 +1090,10 @@ def _organik_lanjut_ucap(original, self, kepada=None, topik=None, *a, **k):
                 from pycos.bahasa.teks import potong_batas_kata
                 ent["teks_sebelum_interupsi"] = teks
                 ent["teks"] = potong_batas_kata(teks, max(1, len(teks) // 2)) + "—"
+                from pycos.bahasa.teks import jejak_bentuk as _jejak_i
+                ent["_jejak_makna"] = _jejak_i(
+                    ent.get("_jejak_makna"), "potong", teks, ent["teks"],
+                    sebab="detak_mual")
                 ent["terpotong_internal"] = "mual"
                 sebab.append("detak_mual")
                 cat["ucapan_dipotong"] = True
