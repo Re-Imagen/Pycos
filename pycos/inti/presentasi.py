@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 from pycos.dukungan import diagnostik as _diag
 from pycos.dukungan.numerik import jepit, jepit_01
 from pycos.dukungan.sumber import kandidat_leksikon
+from pycos.bahasa.teks import jejak_bentuk as _jejak_bentuk
 from pycos.inti._konfigurasi import (_kclip)
 
 PRESENTASI_DEFAULTS: Dict[str, Any] = {
@@ -1783,7 +1784,11 @@ class Presentasi:
         return teks
 
     def _warnai(self, teks: str, act: str) -> str:
-        """Beri warna afektif: hedges, interjeksi somatik, jeda, gagap."""
+        """Beri warna afektif: hedges, interjeksi somatik, jeda, gagap (H6).
+
+        Mengubah BENTUK saja: pikiran asal dicatat lebih dulu di
+        `_tutur_trace`, sehingga `entry["teks"]` selalu dapat dirujuk balik.
+        """
         if not teks:
             return teks
         out = teks
@@ -1909,6 +1914,9 @@ class Presentasi:
         teks = ""
         niat_teks = ""
         generatif = False
+        # H6: jejak makna — setiap pembungkus bentuk (gaya, warna, potong,
+        # pronomina, pelindung) mencatat asal pikiran yang diubahnya.
+        jejak_makna: List[Dict[str, Any]] = []
         if direct is not None:
             # Ujaran yang dipilih sengaja tidak disamarkan oleh template,
             # framing relasional, atau warna bahasa otomatis.
@@ -1972,7 +1980,9 @@ class Presentasi:
                 if inti is None:
                     inti = self._isi_ucap(act, kepada, topik)
                 inti = self._bingkai_relasi(inti, kepada)
+                asal_pikiran = inti
                 calon = self._warnai(inti, act)
+                cacat_gaya: List[str] = []
                 if role_style:
                     prefix = str(style.get("awalan", style.get("prefix", "")) or "").strip()
                     suffix = str(style.get("akhiran", style.get("suffix", "")) or "").strip()
@@ -1987,6 +1997,10 @@ class Presentasi:
                                 calon = re.sub(r"\b" + re.escape(str(source)) + r"\b",
                                                str(target_word), calon,
                                                flags=re.IGNORECASE)
+                                if not re.search(r"\b" + re.escape(str(target_word))
+                                                 + r"\b", calon,
+                                                 flags=re.IGNORECASE):
+                                    cacat_gaya.append(str(source))
                 if not str(calon or "").strip():
                     # E4: tak ada dasar untuk bertutur — kandidat hampa.
                     masalah = ["kandidiat_hampa"]
@@ -2008,15 +2022,21 @@ class Presentasi:
                         masalah = []
                 if calon in self._recent_texts:
                     masalah = list(masalah) + ["pengulangan_terbaru"]
+                # H6: gaya yang menghapus pikiran bukan "variasi" — kandidat
+                # yang kehilangan isi asalnya ditolak sebelum dipilih.
+                masalah = list(masalah) + ["gaya_menghapus_isi:" + k
+                                           for k in cacat_gaya]
                 if (pilihan_inti is None
                         or len(masalah) < len(masalah_pilihan)):
-                    pilihan_teks, pilihan_inti = calon, str(inti)
+                    pilihan_teks, pilihan_inti = calon, str(asal_pikiran)
                     masalah_pilihan = list(masalah)
                 if not masalah and str(calon or "").strip():
                     # kandidat bersih & segar → tidak perlu mencoba lagi
                     break
             teks = pilihan_teks or ""
             niat_teks = pilihan_inti or ""
+            if teks:
+                jejak_makna = _jejak_bentuk(jejak_makna, "gaya", niat_teks, teks)
             if masalah_pilihan:
                 self._tutur_trace = list(getattr(self, "_tutur_trace", []) or []) + [
                     {"F3": {"dipilih": teks, "masalah": masalah_pilihan}}]
@@ -2031,11 +2051,18 @@ class Presentasi:
         kalimat = _pecah(teks)
         batas = max(1, int(round(1 + 1.5 * verb)))
         if len(kalimat) > batas:
+            sebelum_potong = teks
             teks = " ".join(kalimat[:batas])
+            jejak_makna = _jejak_bentuk(jejak_makna, "potong", sebelum_potong,
+                                        teks, maks_kalimat=batas)
         if direct is None:
             # F1: satu pasangan pronomina per percakapan; ujaran yang
             # dipilih sadar (direct) tidak diubah.
+            sebelum_pronomina = teks
             teks = self._konsisten_pronomina(teks, kepada)
+            jejak_makna = _jejak_bentuk(jejak_makna, "gaya",
+                                        sebelum_pronomina, teks,
+                                        sebab="konsisten_pronomina")
         self._recent_texts.append(teks)
         if len(self._recent_texts) > 6:
             self._recent_texts = self._recent_texts[-6:]
@@ -2065,6 +2092,7 @@ class Presentasi:
             "deskripsi": self.deskripsi(teks=teks, nonverbal=nv, act=act,
                                         kepada=kepada),
             "generatif": generatif,
+            "_jejak_makna": list(jejak_makna),
         }
         if direct is not None:
             direct["teks"] = teks
@@ -2075,6 +2103,12 @@ class Presentasi:
                                          "peran": role_style.get("peran", "")}
         if bool(self.params.get("presentasi_trace", False)):
             entry["trace"] = list(self._tutur_trace)
+        # H6: pembaca (host/diagnostik) dapat melihat bentuk akhir beserta
+        # pikiran asal yang mendahuluinya; atribut privat tidak ikut keluar.
+        jejak_akhir = entry.pop("_jejak_makna", None)
+        if jejak_akhir:
+            entry["jejak_makna"] = jejak_akhir
+            entry["pikiran_asal"] = str(jejak_akhir[0].get("asal", ""))
         self._log(entry)
         return entry
 

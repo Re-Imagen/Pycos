@@ -318,7 +318,13 @@ def _organik_ucap(original, self, kepada=None, topik=None, *a, **k):
         n = getattr(self, "naluri", None)
         o.tutur.catat(teks, bentuk, kel, komp, tick=_naluri_tick(n))
         ent["teks_terbentuk"] = teks
+        # H6: penjagaan tubuh mengubah BENTUK, bukan pikiran; jejak makna
+        # menyimpan asal agar pembungkus berikutnya tidak menimpanya buta.
+        from pycos.bahasa.teks import jejak_bentuk as _jejak_bentuk
         ent["teks"] = bentuk
+        ent["_jejak_makna"] = _jejak_bentuk(
+            ent.get("_jejak_makna"), "penjagaan", teks, bentuk,
+            sebab=o.tutur.jenis(komp))
         ent["disembunyikan"] = True
         ent["alasan_penolakan"] = "tubuh menolak"
         ent["kelayakan_tutur"] = round(kel, 3)
@@ -945,7 +951,12 @@ def _organik_lanjut_ucap(original, self, kepada=None, topik=None, *a, **k):
         kata = str(ent["teks"]).split()
         batas = max(3, int(round(9 - 5 * tekanan_duka)))
         if len(kata) > batas:
+            from pycos.bahasa.teks import jejak_bentuk as _jejak_d
+            sebelum_potong = str(ent["teks"])
             ent["teks"] = " ".join(kata[:batas]).rstrip(".,;:") + "…"
+            ent["_jejak_makna"] = _jejak_d(
+                ent.get("_jejak_makna"), "potong", sebelum_potong,
+                ent["teks"], sebab="residu_duka", batas_kata=batas)
         pros = dict(ent.get("prosodi") or {})
         if "volume" in pros:
             pros["volume"] = max(0.0, float(pros["volume"]) *
@@ -1021,6 +1032,10 @@ def _organik_lanjut_ucap(original, self, kepada=None, topik=None, *a, **k):
                 from pycos.bahasa.teks import potong_batas_kata
                 ent["teks_sebelum_interupsi"] = teks
                 ent["teks"] = potong_batas_kata(teks, max(1, len(teks) // 2)) + "—"
+                from pycos.bahasa.teks import jejak_bentuk as _jejak_i
+                ent["_jejak_makna"] = _jejak_i(
+                    ent.get("_jejak_makna"), "potong", teks, ent["teks"],
+                    sebab="detak_mual")
                 ent["terpotong_internal"] = "mual"
                 sebab.append("detak_mual")
                 cat["ucapan_dipotong"] = True
