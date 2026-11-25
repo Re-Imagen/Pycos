@@ -7,7 +7,7 @@ Indikator kontrol/mutasi termasuk scope nested; bukan kompleksitas siklomatik fo
 Nama call bersifat sintaksis, bukan resolusi callback atau monkey patch runtime.
 Analisis semantik dan batas bukti: [audit lanjutan](AUDIT_PYTHON_LANJUTAN.md).
 
-Jumlah berkas: **87**.
+Jumlah berkas: **88**.
 
 ## `examples/dialog_hud.py`
 
@@ -764,14 +764,14 @@ Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from
 
 ## `pycos/inti/ekstensi/organik.py`
 
-SHA-256: `36808d3bfcd36c57066dd15cd0c3ae6066b268b0c6a8eb9d437a28e5b8e942c5`
+SHA-256: `569affa9b1b0e52ee046f3a485046362bdb303eda2ee52276d9cf9275148c983`
 
-1187 baris; 0 kelas; 69 fungsi/metode termasuk nested.
+1245 baris; 0 kelas; 70 fungsi/metode termasuk nested.
 
 Kelas: tidak ada.
-Handler luas: 244, 269, 332, 489, 524, 603, 703, 946, 230, 349, 458, 972, 46, 56, 360, 464, 884, 1010, 1085, 795, 807.
+Handler luas: 244, 290, 312, 390, 547, 582, 661, 761, 1004, 230, 407, 516, 1030, 46, 56, 418, 522, 942, 1068, 1143, 853, 865.
 
-Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from pycos.bahasa.teks import ekstrak_entitas`; `from pycos.bahasa.teks import jejak_bentuk as _jejak_bentuk`; `from pycos.bahasa.teks import jejak_bentuk as _jejak_d`; `from pycos.bahasa.teks import jejak_bentuk as _jejak_i`; `from pycos.bahasa.teks import potong_batas_kata`; `from pycos.dukungan import diagnostik as _diag`; `from pycos.dukungan.numerik import jepit_01, jepit_drive`; `from pycos.dukungan.patching import install_method, install_methods, optional_module, wrap_method`; `from pycos.inti._konfigurasi import DRIVES, EMOSI_ALIASES, FELT_STATES`; `from pycos.inti.kesadaran import Kesadaran`; `from pycos.inti.naluri import _organik_tubuh_langkah`; `from pycos.inti.presentasi import Presentasi`; `from typing import Mapping`; `import math`; `import re`.
+Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from pycos.bahasa.teks import ekstrak_entitas`; `from pycos.bahasa.teks import jejak_bentuk as _jejak_bentuk`; `from pycos.bahasa.teks import jejak_bentuk as _jejak_d`; `from pycos.bahasa.teks import jejak_bentuk as _jejak_i`; `from pycos.bahasa.teks import kemiripan as _mirip`; `from pycos.bahasa.teks import potong_batas_kata`; `from pycos.dukungan import diagnostik as _diag`; `from pycos.dukungan.numerik import jepit_01, jepit_drive`; `from pycos.dukungan.patching import install_method, install_methods, optional_module, wrap_method`; `from pycos.inti._konfigurasi import DRIVES, EMOSI_ALIASES, FELT_STATES`; `from pycos.inti.kesadaran import Kesadaran`; `from pycos.inti.naluri import _organik_tubuh_langkah`; `from pycos.inti.presentasi import Presentasi`; `from typing import Any, List, Mapping`; `import math`; `import re`.
 
 - L26–34 **`_organik_dari`** · kontrol=3, assignment/delete=4, except=0 · Call: `getattr`, `int`, `modul.Organik`, `optional_module`
 - L37–64 **`_organik_bungkus_serialisasi`** · kontrol=5, assignment/delete=4, except=2 · Call: `_diag.catat`, `ambil`, `data.get`, `isinstance`, `original`, `pasang`, `wrap_method`
@@ -798,61 +798,62 @@ Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from
 - L175–206 **`_organik_emosi_naikkan`** · kontrol=12, assignment/delete=14, except=0 · Call: `EMOSI_ALIASES.get`, `_naluri_organik`, `_naluri_tick`, `bool`, `float`, `getattr`, `max`, `min`, `o.identitas.catat_penolakan`, `o.identitas.izinkan`, `o.residu.ambang_dimodifikasi`, `o.residu.langit_dimodifikasi`, `oo.residu.daftar`, `original`, `self.emosi.get`, `self.params.get`, `str`, `str(alasan).lower`, `str(emosi).lower`
 - L212–247 **`_organik_future_simulation`** · kontrol=11, assignment/delete=8, except=2 · Call: `_diag.catat`, `_naluri_tick`, `ent.get`, `getattr`, `isinstance`, `len`, `log.append`, `o.topologi.cabang_mustahil`, `original`, `self.future_sim.pop`, `str`
 - L253–257 **`_presentasi_organik`** · kontrol=2, assignment/delete=1, except=0 · Call: `_organik_dari`, `getattr`
-- L260–285 **`_organik_konteks_tubuh`** · kontrol=10, assignment/delete=14, except=1 · Call: `_diag.catat`, `bool`, `em.get`, `float`, `getattr`, `len`, `lv.get`, `max`, `min`, `n.mood`, `o.topologi.kosong`
-- L288–294 **`kelayakan_tutur`** · kontrol=2, assignment/delete=2, except=0 · Call: `_organik_konteks_tubuh`, `_presentasi_organik`, `komp.items`, `o.tutur.kelayakan`, `round`
-- L297–300 **`penolakan_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `_presentasi_organik`, `o.tutur.riwayat`
-- L303–335 **`_organik_ucap`** · kontrol=7, assignment/delete=13, except=1 · Call: `_diag.catat`, `_jejak_bentuk`, `_naluri_tick`, `_organik_konteks_tubuh`, `_presentasi_organik`, `ent.get`, `getattr`, `isinstance`, `komp.items`, `o.tutur.bentuk`, `o.tutur.catat`, `o.tutur.jenis`, `o.tutur.kelayakan`, `o.tutur.tertahan`, `original`, `round`
-- L341–363 **`_organik_felt_mentah`** · kontrol=10, assignment/delete=9, except=2 · Call: `_diag.catat`, `f.items`, `float`, `fr.items`, `getattr`, `isinstance`, `nu.felt_report`
-- L366–382 **`apersepsi_state`** · kontrol=3, assignment/delete=5, except=1 · Call: `_naluri_organik`, `_organik_felt_mentah`, `getattr`, `list`, `o.apersepsi.amati`
-- L385–386 **`rasa_kabut`** · kontrol=0, assignment/delete=0, except=0 · Call: `self.apersepsi_state`, `self.apersepsi_state().get`
-- L389–396 **`_organik_felt_report_jujur`** · kontrol=0, assignment/delete=1, except=0 · Call: `ap.get`, `self.apersepsi_state`
-- L400–410 **`pegang_dua`** · kontrol=1, assignment/delete=4, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `o.paralel.tambah`
-- L413–417 **`pegang_keyakinan`** · kontrol=1, assignment/delete=1, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `o.paralel.tambah`
-- L420–422 **`keyakinan_paralel`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.paralel.state`
-- L425–427 **`pengaruh_paralel`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.paralel.pengaruh`
-- L430–432 **`tanpa_resolusi`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.paralel.tanpa_resolusi`
-- L435–437 **`bertindak_dari_lapisan`** · kontrol=1, assignment/delete=1, except=0 · Call: `getattr`, `o.paralel.bertindak_dari`
-- L441–467 **`_organik_tubuh_langkah`** · kontrol=7, assignment/delete=8, except=2 · Call: `_diag.catat`, `_organik_felt_mentah`, `delta.items`, `float`, `getattr`, `jepit_drive`, `o.tubuh.langkah`, `self.delta`, `self.levels.get`
-- L470–472 **`tubuh_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.tubuh.state`
-- L475–478 **`suntik_tubuh`** · kontrol=0, assignment/delete=1, except=0 · Call: `_naluri_organik`, `o.tubuh.suntik`
-- L481–492 **`_organik_tick`** · kontrol=2, assignment/delete=2, except=1 · Call: `_diag.catat`, `_organik_tubuh_langkah`, `bool`, `getattr`, `getattr(self, '_vacancy_aktif', lambda: False)`, `original`
-- L502–536 **`_nama_dari_teks`** · kontrol=11, assignment/delete=5, except=1 · Call: `_diag.catat`, `e.get`, `ekstrak_entitas`, `hasil.append`, `len`, `m.group`, `m.start`, `nama.lower`, `nm.lower`, `out.extend`, `re.escape`, `re.findall`, `re.finditer`, `str`
-- L539–586 **`auto_deteksi_slot`** · kontrol=22, assignment/delete=16, except=0 · Call: `(getattr(j, '_patterns', None) or {}).items`, `_naluri_organik`, `_naluri_tick`, `_nama_dari_teks`, `entri.get`, `ep.get`, `getattr`, `int`, `isinstance`, `item.get`, `kandidat.get`, `kandidat.items`, `key.split`, `max`, `o.topologi.daftar`, `o.topologi.peek`, `o.topologi.peek(nama).get`, `slot.get`, `sorted`, `str`
-- L590–606 **`_organik_hud_state`** · kontrol=3, assignment/delete=8, except=1 · Call: `_diag.catat`, `ap.get`, `bool`, `getattr`, `isinstance`, `n.apersepsi_state`, `o.paralel.state`, `original`, `round`, `str`, `str(o.identitas.klaim).strip`
-- L611–616 **`daftarkan_residu`** · kontrol=1, assignment/delete=1, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `o.residu.daftar`
-- L619–624 **`tambal_residu`** · kontrol=1, assignment/delete=1, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `o.residu.tambal`
-- L627–630 **`ambang_dimodifikasi`** · kontrol=0, assignment/delete=1, except=0 · Call: `_naluri_organik`, `float`, `o.residu.ambang_dimodifikasi`
-- L633–636 **`langit_dimodifikasi`** · kontrol=0, assignment/delete=1, except=0 · Call: `_naluri_organik`, `float`, `o.residu.langit_dimodifikasi`
-- L639–641 **`residu_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.residu.state`
-- L645–651 **`mulai_vacancy`** · kontrol=1, assignment/delete=3, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `bool`, `o.vacancy.mulai`, `state.get`
-- L654–659 **`vacancy_state`** · kontrol=1, assignment/delete=1, except=0 · Call: `bool`, `getattr`, `o.vacancy.state`
-- L662–666 **`_vacancy_aktif`** · kontrol=1, assignment/delete=3, except=0 · Call: `bool`, `getattr`
-- L669–684 **`_vacancy_lewat`** · kontrol=5, assignment/delete=6, except=0 · Call: `_naluri_tick`, `bool`, `float`, `getattr`, `int`, `math.ceil`, `max`, `o.vacancy.lewat`, `self._emosi_peluruh`, `self.params.get`
-- L688–728 **`_kesadaran_intrusi_spontan`** · kontrol=10, assignment/delete=11, except=1 · Call: `_diag.catat`, `_naluri_organik`, `_naluri_tick`, `bool`, `dict`, `float`, `getattr`, `int`, `len`, `max`, `n.mood`, `n.params.get`, `o.intrusi.coba`, `o.residu.tekanan`, `self._lolos_lantai`, `self._tick`, `self.workspace.append`
-- L731–733 **`paksa_intrusi`** · kontrol=0, assignment/delete=0, except=0 · Call: `self._intrusi_spontan`
-- L736–738 **`intrusi_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.intrusi.state`
-- L744–755 **`_detak_context`** · kontrol=6, assignment/delete=5, except=0 · Call: `float`, `getattr`, `grief.values`, `max`, `o.residu.tekanan`, `x.get`
-- L758–763 **`_catat_interupsi`** · kontrol=1, assignment/delete=2, except=0 · Call: `_naluri_tick`, `dict`, `len`, `self._interupsi_internal.append`
-- L766–811 **`_detak_checkpoint`** · kontrol=14, assignment/delete=17, except=2 · Call: `_catat_interupsi`, `_detak_context`, `_diag.catat`, `_naluri_organik`, `_naluri_tick`, `entri.get`, `float`, `getattr`, `hasattr`, `isinstance`, `keluar.append`, `ks.attend`, `ks.enabled`, `ks.felt.get`, `max`, `min`, `o.detak.maju`, `p.enabled`, `p.ucap`, `str`, `ucapan.get`
-- L814–816 **`paksa_interupsi`** · kontrol=0, assignment/delete=1, except=0 · Call: `_naluri_organik`, `o.detak.paksa`
-- L819–821 **`detak_internal_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.detak.state`
-- L825–891 **`_catat_selisih_self`** · kontrol=24, assignment/delete=32, except=1 · Call: `_diag.catat`, `_naluri_tick`, `a_pros.get`, `abs`, `aktual.get`, `float`, `getattr`, `hasattr`, `int`, `jepit_01`, `ks._refresh_identity`, `ks.submit`, `lantai.get`, `len`, `list`, `max`, `min`, `p_pros.get`, `prediksi.get`, `round`, `self._selisih_self_log.append`, `self.params.get`, `str`
-- L894–900 **`selisih_self_state`** · kontrol=0, assignment/delete=0, except=0 · Call: `dict`, `float`, `int`, `round`
-- L903–907 **`interupsi_internal_state`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `len`
-- L912–1055 **`_organik_lanjut_ucap`** · kontrol=61, assignment/delete=65, except=3 · Call: `' '.join`, `' '.join(kata[:batas]).rstrip`, `_catat_interupsi`, `_catat_selisih_self`, `_detak_context`, `_diag.catat`, `_jejak_d`, `_jejak_i`, `dict`, `em.get`, `em_utama.get`, `ent.get`, `ev.get`, `float`, `getattr`, `hist[-1].get`, `info.get`, `int`, `isinstance`, `lap.get`, `len`, `list`, `max`, `min`, `model_diri.get`, `n.mood`, `nu._p`, `o.detak.maju`, `o.paralel.tanpa_resolusi`, `o.residu.tekanan_target`, `original`, `potong_batas_kata`, `prediksi.get`, `round`, `sebab.append`, `self._label_rel`, `set`, `str`, `str(ent['teks']).split`, `utama.get`
-- L1061–1088 **`_organik_hold_belief`** · kontrol=8, assignment/delete=12, except=1 · Call: `_diag.catat`, `bool`, `dict`, `float`, `getattr`, `isinstance`, `jepit_01`, `n.delta`, `o.paralel.tanpa_resolusi`, `original`, `self.dissonance.get`, `str`
-- L1097–1186 **`pasang`** · kontrol=3, assignment/delete=0, except=0 · Call: `_organik_bungkus_serialisasi`, `install_method`, `install_methods`, `wrap_method`
+- L271–300 **`_kedekatan_identitas`** · kontrol=8, assignment/delete=10, except=1 · Call: `_diag.catat`, `_mirip`, `float`, `getattr`, `inti.lower`, `jepit_01`, `len`, `max`, `re.findall`, `str`, `str(getattr(getattr(o, 'identitas', None), 'klaim', '') or '').strip`, `str(klaim or '').strip`, `teks.lower`
+- L303–343 **`_organik_konteks_tubuh`** · kontrol=15, assignment/delete=16, except=1 · Call: `' '.join`, `_diag.catat`, `_kedekatan_identitas`, `bahan.append`, `em.get`, `float`, `getattr`, `isinstance`, `len`, `lv.get`, `max`, `min`, `n.mood`, `o.topologi.kosong`, `str`
+- L346–352 **`kelayakan_tutur`** · kontrol=2, assignment/delete=2, except=0 · Call: `_organik_konteks_tubuh`, `_presentasi_organik`, `komp.items`, `o.tutur.kelayakan`, `round`
+- L355–358 **`penolakan_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `_presentasi_organik`, `o.tutur.riwayat`
+- L361–393 **`_organik_ucap`** · kontrol=7, assignment/delete=13, except=1 · Call: `_diag.catat`, `_jejak_bentuk`, `_naluri_tick`, `_organik_konteks_tubuh`, `_presentasi_organik`, `ent.get`, `getattr`, `isinstance`, `komp.items`, `o.tutur.bentuk`, `o.tutur.catat`, `o.tutur.jenis`, `o.tutur.kelayakan`, `o.tutur.tertahan`, `original`, `round`
+- L399–421 **`_organik_felt_mentah`** · kontrol=10, assignment/delete=9, except=2 · Call: `_diag.catat`, `f.items`, `float`, `fr.items`, `getattr`, `isinstance`, `nu.felt_report`
+- L424–440 **`apersepsi_state`** · kontrol=3, assignment/delete=5, except=1 · Call: `_naluri_organik`, `_organik_felt_mentah`, `getattr`, `list`, `o.apersepsi.amati`
+- L443–444 **`rasa_kabut`** · kontrol=0, assignment/delete=0, except=0 · Call: `self.apersepsi_state`, `self.apersepsi_state().get`
+- L447–454 **`_organik_felt_report_jujur`** · kontrol=0, assignment/delete=1, except=0 · Call: `ap.get`, `self.apersepsi_state`
+- L458–468 **`pegang_dua`** · kontrol=1, assignment/delete=4, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `o.paralel.tambah`
+- L471–475 **`pegang_keyakinan`** · kontrol=1, assignment/delete=1, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `o.paralel.tambah`
+- L478–480 **`keyakinan_paralel`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.paralel.state`
+- L483–485 **`pengaruh_paralel`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.paralel.pengaruh`
+- L488–490 **`tanpa_resolusi`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.paralel.tanpa_resolusi`
+- L493–495 **`bertindak_dari_lapisan`** · kontrol=1, assignment/delete=1, except=0 · Call: `getattr`, `o.paralel.bertindak_dari`
+- L499–525 **`_organik_tubuh_langkah`** · kontrol=7, assignment/delete=8, except=2 · Call: `_diag.catat`, `_organik_felt_mentah`, `delta.items`, `float`, `getattr`, `jepit_drive`, `o.tubuh.langkah`, `self.delta`, `self.levels.get`
+- L528–530 **`tubuh_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.tubuh.state`
+- L533–536 **`suntik_tubuh`** · kontrol=0, assignment/delete=1, except=0 · Call: `_naluri_organik`, `o.tubuh.suntik`
+- L539–550 **`_organik_tick`** · kontrol=2, assignment/delete=2, except=1 · Call: `_diag.catat`, `_organik_tubuh_langkah`, `bool`, `getattr`, `getattr(self, '_vacancy_aktif', lambda: False)`, `original`
+- L560–594 **`_nama_dari_teks`** · kontrol=11, assignment/delete=5, except=1 · Call: `_diag.catat`, `e.get`, `ekstrak_entitas`, `hasil.append`, `len`, `m.group`, `m.start`, `nama.lower`, `nm.lower`, `out.extend`, `re.escape`, `re.findall`, `re.finditer`, `str`
+- L597–644 **`auto_deteksi_slot`** · kontrol=22, assignment/delete=16, except=0 · Call: `(getattr(j, '_patterns', None) or {}).items`, `_naluri_organik`, `_naluri_tick`, `_nama_dari_teks`, `entri.get`, `ep.get`, `getattr`, `int`, `isinstance`, `item.get`, `kandidat.get`, `kandidat.items`, `key.split`, `max`, `o.topologi.daftar`, `o.topologi.peek`, `o.topologi.peek(nama).get`, `slot.get`, `sorted`, `str`
+- L648–664 **`_organik_hud_state`** · kontrol=3, assignment/delete=8, except=1 · Call: `_diag.catat`, `ap.get`, `bool`, `getattr`, `isinstance`, `n.apersepsi_state`, `o.paralel.state`, `original`, `round`, `str`, `str(o.identitas.klaim).strip`
+- L669–674 **`daftarkan_residu`** · kontrol=1, assignment/delete=1, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `o.residu.daftar`
+- L677–682 **`tambal_residu`** · kontrol=1, assignment/delete=1, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `o.residu.tambal`
+- L685–688 **`ambang_dimodifikasi`** · kontrol=0, assignment/delete=1, except=0 · Call: `_naluri_organik`, `float`, `o.residu.ambang_dimodifikasi`
+- L691–694 **`langit_dimodifikasi`** · kontrol=0, assignment/delete=1, except=0 · Call: `_naluri_organik`, `float`, `o.residu.langit_dimodifikasi`
+- L697–699 **`residu_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.residu.state`
+- L703–709 **`mulai_vacancy`** · kontrol=1, assignment/delete=3, except=0 · Call: `_naluri_organik`, `_naluri_tick`, `bool`, `o.vacancy.mulai`, `state.get`
+- L712–717 **`vacancy_state`** · kontrol=1, assignment/delete=1, except=0 · Call: `bool`, `getattr`, `o.vacancy.state`
+- L720–724 **`_vacancy_aktif`** · kontrol=1, assignment/delete=3, except=0 · Call: `bool`, `getattr`
+- L727–742 **`_vacancy_lewat`** · kontrol=5, assignment/delete=6, except=0 · Call: `_naluri_tick`, `bool`, `float`, `getattr`, `int`, `math.ceil`, `max`, `o.vacancy.lewat`, `self._emosi_peluruh`, `self.params.get`
+- L746–786 **`_kesadaran_intrusi_spontan`** · kontrol=10, assignment/delete=11, except=1 · Call: `_diag.catat`, `_naluri_organik`, `_naluri_tick`, `bool`, `dict`, `float`, `getattr`, `int`, `len`, `max`, `n.mood`, `n.params.get`, `o.intrusi.coba`, `o.residu.tekanan`, `self._lolos_lantai`, `self._tick`, `self.workspace.append`
+- L789–791 **`paksa_intrusi`** · kontrol=0, assignment/delete=0, except=0 · Call: `self._intrusi_spontan`
+- L794–796 **`intrusi_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.intrusi.state`
+- L802–813 **`_detak_context`** · kontrol=6, assignment/delete=5, except=0 · Call: `float`, `getattr`, `grief.values`, `max`, `o.residu.tekanan`, `x.get`
+- L816–821 **`_catat_interupsi`** · kontrol=1, assignment/delete=2, except=0 · Call: `_naluri_tick`, `dict`, `len`, `self._interupsi_internal.append`
+- L824–869 **`_detak_checkpoint`** · kontrol=14, assignment/delete=17, except=2 · Call: `_catat_interupsi`, `_detak_context`, `_diag.catat`, `_naluri_organik`, `_naluri_tick`, `entri.get`, `float`, `getattr`, `hasattr`, `isinstance`, `keluar.append`, `ks.attend`, `ks.enabled`, `ks.felt.get`, `max`, `min`, `o.detak.maju`, `p.enabled`, `p.ucap`, `str`, `ucapan.get`
+- L872–874 **`paksa_interupsi`** · kontrol=0, assignment/delete=1, except=0 · Call: `_naluri_organik`, `o.detak.paksa`
+- L877–879 **`detak_internal_state`** · kontrol=0, assignment/delete=1, except=0 · Call: `getattr`, `o.detak.state`
+- L883–949 **`_catat_selisih_self`** · kontrol=24, assignment/delete=32, except=1 · Call: `_diag.catat`, `_naluri_tick`, `a_pros.get`, `abs`, `aktual.get`, `float`, `getattr`, `hasattr`, `int`, `jepit_01`, `ks._refresh_identity`, `ks.submit`, `lantai.get`, `len`, `list`, `max`, `min`, `p_pros.get`, `prediksi.get`, `round`, `self._selisih_self_log.append`, `self.params.get`, `str`
+- L952–958 **`selisih_self_state`** · kontrol=0, assignment/delete=0, except=0 · Call: `dict`, `float`, `int`, `round`
+- L961–965 **`interupsi_internal_state`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `len`
+- L970–1113 **`_organik_lanjut_ucap`** · kontrol=61, assignment/delete=65, except=3 · Call: `' '.join`, `' '.join(kata[:batas]).rstrip`, `_catat_interupsi`, `_catat_selisih_self`, `_detak_context`, `_diag.catat`, `_jejak_d`, `_jejak_i`, `dict`, `em.get`, `em_utama.get`, `ent.get`, `ev.get`, `float`, `getattr`, `hist[-1].get`, `info.get`, `int`, `isinstance`, `lap.get`, `len`, `list`, `max`, `min`, `model_diri.get`, `n.mood`, `nu._p`, `o.detak.maju`, `o.paralel.tanpa_resolusi`, `o.residu.tekanan_target`, `original`, `potong_batas_kata`, `prediksi.get`, `round`, `sebab.append`, `self._label_rel`, `set`, `str`, `str(ent['teks']).split`, `utama.get`
+- L1119–1146 **`_organik_hold_belief`** · kontrol=8, assignment/delete=12, except=1 · Call: `_diag.catat`, `bool`, `dict`, `float`, `getattr`, `isinstance`, `jepit_01`, `n.delta`, `o.paralel.tanpa_resolusi`, `original`, `self.dissonance.get`, `str`
+- L1155–1244 **`pasang`** · kontrol=3, assignment/delete=0, except=0 · Call: `_organik_bungkus_serialisasi`, `install_method`, `install_methods`, `wrap_method`
 
 ## `pycos/inti/ekstensi/pelindung.py`
 
-SHA-256: `9887feda8d9202fd51d8a1f52bae233fd9e3663119906a2b1b064106bca3f18c`
+SHA-256: `6b4223219a499aba3755c9742739751b6522e6e0dc055ec063f16088926b78f9`
 
-1845 baris; 1 kelas; 54 fungsi/metode termasuk nested.
+1970 baris; 1 kelas; 58 fungsi/metode termasuk nested.
 
-Kelas: `MonitorIntegritas` L1143.
-Handler luas: 248, 280, 373, 421, 491, 586, 1421, 1521, 1764, 259, 1255, 1385, 1443, 1577, 1728, 1249, 1266, 1561, 724.
+Kelas: `MonitorIntegritas` L1268.
+Handler luas: 248, 280, 376, 424, 494, 589, 868, 915, 1546, 1646, 1889, 259, 1380, 1510, 1568, 1702, 1853, 945, 1374, 1391, 1686, 740.
 
-Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from pycos.bahasa import keadaan as _keadaan`; `from pycos.bahasa.teks import kandidat_dasar`; `from pycos.bahasa.teks import kata_isi as _kata_isi`; `from pycos.bahasa.teks import kata_isi as _kata_isi_t`; `from pycos.bahasa.teks import kata_isi as _kata_isi_u`; `from pycos.dukungan import diagnostik as _diag`; `from pycos.dukungan.numerik import jepit`; `from pycos.dukungan.patching import install_method, install_methods, wrap_method`; `from pycos.inti.kawanan import KawananNPC`; `from pycos.inti.presentasi import Presentasi`; `from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple`; `import copy`; `import re`.
+Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from pycos.bahasa import keadaan as _keadaan`; `from pycos.bahasa.teks import kandidat_dasar`; `from pycos.bahasa.teks import kata_isi as _kata_isi`; `from pycos.bahasa.teks import kata_isi as _kata_isi_k`; `from pycos.bahasa.teks import kata_isi as _kata_isi_t`; `from pycos.bahasa.teks import kata_isi as _kata_isi_u`; `from pycos.bahasa.teks import kata_isi as _ki, stem as _stem`; `from pycos.dukungan import diagnostik as _diag`; `from pycos.dukungan.numerik import jepit`; `from pycos.dukungan.patching import install_method, install_methods, wrap_method`; `from pycos.inti.kawanan import KawananNPC`; `from pycos.inti.naluri import konteks_dari_presentasi as _konteks`; `from pycos.inti.presentasi import Presentasi`; `from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple`; `import copy`; `import dataclasses as _dc`; `import re`.
 
 - L221–226 **`_pelindung_stabil`** · kontrol=1, assignment/delete=2, except=0 · Call: `ord`, `str`
 - L229–230 **`_pelindung_kata`** · kontrol=2, assignment/delete=0, except=0 · Call: `re.findall`, `str`, `str(teks or '').lower`
@@ -863,51 +864,55 @@ Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from
 - L303–306 **`_pelindung_pilih_stabil`** · kontrol=1, assignment/delete=0, except=0 · Call: `_pelindung_stabil`, `len`, `str`
 - L309–315 **`_pelindung_dari`** · kontrol=3, assignment/delete=0, except=0 · Call: `getattr`, `hasattr`
 - L318–324 **`_pelindung_aktif`** · kontrol=2, assignment/delete=3, except=0 · Call: `_pelindung_dari`, `bool`, `getattr`, `params.get`
-- L327–353 **`_pelindung_init`** · kontrol=2, assignment/delete=21, except=0 · Call: `dict`, `getattr`, `int`, `p.params.get`, `set`
-- L359–394 **`_pelindung_ujaran_keadaan`** · kontrol=8, assignment/delete=8, except=1 · Call: `_diag.catat`, `_keadaan.realisasi`, `_keadaan.realisasi_daftar`, `int`, `ord`, `self._tick`, `self.tutur_engine`, `str`, `sum`, `tuple`
-- L397–405 **`watak_kegagalan`** · kontrol=3, assignment/delete=5, except=0 · Call: `data.get`, `dict`, `getattr`, `str`, `str(getattr(self.naluri, 'personality_name', '') or '').strip`, `str(getattr(self.naluri, 'personality_name', '') or '').strip().lower`
-- L408–433 **`pidato_gagal`** · kontrol=7, assignment/delete=7, except=1 · Call: `' '.join`, `_diag.catat`, `_kata_isi`, `_pelindung_pilih_stabil`, `_pelindung_ujaran_keadaan`, `list`, `self._tick`, `self.watak_kegagalan`, `str`, `w.get`
-- L436–446 **`_pelindung_act_hint`** · kontrol=6, assignment/delete=3, except=0 · Call: `_pelindung_init`, `any`, `bool`, `int`, `p._pelindung_flag.values`, `self._tick`, `self.watak_kegagalan`, `str`, `ujian.get`, `w.get`
-- L449–452 **`_pelindung_reset_flag`** · kontrol=1, assignment/delete=1, except=0 · Call: tidak ada
-- L471–501 **`buffer_manusiawi`** · kontrol=9, assignment/delete=8, except=1 · Call: `' '.join`, `_diag.catat`, `_kata_isi`, `_pelindung_init`, `_pelindung_pilih_stabil`, `_pelindung_ujaran_keadaan`, `bool`, `ord`, `self._tick`, `self.params.get`, `self.watak_kegagalan`, `str`, `str(jenis or 'tak_paham').lower`, `sum`, `w.get`, `{'lupa': 'ragu', 'kontradiksi': 'ragu'}.get`
-- L504–507 **`tandai_lupa`** · kontrol=0, assignment/delete=2, except=0 · Call: `_pelindung_init`, `bool`, `dict`
-- L510–513 **`tandai_kontradiksi`** · kontrol=0, assignment/delete=2, except=0 · Call: `_pelindung_init`, `bool`, `dict`
-- L516–519 **`tandai_tidak_paham`** · kontrol=0, assignment/delete=2, except=0 · Call: `_pelindung_init`, `bool`, `dict`
-- L522–552 **`_pelindung_buffer_jenis`** · kontrol=15, assignment/delete=10, except=0 · Call: `(sekarang or {}).get`, `_pelindung_init`, `bool`, `getattr`, `int`, `len`, `p._pelindung_flag.get`, `self._kes`, `self._tick`, `self.params.get`, `str`
-- L558–626 **`jeda_bermakna`** · kontrol=15, assignment/delete=22, except=1 · Call: `_diag.catat`, `_pelindung_init`, `float`, `getattr`, `int`, `jepit`, `len`, `max`, `min`, `p._pelindung_jeda_riwayat.append`, `round`, `sebab.append`, `self._dissonance`, `self._doubt`, `self._nur`, `self._p`, `self._pelindung_kebaruan_input`, `self._tick`, `self.naluri.mood`
-- L629–639 **`_pelindung_kebaruan_input`** · kontrol=3, assignment/delete=4, except=0 · Call: `_pelindung_init`, `_pelindung_kata`, `_pelindung_kata_dikenal`, `_pelindung_lema_tutur`, `float`, `len`
-- L645–742 **`eskalasi_variasi`** · kontrol=34, assignment/delete=41, except=1 · Call: `_PELINDUNG_ALTERNATIF_ACT.get`, `_diag.catat`, `_pelindung_bentuk`, `_pelindung_init`, `_pelindung_jaccard`, `_pelindung_kata`, `all`, `any`, `bool`, `deteksi.get`, `deteksi.items`, `float`, `geser.get`, `int`, `len`, `max`, `min`, `p._pelindung_act_terakhir.append`, `p._pelindung_anggaran.get`, `p._pelindung_anggaran_maks.get`, `p._pelindung_teks.append`, `self._bingkai_relasi`, `self._ganti_kata`, `self._ganti_struktur`, `self._generatif`, `self._isi_ucap`, `self._p`, `self._pengakuan_repetisi`, `self._tick`, `self._warnai`, `str`, `urutan.index`
-- L745–762 **`_pengakuan_repetisi`** · kontrol=0, assignment/delete=3, except=0 · Call: `_pelindung_pilih_stabil`, `list`, `pilihan.append`, `self._tick`, `self.watak_kegagalan`, `str`, `tabel.get`
-- L776–842 **`_ganti_kata`** · kontrol=39, assignment/delete=22, except=0 · Call: `_pelindung_pilih_stabil`, `abs`, `all`, `any`, `e2.get`, `ent.get`, `float`, `getattr`, `hasattr`, `kandidat.append`, `leks.ambil`, `len`, `list`, `m.group`, `max`, `pilih[0].upper`, `re.sub`, `self._tick`, `self.tutur_engine`, `set`, `sorted`, `str`, `w.lower`, `w[0].isupper`
-- L790–840 **`_ganti_kata.ganti`** · kontrol=38, assignment/delete=19, except=0 · Call: `_pelindung_pilih_stabil`, `abs`, `all`, `any`, `e2.get`, `ent.get`, `float`, `kandidat.append`, `leks.ambil`, `len`, `list`, `m.group`, `max`, `pilih[0].upper`, `self._tick`, `set`, `sorted`, `str`, `w.lower`, `w[0].isupper`
-- L845–862 **`_ganti_struktur`** · kontrol=8, assignment/delete=6, except=0 · Call: `' '.join`, `_pelindung_pilih_stabil`, `belakang.strip`, `belakang.strip().rstrip`, `depan.strip`, `depan.strip().lower`, `k.strip`, `len`, `opsi.append`, `re.split`, `self._tick`, `sisa.strip`, `sisa[0].upper`, `str`, `t.split`
-- L865–878 **`_pengakuan_istirahat`** · kontrol=3, assignment/delete=2, except=0 · Call: `_pelindung_pilih_stabil`, `pilihan.append`, `self._tick`, `self.watak_kegagalan`
-- L884–947 **`saring_meta`** · kontrol=13, assignment/delete=21, except=0 · Call: `_PELINDUNG_ANGKA_KONTEKS_RE.search`, `_PELINDUNG_ANGKA_KONTEKS_RE.sub`, `_PELINDUNG_META_KETAT_RE.finditer`, `_pelindung_init`, `_pelindung_pilih_stabil`, `_pola_angka.search`, `_pola_angka.sub`, `bocor.append`, `bool`, `len`, `list`, `m.end`, `m.group`, `m.start`, `p._pelindung_meta_bocor.append`, `pola.finditer`, `re.findall`, `re.sub`, `re.sub('\\s{2,}', ' ', bersih).strip`, `re.sub('\\s{2,}', ' ', out).strip`, `self._kuantor_angka`, `self._tick`, `sorted`, `str`, `x.start`
-- L950–954 **`_kuantor_angka`** · kontrol=2, assignment/delete=2, except=0 · Call: `int`, `re.sub`, `str`, `sum`
-- L960–993 **`serap_adversarial`** · kontrol=12, assignment/delete=11, except=0 · Call: `_PELINDUNG_UJIAN.items`, `_kata_isi_u`, `_pelindung_aktif`, `_pelindung_init`, `_pelindung_pilih_stabil`, `_pelindung_ujaran_keadaan`, `dict`, `list`, `re.search`, `self._tick`, `self.watak_kegagalan`, `str`, `str(teks or '').strip`, `str(teks or '').strip().lower`, `w.get`
-- L999–1031 **`degradasi_state`** · kontrol=8, assignment/delete=13, except=0 · Call: `_pelindung_init`, `float`, `getattr`, `int`, `len`, `max`, `min`, `p._pelindung_anggaran.values`, `p._pelindung_anggaran_maks.values`, `round`, `self._kes`, `self._nur`, `self._p`, `self._tick`, `sum`
-- L1034–1053 **`_pelindung_tanda_lelah`** · kontrol=4, assignment/delete=10, except=0 · Call: `_pelindung_init`, `_pelindung_pilih_stabil`, `dict`, `entry.get`, `float`, `int`, `max`, `pros.get`, `round`, `self._tick`, `str`
-- L1059–1074 **`keragaman_tanda`** · kontrol=4, assignment/delete=6, except=0 · Call: `_pelindung_init`, `dict`, `frek.get`, `frek.items`, `int`, `max`, `re.findall`, `self._act_counts.get`, `self._act_counts.items`, `self._act_counts.values`, `str`, `sum`, `t.lower`, `x.get`
-- L1077–1088 **`dorong_geser`** · kontrol=2, assignment/delete=5, except=0 · Call: `_pelindung_init`, `dict`, `int`, `self._p`, `self._tick`
-- L1091–1137 **`keragaman_scene`** · kontrol=16, assignment/delete=13, except=0 · Call: `_pelindung_aktif`, `_pelindung_dari`, `dict`, `dict(npcs or {}).items`, `dict(npcs or {}).values`, `getattr`, `getattr(contoh, 'params', {}).get`, `int`, `laporan.append`, `len`, `max`, `next`, `p.dorong_geser`, `p.enabled`, `p.keragaman_tanda`, `peta.items`, `peta.setdefault`, `peta.setdefault(str(nilai), []).append`, `sorted`, `str`, `t.get`, `tanda.items`, `tanda[nm].get`
-- L1152–1157 **`MonitorIntegritas.__init__`** · kontrol=0, assignment/delete=5, except=0 · Call: tidak ada
-- L1160–1237 **`MonitorIntegritas.periksa`** · kontrol=25, assignment/delete=28, except=0 · Call: `_pelindung_dari`, `_pelindung_init`, `_pelindung_jaccard`, `_pelindung_kata`, `act.count`, `dict`, `float`, `getattr`, `int`, `koreksi.append`, `len`, `list`, `max`, `min`, `p._kes`, `p._tick`, `p.degradasi_state`, `p.dorong_geser`, `p.enabled`, `round`, `self._picu_momen`, `self.koreksi.append`, `self.riwayat.append`, `self.riwayat[-1].get`, `set`, `str`, `sum`, `temuan.append`, `x.get`
-- L1240–1273 **`MonitorIntegritas._picu_momen`** · kontrol=12, assignment/delete=7, except=3 · Call: `_diag.catat`, `dipakai.append`, `getattr`, `getattr(ritual, 'enabled', lambda: False)`, `koreksi.append`, `ks.enabled`, `ks.submit`, `p._kes`, `p.tell_katalog`, `ritual.maybe_trigger`, `tell.get`
-- L1279–1291 **`_pelindung_pilih_act`** · kontrol=5, assignment/delete=4, except=0 · Call: `_PELINDUNG_ALTERNATIF_ACT.get`, `_pelindung_act_hint`, `_pelindung_aktif`, `_pelindung_init`, `dict`, `geser.get`, `int`, `original`, `self._tick`, `str`
-- L1296–1398 **`_pelindung_ucap`** · kontrol=31, assignment/delete=47, except=1 · Call: `_diag.catat`, `_pelindung_aktif`, `_pelindung_buffer_jenis`, `_pelindung_init`, `_pelindung_reset_flag`, `_pelindung_tanda_lelah`, `_pengakuan_istirahat`, `dict`, `entry.get`, `eskalasi.get`, `int`, `isinstance`, `laporan.get`, `list`, `min`, `original`, `pros.get`, `self._history[-1].get`, `self._p`, `self._pelindung_entry`, `self._tick`, `self.buffer_manusiawi`, `self.degradasi_state`, `self.deskripsi`, `self.eskalasi_variasi`, `self.jeda_bermakna`, `self.monitor_integritas`, `self.monitor_integritas().periksa`, `self.saring_meta`, `self.watak_kegagalan`, `self.watak_kegagalan().get`, `str`, `ujian.get`
-- L1401–1425 **`_pelindung_entry`** · kontrol=4, assignment/delete=8, except=1 · Call: `(degradasi or {}).get`, `_diag.catat`, `dict`, `entry.get`, `int`, `max`, `min`, `pros.get`, `round`, `self._doubt`, `self._eid`, `self._log`, `self._tick`, `self.deskripsi`, `self.jeda_bermakna`, `self.nonverbal`, `self.prosodi`, `str`
-- L1433–1524 **`_penahanan_ucap`** · kontrol=24, assignment/delete=41, except=2 · Call: `' '.join`, `(desc + '; ' + tell).strip`, `(lama + '; ' + tell).strip`, `_diag.catat`, `_kata_isi_t`, `_pelindung_ujaran_keadaan`, `copy.deepcopy`, `dict`, `eksp.get`, `entry.get`, `float`, `gestur.get`, `hasil_tahan.get`, `int`, `isinstance`, `ks.record_withholding_attempt`, `ks.withheld_for`, `max`, `min`, `nv.setdefault`, `original`, `pros.get`, `round`, `self._history[-1].get`, `self._kes`, `self._log`, `self.deskripsi`, `str`, `str(eksp.get('kebocoran') or '').strip`, `str(gestur.get('deskripsi', '')).strip`, `str(hasil_tahan.get('tell', '')).strip`, `tertahan.get`
-- L1531–1583 **`_audisi_diri_ucap`** · kontrol=18, assignment/delete=11, except=2 · Call: `_diag.catat`, `bool`, `dict`, `entry.get`, `entry.pop`, `isinstance`, `ks.audition_self`, `ks.deliver_strategic_speech`, `ks.record_manipulation_step`, `ks.record_roleplay_speech`, `original`, `self._history[-1].get`, `self._kes`, `str`, `str(entry.get('teks', '')).strip`, `str(strategic.get('teks', '')).strip`, `strategic.get`
-- L1588–1608 **`_pelindung_dengar`** · kontrol=7, assignment/delete=8, except=0 · Call: `_pelindung_aktif`, `_pelindung_init`, `_pelindung_kata`, `_pelindung_kata_dikenal`, `_pelindung_lema_tutur`, `float`, `len`, `list`, `original`, `self.serap_adversarial`, `set`, `str`
-- L1613–1618 **`monitor_integritas`** · kontrol=1, assignment/delete=2, except=0 · Call: `MonitorIntegritas`, `_pelindung_init`
-- L1621–1625 **`enable_pelindung`** · kontrol=0, assignment/delete=1, except=0 · Call: `bool`, `self.params.get`
-- L1628–1646 **`pelindung_state`** · kontrol=1, assignment/delete=2, except=0 · Call: `_pelindung_dari`, `_pelindung_init`, `bool`, `dict`, `len`, `p.degradasi_state`, `p.monitor_integritas`, `p.watak_kegagalan`, `self.params.get`
-- L1649–1667 **`_pelindung_to_dict`** · kontrol=2, assignment/delete=2, except=0 · Call: `dict`, `getattr`, `int`, `list`, `original`, `sorted`
-- L1672–1702 **`_pelindung_from_dict`** · kontrol=23, assignment/delete=15, except=0 · Call: `(blok.get('anggaran') or {}).items`, `(blok.get('anggaran_maks') or {}).items`, `(blok.get('flag') or {}).items`, `(data or {}).get`, `_pelindung_init`, `blok.get`, `bool`, `dict`, `int`, `isinstance`, `original`, `set`, `str`
-- L1718–1744 **`monitor_scene`** · kontrol=8, assignment/delete=6, except=1 · Call: `_diag.catat`, `getattr`, `keragaman_scene`, `laporan.get`, `list`, `p.enabled`, `p.monitor_integritas`, `p.monitor_integritas().periksa`, `rotasi.append`, `self.npcs.items`
-- L1747–1749 **`keragaman`** · kontrol=0, assignment/delete=0, except=0 · Call: `keragaman_scene`
-- L1754–1767 **`_pelindung_tick_all`** · kontrol=4, assignment/delete=4, except=1 · Call: `_diag.catat`, `_pelindung_aktif`, `_pelindung_dari`, `getattr`, `getattr(p, '_tick', lambda: 0)`, `int`, `max`, `next`, `original`, `p._p`, `self.monitor_scene`, `self.npcs.values`
-- L1778–1844 **`pasang`** · kontrol=2, assignment/delete=0, except=0 · Call: `install_method`, `install_methods`, `wrap_method`
+- L327–356 **`_pelindung_init`** · kontrol=2, assignment/delete=22, except=0 · Call: `dict`, `getattr`, `int`, `p.params.get`, `set`
+- L362–397 **`_pelindung_ujaran_keadaan`** · kontrol=8, assignment/delete=8, except=1 · Call: `_diag.catat`, `_keadaan.realisasi`, `_keadaan.realisasi_daftar`, `int`, `ord`, `self._tick`, `self.tutur_engine`, `str`, `sum`, `tuple`
+- L400–408 **`watak_kegagalan`** · kontrol=3, assignment/delete=5, except=0 · Call: `data.get`, `dict`, `getattr`, `str`, `str(getattr(self.naluri, 'personality_name', '') or '').strip`, `str(getattr(self.naluri, 'personality_name', '') or '').strip().lower`
+- L411–436 **`pidato_gagal`** · kontrol=7, assignment/delete=7, except=1 · Call: `' '.join`, `_diag.catat`, `_kata_isi`, `_pelindung_pilih_stabil`, `_pelindung_ujaran_keadaan`, `list`, `self._tick`, `self.watak_kegagalan`, `str`, `w.get`
+- L439–449 **`_pelindung_act_hint`** · kontrol=6, assignment/delete=3, except=0 · Call: `_pelindung_init`, `any`, `bool`, `int`, `p._pelindung_flag.values`, `self._tick`, `self.watak_kegagalan`, `str`, `ujian.get`, `w.get`
+- L452–455 **`_pelindung_reset_flag`** · kontrol=1, assignment/delete=1, except=0 · Call: tidak ada
+- L474–504 **`buffer_manusiawi`** · kontrol=9, assignment/delete=8, except=1 · Call: `' '.join`, `_diag.catat`, `_kata_isi`, `_pelindung_init`, `_pelindung_pilih_stabil`, `_pelindung_ujaran_keadaan`, `bool`, `ord`, `self._tick`, `self.params.get`, `self.watak_kegagalan`, `str`, `str(jenis or 'tak_paham').lower`, `sum`, `w.get`, `{'lupa': 'ragu', 'kontradiksi': 'ragu'}.get`
+- L507–510 **`tandai_lupa`** · kontrol=0, assignment/delete=2, except=0 · Call: `_pelindung_init`, `bool`, `dict`
+- L513–516 **`tandai_kontradiksi`** · kontrol=0, assignment/delete=2, except=0 · Call: `_pelindung_init`, `bool`, `dict`
+- L519–522 **`tandai_tidak_paham`** · kontrol=0, assignment/delete=2, except=0 · Call: `_pelindung_init`, `bool`, `dict`
+- L525–555 **`_pelindung_buffer_jenis`** · kontrol=15, assignment/delete=10, except=0 · Call: `(sekarang or {}).get`, `_pelindung_init`, `bool`, `getattr`, `int`, `len`, `p._pelindung_flag.get`, `self._kes`, `self._tick`, `self.params.get`, `str`
+- L561–629 **`jeda_bermakna`** · kontrol=15, assignment/delete=22, except=1 · Call: `_diag.catat`, `_pelindung_init`, `float`, `getattr`, `int`, `jepit`, `len`, `max`, `min`, `p._pelindung_jeda_riwayat.append`, `round`, `sebab.append`, `self._dissonance`, `self._doubt`, `self._nur`, `self._p`, `self._pelindung_kebaruan_input`, `self._tick`, `self.naluri.mood`
+- L632–642 **`_pelindung_kebaruan_input`** · kontrol=3, assignment/delete=4, except=0 · Call: `_pelindung_init`, `_pelindung_kata`, `_pelindung_kata_dikenal`, `_pelindung_lema_tutur`, `float`, `len`
+- L648–761 **`eskalasi_variasi`** · kontrol=37, assignment/delete=48, except=1 · Call: `_PELINDUNG_ALTERNATIF_ACT.get`, `_diag.catat`, `_pelindung_bentuk`, `_pelindung_catat_bentuk`, `_pelindung_init`, `_pelindung_jaccard`, `_pelindung_kandidat_tutur`, `_pelindung_kata`, `all`, `any`, `bool`, `deteksi.get`, `deteksi.items`, `float`, `geser.get`, `getattr`, `int`, `len`, `list`, `max`, `min`, `p._pelindung_act_terakhir.append`, `p._pelindung_anggaran.get`, `p._pelindung_anggaran_maks.get`, `p._pelindung_teks.append`, `self._bingkai_relasi`, `self._ganti_kata`, `self._ganti_struktur`, `self._generatif`, `self._isi_ucap`, `self._p`, `self._pengakuan_repetisi`, `self._tick`, `self._warnai`, `str`, `urutan.index`
+- L764–781 **`_pengakuan_repetisi`** · kontrol=0, assignment/delete=3, except=0 · Call: `_pelindung_pilih_stabil`, `list`, `pilihan.append`, `self._tick`, `self.watak_kegagalan`, `str`, `tabel.get`
+- L795–861 **`_ganti_kata`** · kontrol=39, assignment/delete=22, except=0 · Call: `_pelindung_pilih_stabil`, `abs`, `all`, `any`, `e2.get`, `ent.get`, `float`, `getattr`, `hasattr`, `kandidat.append`, `leks.ambil`, `len`, `list`, `m.group`, `max`, `pilih[0].upper`, `re.sub`, `self._tick`, `self.tutur_engine`, `set`, `sorted`, `str`, `w.lower`, `w[0].isupper`
+- L809–859 **`_ganti_kata.ganti`** · kontrol=38, assignment/delete=19, except=0 · Call: `_pelindung_pilih_stabil`, `abs`, `all`, `any`, `e2.get`, `ent.get`, `float`, `kandidat.append`, `leks.ambil`, `len`, `list`, `m.group`, `max`, `pilih[0].upper`, `self._tick`, `set`, `sorted`, `str`, `w.lower`, `w[0].isupper`
+- L864–873 **`_pelindung_isi_banding`** · kontrol=3, assignment/delete=0, except=1 · Call: `_diag.catat`, `_ki`, `_pelindung_kata`, `_stem`, `len`, `str`, `w.lower`
+- L876–878 **`_norm_banding`** · kontrol=1, assignment/delete=0, except=0 · Call: `re.sub`, `re.sub('[^a-z0-9 ]+', '', str(teks or '').lower()).strip`, `str`, `str(teks or '').lower`
+- L881–891 **`_pelindung_catat_bentuk`** · kontrol=4, assignment/delete=4, except=0 · Call: `_pelindung_bentuk`, `daftar.append`, `getattr`
+- L894–967 **`_pelindung_kandidat_tutur`** · kontrol=20, assignment/delete=17, except=2 · Call: `_PELINDUNG_ALTERNATIF_ACT.get`, `_dc.replace`, `_diag.catat`, `_kata_isi_k`, `_konteks`, `_norm_banding`, `_pelindung_bentuk`, `_pelindung_init`, `_pelindung_isi_banding`, `aktor.append`, `eng.ucap`, `getattr`, `int`, `max`, `range`, `self.tutur_engine`, `str`, `str(getattr(hasil, 'teks', '') or '').strip`, `str(isi_asal or '').strip`, `tuple`
+- L970–987 **`_ganti_struktur`** · kontrol=8, assignment/delete=6, except=0 · Call: `' '.join`, `_pelindung_pilih_stabil`, `belakang.strip`, `belakang.strip().rstrip`, `depan.strip`, `depan.strip().lower`, `k.strip`, `len`, `opsi.append`, `re.split`, `self._tick`, `sisa.strip`, `sisa[0].upper`, `str`, `t.split`
+- L990–1003 **`_pengakuan_istirahat`** · kontrol=3, assignment/delete=2, except=0 · Call: `_pelindung_pilih_stabil`, `pilihan.append`, `self._tick`, `self.watak_kegagalan`
+- L1009–1072 **`saring_meta`** · kontrol=13, assignment/delete=21, except=0 · Call: `_PELINDUNG_ANGKA_KONTEKS_RE.search`, `_PELINDUNG_ANGKA_KONTEKS_RE.sub`, `_PELINDUNG_META_KETAT_RE.finditer`, `_pelindung_init`, `_pelindung_pilih_stabil`, `_pola_angka.search`, `_pola_angka.sub`, `bocor.append`, `bool`, `len`, `list`, `m.end`, `m.group`, `m.start`, `p._pelindung_meta_bocor.append`, `pola.finditer`, `re.findall`, `re.sub`, `re.sub('\\s{2,}', ' ', bersih).strip`, `re.sub('\\s{2,}', ' ', out).strip`, `self._kuantor_angka`, `self._tick`, `sorted`, `str`, `x.start`
+- L1075–1079 **`_kuantor_angka`** · kontrol=2, assignment/delete=2, except=0 · Call: `int`, `re.sub`, `str`, `sum`
+- L1085–1118 **`serap_adversarial`** · kontrol=12, assignment/delete=11, except=0 · Call: `_PELINDUNG_UJIAN.items`, `_kata_isi_u`, `_pelindung_aktif`, `_pelindung_init`, `_pelindung_pilih_stabil`, `_pelindung_ujaran_keadaan`, `dict`, `list`, `re.search`, `self._tick`, `self.watak_kegagalan`, `str`, `str(teks or '').strip`, `str(teks or '').strip().lower`, `w.get`
+- L1124–1156 **`degradasi_state`** · kontrol=8, assignment/delete=13, except=0 · Call: `_pelindung_init`, `float`, `getattr`, `int`, `len`, `max`, `min`, `p._pelindung_anggaran.values`, `p._pelindung_anggaran_maks.values`, `round`, `self._kes`, `self._nur`, `self._p`, `self._tick`, `sum`
+- L1159–1178 **`_pelindung_tanda_lelah`** · kontrol=4, assignment/delete=10, except=0 · Call: `_pelindung_init`, `_pelindung_pilih_stabil`, `dict`, `entry.get`, `float`, `int`, `max`, `pros.get`, `round`, `self._tick`, `str`
+- L1184–1199 **`keragaman_tanda`** · kontrol=4, assignment/delete=6, except=0 · Call: `_pelindung_init`, `dict`, `frek.get`, `frek.items`, `int`, `max`, `re.findall`, `self._act_counts.get`, `self._act_counts.items`, `self._act_counts.values`, `str`, `sum`, `t.lower`, `x.get`
+- L1202–1213 **`dorong_geser`** · kontrol=2, assignment/delete=5, except=0 · Call: `_pelindung_init`, `dict`, `int`, `self._p`, `self._tick`
+- L1216–1262 **`keragaman_scene`** · kontrol=16, assignment/delete=13, except=0 · Call: `_pelindung_aktif`, `_pelindung_dari`, `dict`, `dict(npcs or {}).items`, `dict(npcs or {}).values`, `getattr`, `getattr(contoh, 'params', {}).get`, `int`, `laporan.append`, `len`, `max`, `next`, `p.dorong_geser`, `p.enabled`, `p.keragaman_tanda`, `peta.items`, `peta.setdefault`, `peta.setdefault(str(nilai), []).append`, `sorted`, `str`, `t.get`, `tanda.items`, `tanda[nm].get`
+- L1277–1282 **`MonitorIntegritas.__init__`** · kontrol=0, assignment/delete=5, except=0 · Call: tidak ada
+- L1285–1362 **`MonitorIntegritas.periksa`** · kontrol=25, assignment/delete=28, except=0 · Call: `_pelindung_dari`, `_pelindung_init`, `_pelindung_jaccard`, `_pelindung_kata`, `act.count`, `dict`, `float`, `getattr`, `int`, `koreksi.append`, `len`, `list`, `max`, `min`, `p._kes`, `p._tick`, `p.degradasi_state`, `p.dorong_geser`, `p.enabled`, `round`, `self._picu_momen`, `self.koreksi.append`, `self.riwayat.append`, `self.riwayat[-1].get`, `set`, `str`, `sum`, `temuan.append`, `x.get`
+- L1365–1398 **`MonitorIntegritas._picu_momen`** · kontrol=12, assignment/delete=7, except=3 · Call: `_diag.catat`, `dipakai.append`, `getattr`, `getattr(ritual, 'enabled', lambda: False)`, `koreksi.append`, `ks.enabled`, `ks.submit`, `p._kes`, `p.tell_katalog`, `ritual.maybe_trigger`, `tell.get`
+- L1404–1416 **`_pelindung_pilih_act`** · kontrol=5, assignment/delete=4, except=0 · Call: `_PELINDUNG_ALTERNATIF_ACT.get`, `_pelindung_act_hint`, `_pelindung_aktif`, `_pelindung_init`, `dict`, `geser.get`, `int`, `original`, `self._tick`, `str`
+- L1421–1523 **`_pelindung_ucap`** · kontrol=31, assignment/delete=47, except=1 · Call: `_diag.catat`, `_pelindung_aktif`, `_pelindung_buffer_jenis`, `_pelindung_init`, `_pelindung_reset_flag`, `_pelindung_tanda_lelah`, `_pengakuan_istirahat`, `dict`, `entry.get`, `eskalasi.get`, `int`, `isinstance`, `laporan.get`, `list`, `min`, `original`, `pros.get`, `self._history[-1].get`, `self._p`, `self._pelindung_entry`, `self._tick`, `self.buffer_manusiawi`, `self.degradasi_state`, `self.deskripsi`, `self.eskalasi_variasi`, `self.jeda_bermakna`, `self.monitor_integritas`, `self.monitor_integritas().periksa`, `self.saring_meta`, `self.watak_kegagalan`, `self.watak_kegagalan().get`, `str`, `ujian.get`
+- L1526–1550 **`_pelindung_entry`** · kontrol=4, assignment/delete=8, except=1 · Call: `(degradasi or {}).get`, `_diag.catat`, `dict`, `entry.get`, `int`, `max`, `min`, `pros.get`, `round`, `self._doubt`, `self._eid`, `self._log`, `self._tick`, `self.deskripsi`, `self.jeda_bermakna`, `self.nonverbal`, `self.prosodi`, `str`
+- L1558–1649 **`_penahanan_ucap`** · kontrol=24, assignment/delete=41, except=2 · Call: `' '.join`, `(desc + '; ' + tell).strip`, `(lama + '; ' + tell).strip`, `_diag.catat`, `_kata_isi_t`, `_pelindung_ujaran_keadaan`, `copy.deepcopy`, `dict`, `eksp.get`, `entry.get`, `float`, `gestur.get`, `hasil_tahan.get`, `int`, `isinstance`, `ks.record_withholding_attempt`, `ks.withheld_for`, `max`, `min`, `nv.setdefault`, `original`, `pros.get`, `round`, `self._history[-1].get`, `self._kes`, `self._log`, `self.deskripsi`, `str`, `str(eksp.get('kebocoran') or '').strip`, `str(gestur.get('deskripsi', '')).strip`, `str(hasil_tahan.get('tell', '')).strip`, `tertahan.get`
+- L1656–1708 **`_audisi_diri_ucap`** · kontrol=18, assignment/delete=11, except=2 · Call: `_diag.catat`, `bool`, `dict`, `entry.get`, `entry.pop`, `isinstance`, `ks.audition_self`, `ks.deliver_strategic_speech`, `ks.record_manipulation_step`, `ks.record_roleplay_speech`, `original`, `self._history[-1].get`, `self._kes`, `str`, `str(entry.get('teks', '')).strip`, `str(strategic.get('teks', '')).strip`, `strategic.get`
+- L1713–1733 **`_pelindung_dengar`** · kontrol=7, assignment/delete=8, except=0 · Call: `_pelindung_aktif`, `_pelindung_init`, `_pelindung_kata`, `_pelindung_kata_dikenal`, `_pelindung_lema_tutur`, `float`, `len`, `list`, `original`, `self.serap_adversarial`, `set`, `str`
+- L1738–1743 **`monitor_integritas`** · kontrol=1, assignment/delete=2, except=0 · Call: `MonitorIntegritas`, `_pelindung_init`
+- L1746–1750 **`enable_pelindung`** · kontrol=0, assignment/delete=1, except=0 · Call: `bool`, `self.params.get`
+- L1753–1771 **`pelindung_state`** · kontrol=1, assignment/delete=2, except=0 · Call: `_pelindung_dari`, `_pelindung_init`, `bool`, `dict`, `len`, `p.degradasi_state`, `p.monitor_integritas`, `p.watak_kegagalan`, `self.params.get`
+- L1774–1792 **`_pelindung_to_dict`** · kontrol=2, assignment/delete=2, except=0 · Call: `dict`, `getattr`, `int`, `list`, `original`, `sorted`
+- L1797–1827 **`_pelindung_from_dict`** · kontrol=23, assignment/delete=15, except=0 · Call: `(blok.get('anggaran') or {}).items`, `(blok.get('anggaran_maks') or {}).items`, `(blok.get('flag') or {}).items`, `(data or {}).get`, `_pelindung_init`, `blok.get`, `bool`, `dict`, `int`, `isinstance`, `original`, `set`, `str`
+- L1843–1869 **`monitor_scene`** · kontrol=8, assignment/delete=6, except=1 · Call: `_diag.catat`, `getattr`, `keragaman_scene`, `laporan.get`, `list`, `p.enabled`, `p.monitor_integritas`, `p.monitor_integritas().periksa`, `rotasi.append`, `self.npcs.items`
+- L1872–1874 **`keragaman`** · kontrol=0, assignment/delete=0, except=0 · Call: `keragaman_scene`
+- L1879–1892 **`_pelindung_tick_all`** · kontrol=4, assignment/delete=4, except=1 · Call: `_diag.catat`, `_pelindung_aktif`, `_pelindung_dari`, `getattr`, `getattr(p, '_tick', lambda: 0)`, `int`, `max`, `next`, `original`, `p._p`, `self.monitor_scene`, `self.npcs.values`
+- L1903–1969 **`pasang`** · kontrol=2, assignment/delete=0, except=0 · Call: `install_method`, `install_methods`, `wrap_method`
 
 ## `pycos/inti/ekstensi/perencana.py`
 
@@ -1887,12 +1892,12 @@ Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from
 
 ## `pycos/mandiri/organik.py`
 
-SHA-256: `824402cd7386a32054f56cf312ce673bb2d8f537ad65c308c36236e32cfbba68`
+SHA-256: `591350869957e7149e556565730052ffdd632a3555eeed2c2487a3c2f8f1b1aa`
 
-3422 baris; 19 kelas; 217 fungsi/metode termasuk nested.
+3430 baris; 19 kelas; 217 fungsi/metode termasuk nested.
 
-Kelas: `Residu` L136, `Intrusi` L350, `DetakInternal` L473, `TopologiSlot` L589, `LukaDomain` L714, `BatasIdentitas` L793, `WaktuHeterogen` L888, `PenolakanTutur` L1025, `Apersepsi` L1149, `LapisanParalel` L1277, `TubuhSumber` L1381, `Vacancy` L1476, `GejalaMurni` L1575, `KategoriProto` L1682, `Gejala` L1768, `Invensi` L2139, `ModelKausal` L2505, `Perencana` L2808, `Organik` L3063.
-Handler luas: 368, 500, 2443, 491, 2360.
+Kelas: `Residu` L136, `Intrusi` L350, `DetakInternal` L473, `TopologiSlot` L589, `LukaDomain` L714, `BatasIdentitas` L793, `WaktuHeterogen` L888, `PenolakanTutur` L1025, `Apersepsi` L1157, `LapisanParalel` L1285, `TubuhSumber` L1389, `Vacancy` L1484, `GejalaMurni` L1583, `KategoriProto` L1690, `Gejala` L1776, `Invensi` L2147, `ModelKausal` L2513, `Perencana` L2816, `Organik` L3071.
+Handler luas: 368, 500, 2451, 491, 2368.
 
 Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple`; `import math`; `import random`; `import re`; `import zlib`.
 
@@ -1970,149 +1975,149 @@ Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from
 - L989–996 **`WaktuHeterogen.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `self._durasi_subjektif.items`
 - L999–1019 **`WaktuHeterogen.from_dict`** · kontrol=12, assignment/delete=6, except=0 · Call: `(d.get('durasi_subjektif') or {}).items`, `(d.get('hl') or {}).items`, `(d.get('ingat') or {}).items`, `(d.get('salah') or {}).items`, `(d.get('skala_subjektif') or {}).items`, `_kclip`, `cls`, `d.get`, `dict`, `int`, `isinstance`, `o._skala_subjektif.setdefault`, `str`
 - L1040–1042 **`PenolakanTutur.__init__`** · kontrol=0, assignment/delete=2, except=0 · Call: `float`
-- L1044–1058 **`PenolakanTutur.kelayakan`** · kontrol=7, assignment/delete=11, except=0 · Call: `_kclip`, `float`, `k.get`, `komp.values`, `max`, `sum`
-- L1060–1063 **`PenolakanTutur.kelayakan_bertipe`** · kontrol=0, assignment/delete=1, except=0 · Call: `self.jenis`, `self.jenis_penolakan`, `self.kelayakan`
-- L1065–1070 **`PenolakanTutur.tertahan`** · kontrol=1, assignment/delete=2, except=0 · Call: `_kclip`, `float`, `max`, `r.random`
-- L1072–1077 **`PenolakanTutur.jenis`** · kontrol=3, assignment/delete=1, except=0 · Call: `float`, `k.get`, `min`
-- L1079–1113 **`PenolakanTutur.bentuk`** · kontrol=9, assignment/delete=5, except=0 · Call: `' '.join`, `_teks`, `_teks(teks_terbentuk).split`, `len`, `list`, `r.choice`, `r.shuffle`, `self.jenis`
-- L1115–1117 **`PenolakanTutur.jenis_penolakan`** · kontrol=0, assignment/delete=0, except=0 · Call: `_JENIS_PENOLAKAN.get`, `self.jenis`
-- L1119–1130 **`PenolakanTutur.catat`** · kontrol=3, assignment/delete=2, except=0 · Call: `(komponen or {}).items`, `_teks`, `dict`, `float`, `int`, `len`, `round`, `self._riwayat.append`
-- L1132–1133 **`PenolakanTutur.riwayat`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
-- L1135–1136 **`PenolakanTutur.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
-- L1139–1143 **`PenolakanTutur.from_dict`** · kontrol=4, assignment/delete=2, except=0 · Call: `(d or {}).get`, `cls`, `d.get`, `dict`, `isinstance`
-- L1167–1173 **`Apersepsi.__init__`** · kontrol=0, assignment/delete=5, except=0 · Call: `float`, `int`, `max`
-- L1175–1233 **`Apersepsi.amati`** · kontrol=18, assignment/delete=21, except=0 · Call: `'aku merasa {n}.'.format`, `(felt or {}).items`, `_kclip`, `_teks`, `_teks(klaim_identitas).strip`, `abs`, `bool`, `dict`, `f.keys`, `f.values`, `float`, `len`, `list`, `lv.values`, `math.log`, `max`, `round`, `self._gradien`, `self._riwayat.append`, `self._signature`, `sorted`, `sum`
-- L1235–1254 **`Apersepsi._gradien`** · kontrol=13, assignment/delete=7, except=0 · Call: `abs`, `bool`, `float`, `len`, `math.sqrt`, `max`, `range`, `round`, `set`, `set().union`, `sorted`, `sum`, `x.get`, `x.keys`, `zip`
-- L1257–1261 **`Apersepsi._signature`** · kontrol=5, assignment/delete=1, except=0 · Call: `'{}='.format`, `'|'.join`, `f.items`, `float`, `round`, `sorted`, `str`
-- L1263–1264 **`Apersepsi.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
-- L1267–1271 **`Apersepsi.from_dict`** · kontrol=3, assignment/delete=2, except=0 · Call: `cls`, `d.get`, `dict`, `isinstance`
-- L1290–1293 **`LapisanParalel.__init__`** · kontrol=0, assignment/delete=3, except=0 · Call: `int`, `max`
-- L1295–1309 **`LapisanParalel.tambah`** · kontrol=3, assignment/delete=3, except=0 · Call: `(emosi or {}).items`, `_kclip`, `_teks`, `dict`, `float`, `int`, `len`, `self._lapisan.append`, `str`
-- L1311–1317 **`LapisanParalel.aktif`** · kontrol=4, assignment/delete=1, except=0 · Call: `_teks`, `dict`
-- L1319–1325 **`LapisanParalel.pengaruh`** · kontrol=3, assignment/delete=2, except=0 · Call: `float`, `hasil.get`, `hasil.items`, `lap['emosi'].items`, `round`, `self.aktif`
-- L1327–1341 **`LapisanParalel.bertentangan`** · kontrol=7, assignment/delete=3, except=0 · Call: `a.get`, `b.get`, `enumerate`, `keluar.append`, `set`
-- L1343–1345 **`LapisanParalel.disonansi_paralel`** · kontrol=0, assignment/delete=0, except=0 · Call: tidak ada
-- L1347–1348 **`LapisanParalel.tanpa_resolusi`** · kontrol=1, assignment/delete=0, except=0 · Call: `bool`, `len`, `self.bertentangan`
-- L1350–1356 **`LapisanParalel.bertindak_dari`** · kontrol=3, assignment/delete=2, except=0 · Call: `_teks`, `dict`, `max`
-- L1358–1363 **`LapisanParalel.state`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `len`, `self.bertentangan`, `self.tanpa_resolusi`
-- L1365–1367 **`LapisanParalel.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
-- L1370–1375 **`LapisanParalel.from_dict`** · kontrol=5, assignment/delete=3, except=0 · Call: `(d or {}).get`, `cls`, `d.get`, `dict`, `int`, `isinstance`, `len`
-- L1395–1413 **`TubuhSumber.__init__`** · kontrol=0, assignment/delete=7, except=0 · Call: `float`
-- L1415–1423 **`TubuhSumber.masukan`** · kontrol=6, assignment/delete=4, except=0 · Call: `(emosi or {}).get`, `f.get`, `float`, `max`, `sum`
-- L1425–1450 **`TubuhSumber.langkah`** · kontrol=10, assignment/delete=9, except=0 · Call: `(felt or {}).items`, `_kclip`, `abs`, `delta.get`, `delta.items`, `delta.setdefault`, `float`, `len`, `max`, `round`, `self._jejak.append`, `self.arah.get`, `self.arah.get(isyarat, {}).items`, `self.masukan`
-- L1452–1455 **`TubuhSumber.suntik`** · kontrol=0, assignment/delete=1, except=0 · Call: `_kclip`, `float`
-- L1457–1459 **`TubuhSumber.state`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `round`
-- L1461–1463 **`TubuhSumber.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
-- L1466–1473 **`TubuhSumber.from_dict`** · kontrol=4, assignment/delete=3, except=0 · Call: `cls`, `d.get`, `dict`, `float`, `isinstance`
-- L1483–1488 **`Vacancy.__init__`** · kontrol=0, assignment/delete=5, except=0 · Call: tidak ada
-- L1490–1496 **`Vacancy.mulai`** · kontrol=0, assignment/delete=5, except=0 · Call: `float`, `int`, `max`, `self.state`
-- L1498–1510 **`Vacancy.lewat`** · kontrol=3, assignment/delete=6, except=0 · Call: `float`, `int`, `max`, `min`
-- L1512–1518 **`Vacancy.state`** · kontrol=0, assignment/delete=0, except=0 · Call: `max`, `round`
-- L1520–1523 **`Vacancy.to_dict`** · kontrol=0, assignment/delete=0, except=0 · Call: tidak ada
-- L1526–1536 **`Vacancy.from_dict`** · kontrol=2, assignment/delete=6, except=0 · Call: `bool`, `cls`, `d.get`, `float`, `int`, `isinstance`, `max`, `min`
-- L1584–1599 **`GejalaMurni.__init__`** · kontrol=0, assignment/delete=10, except=0 · Call: `_kclip`, `float`, `int`, `round`, `str`
-- L1602–1623 **`GejalaMurni.perbarui`** · kontrol=3, assignment/delete=6, except=0 · Call: `_kclip`, `float`, `int`, `len`, `max`, `round`, `self.riwayat.append`, `self.state`
-- L1625–1629 **`GejalaMurni.tekanan`** · kontrol=1, assignment/delete=0, except=0 · Call: `_kclip`, `max`
-- L1631–1636 **`GejalaMurni.tandai_terklaim`** · kontrol=0, assignment/delete=1, except=0 · Call: `dict`, `float`, `int`, `round`, `str`
-- L1638–1640 **`GejalaMurni.properti_terlarang`** · kontrol=1, assignment/delete=0, except=0 · Call: `hasattr`
-- L1642–1655 **`GejalaMurni.state`** · kontrol=0, assignment/delete=0, except=0 · Call: `bool`, `dict`, `int`, `round`, `self.tekanan`
-- L1657–1664 **`GejalaMurni.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `bool`, `dict`, `float`, `int`
-- L1667–1679 **`GejalaMurni.from_dict`** · kontrol=3, assignment/delete=7, except=0 · Call: `bool`, `cls`, `d.get`, `dict`, `float`, `int`, `isinstance`, `max`, `str`
-- L1691–1702 **`KategoriProto.__init__`** · kontrol=1, assignment/delete=9, except=0 · Call: `_kclip`, `float`, `int`, `str`
-- L1704–1716 **`KategoriProto.konfirmasi`** · kontrol=2, assignment/delete=7, except=0 · Call: `_kclip`, `float`, `int`, `max`, `self.state`, `str`
-- L1718–1723 **`KategoriProto.beri_nama`** · kontrol=2, assignment/delete=2, except=0 · Call: `str`
-- L1725–1726 **`KategoriProto.umur`** · kontrol=0, assignment/delete=0, except=0 · Call: `int`, `max`
-- L1728–1732 **`KategoriProto.layak_penuh`** · kontrol=1, assignment/delete=0, except=0 · Call: `int`, `max`, `self.umur`
-- L1734–1742 **`KategoriProto.state`** · kontrol=0, assignment/delete=0, except=0 · Call: `bool`, `int`, `round`
-- L1744–1751 **`KategoriProto.to_dict`** · kontrol=0, assignment/delete=0, except=0 · Call: tidak ada
-- L1754–1765 **`KategoriProto.from_dict`** · kontrol=1, assignment/delete=7, except=0 · Call: `_kclip`, `cls`, `d.get`, `float`, `int`, `max`, `str`
-- L1792–1813 **`Gejala.__init__`** · kontrol=0, assignment/delete=16, except=0 · Call: `int`, `max`
-- L1819–1822 **`Gejala.tanda_dari`** · kontrol=0, assignment/delete=1, except=0 · Call: `format`, `repr`, `repr(nilai).encode`, `zlib.crc32`
-- L1827–1862 **`Gejala.muncul`** · kontrol=5, assignment/delete=12, except=0 · Call: `GejalaMurni`, `_kclip`, `dict`, `entri.get`, `float`, `g.state`, `int`, `lama.perbarui`, `lama.state`, `round`, `self._aktif.get`, `self._catat`, `self._dikenal.get`, `self._pangkas`, `self.tanda_dari`, `str`
-- L1868–1874 **`Gejala.kalimat_tanpa_nama`** · kontrol=0, assignment/delete=0, except=0 · Call: tidak ada
-- L1876–1884 **`Gejala.gagal`** · kontrol=1, assignment/delete=1, except=0 · Call: `int`, `round`, `self._aktif.get`, `self._catat`, `self.kalimat_tanpa_nama`, `str`
-- L1889–1907 **`Gejala.klaim`** · kontrol=3, assignment/delete=5, except=0 · Call: `dict`, `float`, `g.tandai_terklaim`, `int`, `len`, `round`, `self._aktif.get`, `self._catat`, `self._pangkas`, `self._terklaim.append`, `str`
-- L1909–1913 **`Gejala.jenis_hint`** · kontrol=1, assignment/delete=1, except=0 · Call: `self._aktif.get`, `setattr`, `str`
-- L1918–1985 **`Gejala.proses`** · kontrol=9, assignment/delete=21, except=0 · Call: `KategoriProto`, `dict`, `endapan.append`, `getattr`, `int`, `konsolidasi.append`, `len`, `list`, `min`, `pemudaran.append`, `proto.konfirmasi`, `proto.layak_penuh`, `proto.state`, `proto.umur`, `round`, `self._aktif.items`, `self._bekas.append`, `self._catat`, `self._proto.get`, `str`
-- L1987–1990 **`Gejala.beri_nama`** · kontrol=0, assignment/delete=1, except=0 · Call: `proto.beri_nama`, `self._proto.get`, `str`
-- L1992–1993 **`Gejala.bekas`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
-- L1995–1996 **`Gejala.kategori_penuh`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `self._penuh.values`
-- L1998–1999 **`Gejala.proto`** · kontrol=1, assignment/delete=0, except=0 · Call: `p.state`, `self._proto.values`
-- L2001–2002 **`Gejala.aktif`** · kontrol=1, assignment/delete=0, except=0 · Call: `g.state`, `self._aktif.values`
-- L2004–2005 **`Gejala.terklaim`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
-- L2008–2014 **`Gejala._catat`** · kontrol=1, assignment/delete=1, except=0 · Call: `int`, `len`, `round`, `self._log.append`, `str`
-- L2016–2029 **`Gejala._pangkas`** · kontrol=4, assignment/delete=3, except=0 · Call: `len`, `list`, `self._aktif.values`, `self._catat`, `self._dikenal.keys`, `self._dikenal.pop`, `sorted`
-- L2031–2042 **`Gejala.state`** · kontrol=3, assignment/delete=1, except=0 · Call: `dict`, `g.state`, `len`, `self._aktif.values`, `self.kategori_penuh`, `self.proto`
-- L2044–2058 **`Gejala.to_dict`** · kontrol=7, assignment/delete=0, except=0 · Call: `dict`, `self._aktif.items`, `self._dikenal.items`, `self._penuh.items`, `self._proto.items`, `v.to_dict`
-- L2061–2084 **`Gejala.from_dict`** · kontrol=21, assignment/delete=13, except=0 · Call: `(d or {}).get`, `(d.get('aktif') or {}).items`, `(d.get('dikenal') or {}).items`, `(d.get('penuh') or {}).items`, `(d.get('proto') or {}).items`, `GejalaMurni.from_dict`, `KategoriProto.from_dict`, `cls`, `d.get`, `dict`, `int`, `isinstance`, `setelan.items`, `str`
-- L2150–2160 **`Invensi.__init__`** · kontrol=0, assignment/delete=9, except=0 · Call: `int`, `random.Random`
-- L2164–2166 **`Invensi._token`** · kontrol=3, assignment/delete=0, except=0 · Call: `len`, `re.findall`, `str`, `str(teks or '').lower`
-- L2169–2173 **`Invensi._jaccard`** · kontrol=2, assignment/delete=1, except=0 · Call: `len`, `set`
-- L2175–2176 **`Invensi._ada`** · kontrol=1, assignment/delete=0, except=0 · Call: `s.get`
-- L2178–2182 **`Invensi._kebaruan`** · kontrol=2, assignment/delete=1, except=0 · Call: `_kclip`, `max`, `self._ada`, `self._jaccard`
-- L2185–2188 **`Invensi._koherensi`** · kontrol=2, assignment/delete=0, except=0 · Call: `len`, `sum`
-- L2191–2201 **`Invensi._utilitas`** · kontrol=7, assignment/delete=3, except=0 · Call: `(drives or {}).items`, `(emosi or {}).items`, `_kclip`, `bobot.get`, `float`, `len`, `max`, `re.findall`, `str`, `str(d).lower`, `sum`
-- L2204–2208 **`Invensi._emosi_teratas`** · kontrol=1, assignment/delete=1, except=0 · Call: `emosi.items`, `float`, `max`
-- L2210–2221 **`Invensi._kosakata`** · kontrol=4, assignment/delete=1, except=0 · Call: `d.get`, `k.add`, `k.update`, `self._token`, `set`, `str`, `str(a).lower`, `str(b).lower`
-- L2224–2237 **`Invensi._g_negasi`** · kontrol=3, assignment/delete=3, except=0 · Call: `d.get`, `key.startswith`, `len`, `out.append`, `self._token`, `str`
-- L2239–2251 **`Invensi._g_abstraksi`** · kontrol=3, assignment/delete=4, except=0 · Call: `' '.join`, `d.get`, `len`, `out.append`, `self._emosi_teratas`, `self._token`
-- L2253–2273 **`Invensi._g_analogi`** · kontrol=6, assignment/delete=5, except=0 · Call: `d.get`, `float`, `frozenset`, `out.append`, `pasangan.add`, `self._token`, `set`, `sorted`, `str`, `tetangga.get`, `tetangga.setdefault`, `tetangga.setdefault(a, []).append`, `tetangga.setdefault(b, []).append`
-- L2275–2295 **`Invensi._g_pengisian`** · kontrol=2, assignment/delete=4, except=0 · Call: `d.get`, `lub.get`, `out.append`, `self._token`, `str`
-- L2297–2315 **`Invensi._g_inventori`** · kontrol=3, assignment/delete=5, except=0 · Call: `d.get`, `float`, `kon.get`, `out.append`, `self._token`, `sorted`, `str`
-- L2317–2331 **`Invensi._g_konstruksi`** · kontrol=5, assignment/delete=9, except=0 · Call: `' → '.join`, `d.get`, `len`, `list`, `map`, `min`, `out.append`, `self._token`, `self.rng.sample`, `str`
-- L2333–2349 **`Invensi._g_pengelompokan`** · kontrol=6, assignment/delete=8, except=0 · Call: `', '.join`, `d.get`, `len`, `list`, `map`, `out.append`, `range`, `self._token`, `set`, `sorted`, `str`, `tetangga.get`, `tetangga.keys`, `tetangga.setdefault`, `tetangga.setdefault(a, set()).add`, `tetangga.setdefault(b, set()).add`
-- L2352–2412 **`Invensi.lahirkan`** · kontrol=16, assignment/delete=22, except=1 · Call: `dict.fromkeys`, `digest.get`, `dinilai.append`, `dinilai.sort`, `diterima.append`, `frozenset`, `gen`, `int`, `kandidat.extend`, `len`, `list`, `per.keys`, `per.setdefault`, `per.setdefault(s['jenis'], []).append`, `round`, `self._kebaruan`, `self._koherensi`, `self._kosakata`, `self._utilitas`, `self.lahir.append`, `self.riwayat_usul.append`, `set`, `sorted`, `tanda.add`
-- L2414–2424 **`Invensi.kristal`** · kontrol=4, assignment/delete=3, except=0 · Call: `int`, `naik.append`, `s.get`
-- L2426–2430 **`Invensi.gugur`** · kontrol=3, assignment/delete=1, except=0 · Call: `int`, `s.get`
-- L2432–2445 **`Invensi.set_knob`** · kontrol=6, assignment/delete=4, except=1 · Call: `_kclip`, `float`, `int`, `max`
-- L2448–2453 **`Invensi.state`** · kontrol=4, assignment/delete=2, except=0 · Call: `len`, `s.get`, `sum`
-- L2455–2459 **`Invensi.ringkas`** · kontrol=3, assignment/delete=0, except=0 · Call: `len`, `s.get`, `sum`
-- L2461–2463 **`Invensi.to_dict`** · kontrol=2, assignment/delete=0, except=0 · Call: `dict`, `list`
-- L2466–2473 **`Invensi.from_dict`** · kontrol=4, assignment/delete=4, except=0 · Call: `cls`, `d.get`, `dict`, `int`, `list`
-- L2511–2516 **`ModelKausal.__init__`** · kontrol=0, assignment/delete=5, except=0 · Call: `int`, `random.Random`
-- L2520–2522 **`ModelKausal._token`** · kontrol=3, assignment/delete=0, except=0 · Call: `len`, `re.findall`, `str`, `str(teks or '').lower`
-- L2525–2533 **`ModelKausal._jenis`** · kontrol=5, assignment/delete=0, except=0 · Call: `a.startswith`, `b.startswith`
-- L2535–2547 **`ModelKausal._tepi`** · kontrol=3, assignment/delete=8, except=0 · Call: `_kclip`, `float`, `self.keluar.setdefault`, `self.masuk.setdefault`, `self.tepi.get`
-- L2549–2557 **`ModelKausal._pangkas`** · kontrol=2, assignment/delete=1, except=0 · Call: `len`, `self.keluar.get`, `self.keluar.get(a, {}).pop`, `self.masuk.get`, `self.masuk.get(b, {}).pop`, `self.tepi.items`, `self.tepi.pop`, `sorted`
-- L2560–2565 **`ModelKausal.pelajari`** · kontrol=2, assignment/delete=0, except=0 · Call: `self._pangkas`, `self._pelajari_satu`, `self.ringkas`
-- L2567–2587 **`ModelKausal._pelajari_satu`** · kontrol=12, assignment/delete=8, except=0 · Call: `_kclip`, `abs`, `deltas.items`, `dict.fromkeys`, `ep.get`, `float`, `list`, `self._tepi`, `self._token`, `str`, `str(ep.get('action') or '').strip`, `str(ep.get('action') or '').strip().lower`, `str(ep.get('label') or '').strip`
-- L2590–2603 **`ModelKausal._node`** · kontrol=9, assignment/delete=3, except=0 · Call: `self._token`, `str`, `str(target or '').strip`, `str(target or '').strip().lower`
-- L2605–2612 **`ModelKausal._sebab`** · kontrol=2, assignment/delete=2, except=0 · Call: `cand.append`, `cand.sort`, `self._jenis`, `self.masuk.get`
-- L2615–2624 **`ModelKausal._narasi`** · kontrol=4, assignment/delete=0, except=0 · Call: `node.startswith`
-- L2626–2646 **`ModelKausal.jelaskan`** · kontrol=6, assignment/delete=7, except=0 · Call: `' karena '.join`, `int`, `max`, `range`, `rantai.append`, `round`, `self._jenis`, `self._narasi`, `self._node`, `self._sebab`, `str`
-- L2648–2669 **`ModelKausal.counterfactual`** · kontrol=5, assignment/delete=7, except=0 · Call: `b.startswith`, `max`, `round`, `self._jenis`, `self._mekanisme_dorong`, `self._narasi`, `self._token`, `self.keluar.get`, `self.tepi.get`, `self.tepi.get(('s:' + s, a_node), {}).get`, `sorted`, `str`, `str(aksi_alt).strip`, `str(aksi_alt).strip().lower`
-- L2671–2676 **`ModelKausal._mekanisme_dorong`** · kontrol=1, assignment/delete=1, except=0 · Call: `d.startswith`, `self._narasi`, `self.keluar.get`, `sorted`
-- L2678–2681 **`ModelKausal._aksi_ke`** · kontrol=1, assignment/delete=0, except=0 · Call: `self._jenis`, `self.masuk.get`
-- L2683–2717 **`ModelKausal.blame`** · kontrol=4, assignment/delete=15, except=0 · Call: `_kclip`, `max`, `round`, `self._aksi_ke`, `self._jenis`, `self._token`, `self.tepi.get`, `self.tepi.get(('s:' + s, h_node), {}).get`, `self.tepi.get((a_node, h_node), {}).get`, `str`, `str(aksi).strip`, `str(aksi).strip().lower`, `str(hasil_label).strip`, `str(hasil_label).strip().lower`, `sum`
-- L2719–2741 **`ModelKausal.mekanisme`** · kontrol=8, assignment/delete=6, except=0 · Call: `' → '.join`, `antrian.append`, `antrian.pop`, `jalur.append`, `jalur.reverse`, `len`, `self._narasi`, `self._node`, `self.keluar.get`
-- L2743–2754 **`ModelKausal.keyakinan`** · kontrol=1, assignment/delete=4, except=0 · Call: `_kclip`, `int`, `round`, `self._jenis`, `self._node`, `self.tepi.get`
-- L2757–2765 **`ModelKausal.state`** · kontrol=2, assignment/delete=3, except=0 · Call: `int`, `len`, `round`, `self._jenis`, `self.tepi.items`, `sorted`
-- L2767–2768 **`ModelKausal.ringkas`** · kontrol=0, assignment/delete=0, except=0 · Call: `len`, `set`
-- L2770–2772 **`ModelKausal.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `self.tepi.items`
-- L2775–2787 **`ModelKausal.from_dict`** · kontrol=6, assignment/delete=6, except=0 · Call: `(d.get('tepi', {}) or {}).items`, `cls`, `d.get`, `float`, `int`, `kunci.partition`, `m.keluar.setdefault`, `m.masuk.setdefault`, `rec.get`
-- L2812–2816 **`Perencana.__init__`** · kontrol=0, assignment/delete=4, except=0 · Call: `int`, `random.Random`
-- L2820–2823 **`Perencana._fakta`** · kontrol=2, assignment/delete=2, except=0 · Call: `node.split`, `set`
-- L2825–2831 **`Perencana._aksi_capai`** · kontrol=1, assignment/delete=1, except=0 · Call: `domain._jenis`, `domain.masuk.get`, `keluar.sort`
-- L2833–2835 **`Perencana._pemicu`** · kontrol=1, assignment/delete=0, except=0 · Call: `domain._jenis`, `domain.masuk.get`
-- L2838–2873 **`Perencana._mundur`** · kontrol=10, assignment/delete=7, except=0 · Call: `all`, `domain._node`, `pra_rencana.append`, `round`, `s.split`, `self._aksi_capai`, `self._fakta`, `self._mundur`, `self._outcome_penutup`, `self._pemicu`
-- L2875–2887 **`Perencana._outcome_penutup`** · kontrol=6, assignment/delete=6, except=0 · Call: `h[2:].lower`, `len`, `n.startswith`, `re.findall`, `self._aksi_capai`, `set`, `sorted`, `t.split`, `t.split(':', 1)[-1].lower`
-- L2890–2918 **`Perencana.maju`** · kontrol=12, assignment/delete=7, except=0 · Call: `a.startswith`, `all`, `bisa.append`, `bisa.sort`, `dilihat.add`, `domain._jenis`, `domain._node`, `domain.keluar.get`, `langkah.append`, `len`, `punya.add`, `range`, `self._fakta`, `self._pemicu`, `set`, `sorted`
-- L2921–2938 **`Perencana._kompleksitas`** · kontrol=9, assignment/delete=5, except=0 · Call: `_kclip`, `baru.add`, `domain._jenis`, `domain._node`, `domain.keluar.get`, `domain.masuk.get`, `len`, `list`, `range`, `set`
-- L2940–2956 **`Perencana.rencanakan_rencana`** · kontrol=0, assignment/delete=7, except=0 · Call: `round`, `self._buntu`, `self._kompleksitas`, `self.maju`, `self.rancang`, `uji.get`
-- L2959–2972 **`Perencana.rancang`** · kontrol=1, assignment/delete=5, except=0 · Call: `frozenset`, `len`, `self._kedalaman`, `self._mundur`, `self.jejak_rencana.append`, `str`
-- L2974–2977 **`Perencana._kedalaman`** · kontrol=2, assignment/delete=0, except=0 · Call: `max`, `node.get`, `self._kedalaman`
-- L2979–2985 **`Perencana._buntu`** · kontrol=2, assignment/delete=1, except=0 · Call: `keluar.append`, `keluar.extend`, `node.get`, `self._buntu`, `self._buntu_label`
-- L2988–2989 **`Perencana._buntu_label`** · kontrol=0, assignment/delete=0, except=0 · Call: `node.get`
-- L2991–3002 **`Perencana.langkah`** · kontrol=6, assignment/delete=2, except=0 · Call: `(self.rencana_aktif or {}).get`, `keluar.append`, `keluar.extend`, `node.get`, `self.langkah`
-- L3004–3030 **`Perencana.narasi`** · kontrol=8, assignment/delete=12, except=0 · Call: `' '.join`, `(self.rencana_aktif or {}).get`, `domain._narasi`, `node.get`, `self.narasi`
-- L3033–3039 **`Perencana.state`** · kontrol=1, assignment/delete=1, except=0 · Call: `aktif.get`, `len`, `self.langkah`
-- L3041–3043 **`Perencana.ringkas`** · kontrol=0, assignment/delete=0, except=0 · Call: `len`
-- L3045–3047 **`Perencana.to_dict`** · kontrol=0, assignment/delete=0, except=0 · Call: `list`
-- L3050–3057 **`Perencana.from_dict`** · kontrol=2, assignment/delete=4, except=0 · Call: `cls`, `d.get`, `int`, `list`
-- L3066–3087 **`Organik.__init__`** · kontrol=0, assignment/delete=17, except=0 · Call: `Apersepsi`, `BatasIdentitas`, `DetakInternal`, `Gejala`, `Intrusi`, `Invensi`, `LapisanParalel`, `LukaDomain`, `ModelKausal`, `PenolakanTutur`, `Perencana`, `Residu`, `TopologiSlot`, `TubuhSumber`, `Vacancy`, `WaktuHeterogen`, `int`, `random.Random`
-- L3090–3106 **`Organik.ringkas`** · kontrol=0, assignment/delete=0, except=0 · Call: `len`, `round`, `self.detak.state`, `self.gejala.state`, `self.identitas.state`, `self.intrusi.state`, `self.invensi.state`, `self.kausal.state`, `self.luka.ringkas`, `self.paralel.state`, `self.perencana.state`, `self.residu.state`, `self.topologi.kosong`, `self.topologi.semua`, `self.tutur.riwayat`, `self.vacancy.state`, `self.waktu.ringkas`
-- L3108–3126 **`Organik.to_dict`** · kontrol=1, assignment/delete=1, except=0 · Call: `int`, `self.apersepsi.to_dict`, `self.detak.to_dict`, `self.gejala.to_dict`, `self.identitas.to_dict`, `self.intrusi.to_dict`, `self.invensi.to_dict`, `self.kausal.to_dict`, `self.luka.to_dict`, `self.paralel.to_dict`, `self.perencana.to_dict`, `self.residu.to_dict`, `self.rng.getstate`, `self.topologi.to_dict`, `self.tubuh.to_dict`, `self.tutur.to_dict`, `self.vacancy.to_dict`, `self.waktu.to_dict`
-- L3129–3154 **`Organik.from_dict`** · kontrol=5, assignment/delete=18, except=1 · Call: `Apersepsi.from_dict`, `BatasIdentitas.from_dict`, `DetakInternal.from_dict`, `Gejala.from_dict`, `Intrusi.from_dict`, `Invensi.from_dict`, `LapisanParalel.from_dict`, `LukaDomain.from_dict`, `ModelKausal.from_dict`, `PenolakanTutur.from_dict`, `Perencana.from_dict`, `Residu.from_dict`, `TopologiSlot.from_dict`, `TubuhSumber.from_dict`, `Vacancy.from_dict`, `WaktuHeterogen.from_dict`, `cls`, `d.get`, `int`, `isinstance`, `len`, `o.rng.setstate`, `tuple`
+- L1044–1066 **`PenolakanTutur.kelayakan`** · kontrol=9, assignment/delete=13, except=0 · Call: `_kclip`, `float`, `k.get`, `komp.values`, `max`, `sum`
+- L1068–1071 **`PenolakanTutur.kelayakan_bertipe`** · kontrol=0, assignment/delete=1, except=0 · Call: `self.jenis`, `self.jenis_penolakan`, `self.kelayakan`
+- L1073–1078 **`PenolakanTutur.tertahan`** · kontrol=1, assignment/delete=2, except=0 · Call: `_kclip`, `float`, `max`, `r.random`
+- L1080–1085 **`PenolakanTutur.jenis`** · kontrol=3, assignment/delete=1, except=0 · Call: `float`, `k.get`, `min`
+- L1087–1121 **`PenolakanTutur.bentuk`** · kontrol=9, assignment/delete=5, except=0 · Call: `' '.join`, `_teks`, `_teks(teks_terbentuk).split`, `len`, `list`, `r.choice`, `r.shuffle`, `self.jenis`
+- L1123–1125 **`PenolakanTutur.jenis_penolakan`** · kontrol=0, assignment/delete=0, except=0 · Call: `_JENIS_PENOLAKAN.get`, `self.jenis`
+- L1127–1138 **`PenolakanTutur.catat`** · kontrol=3, assignment/delete=2, except=0 · Call: `(komponen or {}).items`, `_teks`, `dict`, `float`, `int`, `len`, `round`, `self._riwayat.append`
+- L1140–1141 **`PenolakanTutur.riwayat`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
+- L1143–1144 **`PenolakanTutur.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
+- L1147–1151 **`PenolakanTutur.from_dict`** · kontrol=4, assignment/delete=2, except=0 · Call: `(d or {}).get`, `cls`, `d.get`, `dict`, `isinstance`
+- L1175–1181 **`Apersepsi.__init__`** · kontrol=0, assignment/delete=5, except=0 · Call: `float`, `int`, `max`
+- L1183–1241 **`Apersepsi.amati`** · kontrol=18, assignment/delete=21, except=0 · Call: `'aku merasa {n}.'.format`, `(felt or {}).items`, `_kclip`, `_teks`, `_teks(klaim_identitas).strip`, `abs`, `bool`, `dict`, `f.keys`, `f.values`, `float`, `len`, `list`, `lv.values`, `math.log`, `max`, `round`, `self._gradien`, `self._riwayat.append`, `self._signature`, `sorted`, `sum`
+- L1243–1262 **`Apersepsi._gradien`** · kontrol=13, assignment/delete=7, except=0 · Call: `abs`, `bool`, `float`, `len`, `math.sqrt`, `max`, `range`, `round`, `set`, `set().union`, `sorted`, `sum`, `x.get`, `x.keys`, `zip`
+- L1265–1269 **`Apersepsi._signature`** · kontrol=5, assignment/delete=1, except=0 · Call: `'{}='.format`, `'|'.join`, `f.items`, `float`, `round`, `sorted`, `str`
+- L1271–1272 **`Apersepsi.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
+- L1275–1279 **`Apersepsi.from_dict`** · kontrol=3, assignment/delete=2, except=0 · Call: `cls`, `d.get`, `dict`, `isinstance`
+- L1298–1301 **`LapisanParalel.__init__`** · kontrol=0, assignment/delete=3, except=0 · Call: `int`, `max`
+- L1303–1317 **`LapisanParalel.tambah`** · kontrol=3, assignment/delete=3, except=0 · Call: `(emosi or {}).items`, `_kclip`, `_teks`, `dict`, `float`, `int`, `len`, `self._lapisan.append`, `str`
+- L1319–1325 **`LapisanParalel.aktif`** · kontrol=4, assignment/delete=1, except=0 · Call: `_teks`, `dict`
+- L1327–1333 **`LapisanParalel.pengaruh`** · kontrol=3, assignment/delete=2, except=0 · Call: `float`, `hasil.get`, `hasil.items`, `lap['emosi'].items`, `round`, `self.aktif`
+- L1335–1349 **`LapisanParalel.bertentangan`** · kontrol=7, assignment/delete=3, except=0 · Call: `a.get`, `b.get`, `enumerate`, `keluar.append`, `set`
+- L1351–1353 **`LapisanParalel.disonansi_paralel`** · kontrol=0, assignment/delete=0, except=0 · Call: tidak ada
+- L1355–1356 **`LapisanParalel.tanpa_resolusi`** · kontrol=1, assignment/delete=0, except=0 · Call: `bool`, `len`, `self.bertentangan`
+- L1358–1364 **`LapisanParalel.bertindak_dari`** · kontrol=3, assignment/delete=2, except=0 · Call: `_teks`, `dict`, `max`
+- L1366–1371 **`LapisanParalel.state`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `len`, `self.bertentangan`, `self.tanpa_resolusi`
+- L1373–1375 **`LapisanParalel.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
+- L1378–1383 **`LapisanParalel.from_dict`** · kontrol=5, assignment/delete=3, except=0 · Call: `(d or {}).get`, `cls`, `d.get`, `dict`, `int`, `isinstance`, `len`
+- L1403–1421 **`TubuhSumber.__init__`** · kontrol=0, assignment/delete=7, except=0 · Call: `float`
+- L1423–1431 **`TubuhSumber.masukan`** · kontrol=6, assignment/delete=4, except=0 · Call: `(emosi or {}).get`, `f.get`, `float`, `max`, `sum`
+- L1433–1458 **`TubuhSumber.langkah`** · kontrol=10, assignment/delete=9, except=0 · Call: `(felt or {}).items`, `_kclip`, `abs`, `delta.get`, `delta.items`, `delta.setdefault`, `float`, `len`, `max`, `round`, `self._jejak.append`, `self.arah.get`, `self.arah.get(isyarat, {}).items`, `self.masukan`
+- L1460–1463 **`TubuhSumber.suntik`** · kontrol=0, assignment/delete=1, except=0 · Call: `_kclip`, `float`
+- L1465–1467 **`TubuhSumber.state`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `round`
+- L1469–1471 **`TubuhSumber.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
+- L1474–1481 **`TubuhSumber.from_dict`** · kontrol=4, assignment/delete=3, except=0 · Call: `cls`, `d.get`, `dict`, `float`, `isinstance`
+- L1491–1496 **`Vacancy.__init__`** · kontrol=0, assignment/delete=5, except=0 · Call: tidak ada
+- L1498–1504 **`Vacancy.mulai`** · kontrol=0, assignment/delete=5, except=0 · Call: `float`, `int`, `max`, `self.state`
+- L1506–1518 **`Vacancy.lewat`** · kontrol=3, assignment/delete=6, except=0 · Call: `float`, `int`, `max`, `min`
+- L1520–1526 **`Vacancy.state`** · kontrol=0, assignment/delete=0, except=0 · Call: `max`, `round`
+- L1528–1531 **`Vacancy.to_dict`** · kontrol=0, assignment/delete=0, except=0 · Call: tidak ada
+- L1534–1544 **`Vacancy.from_dict`** · kontrol=2, assignment/delete=6, except=0 · Call: `bool`, `cls`, `d.get`, `float`, `int`, `isinstance`, `max`, `min`
+- L1592–1607 **`GejalaMurni.__init__`** · kontrol=0, assignment/delete=10, except=0 · Call: `_kclip`, `float`, `int`, `round`, `str`
+- L1610–1631 **`GejalaMurni.perbarui`** · kontrol=3, assignment/delete=6, except=0 · Call: `_kclip`, `float`, `int`, `len`, `max`, `round`, `self.riwayat.append`, `self.state`
+- L1633–1637 **`GejalaMurni.tekanan`** · kontrol=1, assignment/delete=0, except=0 · Call: `_kclip`, `max`
+- L1639–1644 **`GejalaMurni.tandai_terklaim`** · kontrol=0, assignment/delete=1, except=0 · Call: `dict`, `float`, `int`, `round`, `str`
+- L1646–1648 **`GejalaMurni.properti_terlarang`** · kontrol=1, assignment/delete=0, except=0 · Call: `hasattr`
+- L1650–1663 **`GejalaMurni.state`** · kontrol=0, assignment/delete=0, except=0 · Call: `bool`, `dict`, `int`, `round`, `self.tekanan`
+- L1665–1672 **`GejalaMurni.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `bool`, `dict`, `float`, `int`
+- L1675–1687 **`GejalaMurni.from_dict`** · kontrol=3, assignment/delete=7, except=0 · Call: `bool`, `cls`, `d.get`, `dict`, `float`, `int`, `isinstance`, `max`, `str`
+- L1699–1710 **`KategoriProto.__init__`** · kontrol=1, assignment/delete=9, except=0 · Call: `_kclip`, `float`, `int`, `str`
+- L1712–1724 **`KategoriProto.konfirmasi`** · kontrol=2, assignment/delete=7, except=0 · Call: `_kclip`, `float`, `int`, `max`, `self.state`, `str`
+- L1726–1731 **`KategoriProto.beri_nama`** · kontrol=2, assignment/delete=2, except=0 · Call: `str`
+- L1733–1734 **`KategoriProto.umur`** · kontrol=0, assignment/delete=0, except=0 · Call: `int`, `max`
+- L1736–1740 **`KategoriProto.layak_penuh`** · kontrol=1, assignment/delete=0, except=0 · Call: `int`, `max`, `self.umur`
+- L1742–1750 **`KategoriProto.state`** · kontrol=0, assignment/delete=0, except=0 · Call: `bool`, `int`, `round`
+- L1752–1759 **`KategoriProto.to_dict`** · kontrol=0, assignment/delete=0, except=0 · Call: tidak ada
+- L1762–1773 **`KategoriProto.from_dict`** · kontrol=1, assignment/delete=7, except=0 · Call: `_kclip`, `cls`, `d.get`, `float`, `int`, `max`, `str`
+- L1800–1821 **`Gejala.__init__`** · kontrol=0, assignment/delete=16, except=0 · Call: `int`, `max`
+- L1827–1830 **`Gejala.tanda_dari`** · kontrol=0, assignment/delete=1, except=0 · Call: `format`, `repr`, `repr(nilai).encode`, `zlib.crc32`
+- L1835–1870 **`Gejala.muncul`** · kontrol=5, assignment/delete=12, except=0 · Call: `GejalaMurni`, `_kclip`, `dict`, `entri.get`, `float`, `g.state`, `int`, `lama.perbarui`, `lama.state`, `round`, `self._aktif.get`, `self._catat`, `self._dikenal.get`, `self._pangkas`, `self.tanda_dari`, `str`
+- L1876–1882 **`Gejala.kalimat_tanpa_nama`** · kontrol=0, assignment/delete=0, except=0 · Call: tidak ada
+- L1884–1892 **`Gejala.gagal`** · kontrol=1, assignment/delete=1, except=0 · Call: `int`, `round`, `self._aktif.get`, `self._catat`, `self.kalimat_tanpa_nama`, `str`
+- L1897–1915 **`Gejala.klaim`** · kontrol=3, assignment/delete=5, except=0 · Call: `dict`, `float`, `g.tandai_terklaim`, `int`, `len`, `round`, `self._aktif.get`, `self._catat`, `self._pangkas`, `self._terklaim.append`, `str`
+- L1917–1921 **`Gejala.jenis_hint`** · kontrol=1, assignment/delete=1, except=0 · Call: `self._aktif.get`, `setattr`, `str`
+- L1926–1993 **`Gejala.proses`** · kontrol=9, assignment/delete=21, except=0 · Call: `KategoriProto`, `dict`, `endapan.append`, `getattr`, `int`, `konsolidasi.append`, `len`, `list`, `min`, `pemudaran.append`, `proto.konfirmasi`, `proto.layak_penuh`, `proto.state`, `proto.umur`, `round`, `self._aktif.items`, `self._bekas.append`, `self._catat`, `self._proto.get`, `str`
+- L1995–1998 **`Gejala.beri_nama`** · kontrol=0, assignment/delete=1, except=0 · Call: `proto.beri_nama`, `self._proto.get`, `str`
+- L2000–2001 **`Gejala.bekas`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
+- L2003–2004 **`Gejala.kategori_penuh`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `self._penuh.values`
+- L2006–2007 **`Gejala.proto`** · kontrol=1, assignment/delete=0, except=0 · Call: `p.state`, `self._proto.values`
+- L2009–2010 **`Gejala.aktif`** · kontrol=1, assignment/delete=0, except=0 · Call: `g.state`, `self._aktif.values`
+- L2012–2013 **`Gejala.terklaim`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`
+- L2016–2022 **`Gejala._catat`** · kontrol=1, assignment/delete=1, except=0 · Call: `int`, `len`, `round`, `self._log.append`, `str`
+- L2024–2037 **`Gejala._pangkas`** · kontrol=4, assignment/delete=3, except=0 · Call: `len`, `list`, `self._aktif.values`, `self._catat`, `self._dikenal.keys`, `self._dikenal.pop`, `sorted`
+- L2039–2050 **`Gejala.state`** · kontrol=3, assignment/delete=1, except=0 · Call: `dict`, `g.state`, `len`, `self._aktif.values`, `self.kategori_penuh`, `self.proto`
+- L2052–2066 **`Gejala.to_dict`** · kontrol=7, assignment/delete=0, except=0 · Call: `dict`, `self._aktif.items`, `self._dikenal.items`, `self._penuh.items`, `self._proto.items`, `v.to_dict`
+- L2069–2092 **`Gejala.from_dict`** · kontrol=21, assignment/delete=13, except=0 · Call: `(d or {}).get`, `(d.get('aktif') or {}).items`, `(d.get('dikenal') or {}).items`, `(d.get('penuh') or {}).items`, `(d.get('proto') or {}).items`, `GejalaMurni.from_dict`, `KategoriProto.from_dict`, `cls`, `d.get`, `dict`, `int`, `isinstance`, `setelan.items`, `str`
+- L2158–2168 **`Invensi.__init__`** · kontrol=0, assignment/delete=9, except=0 · Call: `int`, `random.Random`
+- L2172–2174 **`Invensi._token`** · kontrol=3, assignment/delete=0, except=0 · Call: `len`, `re.findall`, `str`, `str(teks or '').lower`
+- L2177–2181 **`Invensi._jaccard`** · kontrol=2, assignment/delete=1, except=0 · Call: `len`, `set`
+- L2183–2184 **`Invensi._ada`** · kontrol=1, assignment/delete=0, except=0 · Call: `s.get`
+- L2186–2190 **`Invensi._kebaruan`** · kontrol=2, assignment/delete=1, except=0 · Call: `_kclip`, `max`, `self._ada`, `self._jaccard`
+- L2193–2196 **`Invensi._koherensi`** · kontrol=2, assignment/delete=0, except=0 · Call: `len`, `sum`
+- L2199–2209 **`Invensi._utilitas`** · kontrol=7, assignment/delete=3, except=0 · Call: `(drives or {}).items`, `(emosi or {}).items`, `_kclip`, `bobot.get`, `float`, `len`, `max`, `re.findall`, `str`, `str(d).lower`, `sum`
+- L2212–2216 **`Invensi._emosi_teratas`** · kontrol=1, assignment/delete=1, except=0 · Call: `emosi.items`, `float`, `max`
+- L2218–2229 **`Invensi._kosakata`** · kontrol=4, assignment/delete=1, except=0 · Call: `d.get`, `k.add`, `k.update`, `self._token`, `set`, `str`, `str(a).lower`, `str(b).lower`
+- L2232–2245 **`Invensi._g_negasi`** · kontrol=3, assignment/delete=3, except=0 · Call: `d.get`, `key.startswith`, `len`, `out.append`, `self._token`, `str`
+- L2247–2259 **`Invensi._g_abstraksi`** · kontrol=3, assignment/delete=4, except=0 · Call: `' '.join`, `d.get`, `len`, `out.append`, `self._emosi_teratas`, `self._token`
+- L2261–2281 **`Invensi._g_analogi`** · kontrol=6, assignment/delete=5, except=0 · Call: `d.get`, `float`, `frozenset`, `out.append`, `pasangan.add`, `self._token`, `set`, `sorted`, `str`, `tetangga.get`, `tetangga.setdefault`, `tetangga.setdefault(a, []).append`, `tetangga.setdefault(b, []).append`
+- L2283–2303 **`Invensi._g_pengisian`** · kontrol=2, assignment/delete=4, except=0 · Call: `d.get`, `lub.get`, `out.append`, `self._token`, `str`
+- L2305–2323 **`Invensi._g_inventori`** · kontrol=3, assignment/delete=5, except=0 · Call: `d.get`, `float`, `kon.get`, `out.append`, `self._token`, `sorted`, `str`
+- L2325–2339 **`Invensi._g_konstruksi`** · kontrol=5, assignment/delete=9, except=0 · Call: `' → '.join`, `d.get`, `len`, `list`, `map`, `min`, `out.append`, `self._token`, `self.rng.sample`, `str`
+- L2341–2357 **`Invensi._g_pengelompokan`** · kontrol=6, assignment/delete=8, except=0 · Call: `', '.join`, `d.get`, `len`, `list`, `map`, `out.append`, `range`, `self._token`, `set`, `sorted`, `str`, `tetangga.get`, `tetangga.keys`, `tetangga.setdefault`, `tetangga.setdefault(a, set()).add`, `tetangga.setdefault(b, set()).add`
+- L2360–2420 **`Invensi.lahirkan`** · kontrol=16, assignment/delete=22, except=1 · Call: `dict.fromkeys`, `digest.get`, `dinilai.append`, `dinilai.sort`, `diterima.append`, `frozenset`, `gen`, `int`, `kandidat.extend`, `len`, `list`, `per.keys`, `per.setdefault`, `per.setdefault(s['jenis'], []).append`, `round`, `self._kebaruan`, `self._koherensi`, `self._kosakata`, `self._utilitas`, `self.lahir.append`, `self.riwayat_usul.append`, `set`, `sorted`, `tanda.add`
+- L2422–2432 **`Invensi.kristal`** · kontrol=4, assignment/delete=3, except=0 · Call: `int`, `naik.append`, `s.get`
+- L2434–2438 **`Invensi.gugur`** · kontrol=3, assignment/delete=1, except=0 · Call: `int`, `s.get`
+- L2440–2453 **`Invensi.set_knob`** · kontrol=6, assignment/delete=4, except=1 · Call: `_kclip`, `float`, `int`, `max`
+- L2456–2461 **`Invensi.state`** · kontrol=4, assignment/delete=2, except=0 · Call: `len`, `s.get`, `sum`
+- L2463–2467 **`Invensi.ringkas`** · kontrol=3, assignment/delete=0, except=0 · Call: `len`, `s.get`, `sum`
+- L2469–2471 **`Invensi.to_dict`** · kontrol=2, assignment/delete=0, except=0 · Call: `dict`, `list`
+- L2474–2481 **`Invensi.from_dict`** · kontrol=4, assignment/delete=4, except=0 · Call: `cls`, `d.get`, `dict`, `int`, `list`
+- L2519–2524 **`ModelKausal.__init__`** · kontrol=0, assignment/delete=5, except=0 · Call: `int`, `random.Random`
+- L2528–2530 **`ModelKausal._token`** · kontrol=3, assignment/delete=0, except=0 · Call: `len`, `re.findall`, `str`, `str(teks or '').lower`
+- L2533–2541 **`ModelKausal._jenis`** · kontrol=5, assignment/delete=0, except=0 · Call: `a.startswith`, `b.startswith`
+- L2543–2555 **`ModelKausal._tepi`** · kontrol=3, assignment/delete=8, except=0 · Call: `_kclip`, `float`, `self.keluar.setdefault`, `self.masuk.setdefault`, `self.tepi.get`
+- L2557–2565 **`ModelKausal._pangkas`** · kontrol=2, assignment/delete=1, except=0 · Call: `len`, `self.keluar.get`, `self.keluar.get(a, {}).pop`, `self.masuk.get`, `self.masuk.get(b, {}).pop`, `self.tepi.items`, `self.tepi.pop`, `sorted`
+- L2568–2573 **`ModelKausal.pelajari`** · kontrol=2, assignment/delete=0, except=0 · Call: `self._pangkas`, `self._pelajari_satu`, `self.ringkas`
+- L2575–2595 **`ModelKausal._pelajari_satu`** · kontrol=12, assignment/delete=8, except=0 · Call: `_kclip`, `abs`, `deltas.items`, `dict.fromkeys`, `ep.get`, `float`, `list`, `self._tepi`, `self._token`, `str`, `str(ep.get('action') or '').strip`, `str(ep.get('action') or '').strip().lower`, `str(ep.get('label') or '').strip`
+- L2598–2611 **`ModelKausal._node`** · kontrol=9, assignment/delete=3, except=0 · Call: `self._token`, `str`, `str(target or '').strip`, `str(target or '').strip().lower`
+- L2613–2620 **`ModelKausal._sebab`** · kontrol=2, assignment/delete=2, except=0 · Call: `cand.append`, `cand.sort`, `self._jenis`, `self.masuk.get`
+- L2623–2632 **`ModelKausal._narasi`** · kontrol=4, assignment/delete=0, except=0 · Call: `node.startswith`
+- L2634–2654 **`ModelKausal.jelaskan`** · kontrol=6, assignment/delete=7, except=0 · Call: `' karena '.join`, `int`, `max`, `range`, `rantai.append`, `round`, `self._jenis`, `self._narasi`, `self._node`, `self._sebab`, `str`
+- L2656–2677 **`ModelKausal.counterfactual`** · kontrol=5, assignment/delete=7, except=0 · Call: `b.startswith`, `max`, `round`, `self._jenis`, `self._mekanisme_dorong`, `self._narasi`, `self._token`, `self.keluar.get`, `self.tepi.get`, `self.tepi.get(('s:' + s, a_node), {}).get`, `sorted`, `str`, `str(aksi_alt).strip`, `str(aksi_alt).strip().lower`
+- L2679–2684 **`ModelKausal._mekanisme_dorong`** · kontrol=1, assignment/delete=1, except=0 · Call: `d.startswith`, `self._narasi`, `self.keluar.get`, `sorted`
+- L2686–2689 **`ModelKausal._aksi_ke`** · kontrol=1, assignment/delete=0, except=0 · Call: `self._jenis`, `self.masuk.get`
+- L2691–2725 **`ModelKausal.blame`** · kontrol=4, assignment/delete=15, except=0 · Call: `_kclip`, `max`, `round`, `self._aksi_ke`, `self._jenis`, `self._token`, `self.tepi.get`, `self.tepi.get(('s:' + s, h_node), {}).get`, `self.tepi.get((a_node, h_node), {}).get`, `str`, `str(aksi).strip`, `str(aksi).strip().lower`, `str(hasil_label).strip`, `str(hasil_label).strip().lower`, `sum`
+- L2727–2749 **`ModelKausal.mekanisme`** · kontrol=8, assignment/delete=6, except=0 · Call: `' → '.join`, `antrian.append`, `antrian.pop`, `jalur.append`, `jalur.reverse`, `len`, `self._narasi`, `self._node`, `self.keluar.get`
+- L2751–2762 **`ModelKausal.keyakinan`** · kontrol=1, assignment/delete=4, except=0 · Call: `_kclip`, `int`, `round`, `self._jenis`, `self._node`, `self.tepi.get`
+- L2765–2773 **`ModelKausal.state`** · kontrol=2, assignment/delete=3, except=0 · Call: `int`, `len`, `round`, `self._jenis`, `self.tepi.items`, `sorted`
+- L2775–2776 **`ModelKausal.ringkas`** · kontrol=0, assignment/delete=0, except=0 · Call: `len`, `set`
+- L2778–2780 **`ModelKausal.to_dict`** · kontrol=1, assignment/delete=0, except=0 · Call: `dict`, `self.tepi.items`
+- L2783–2795 **`ModelKausal.from_dict`** · kontrol=6, assignment/delete=6, except=0 · Call: `(d.get('tepi', {}) or {}).items`, `cls`, `d.get`, `float`, `int`, `kunci.partition`, `m.keluar.setdefault`, `m.masuk.setdefault`, `rec.get`
+- L2820–2824 **`Perencana.__init__`** · kontrol=0, assignment/delete=4, except=0 · Call: `int`, `random.Random`
+- L2828–2831 **`Perencana._fakta`** · kontrol=2, assignment/delete=2, except=0 · Call: `node.split`, `set`
+- L2833–2839 **`Perencana._aksi_capai`** · kontrol=1, assignment/delete=1, except=0 · Call: `domain._jenis`, `domain.masuk.get`, `keluar.sort`
+- L2841–2843 **`Perencana._pemicu`** · kontrol=1, assignment/delete=0, except=0 · Call: `domain._jenis`, `domain.masuk.get`
+- L2846–2881 **`Perencana._mundur`** · kontrol=10, assignment/delete=7, except=0 · Call: `all`, `domain._node`, `pra_rencana.append`, `round`, `s.split`, `self._aksi_capai`, `self._fakta`, `self._mundur`, `self._outcome_penutup`, `self._pemicu`
+- L2883–2895 **`Perencana._outcome_penutup`** · kontrol=6, assignment/delete=6, except=0 · Call: `h[2:].lower`, `len`, `n.startswith`, `re.findall`, `self._aksi_capai`, `set`, `sorted`, `t.split`, `t.split(':', 1)[-1].lower`
+- L2898–2926 **`Perencana.maju`** · kontrol=12, assignment/delete=7, except=0 · Call: `a.startswith`, `all`, `bisa.append`, `bisa.sort`, `dilihat.add`, `domain._jenis`, `domain._node`, `domain.keluar.get`, `langkah.append`, `len`, `punya.add`, `range`, `self._fakta`, `self._pemicu`, `set`, `sorted`
+- L2929–2946 **`Perencana._kompleksitas`** · kontrol=9, assignment/delete=5, except=0 · Call: `_kclip`, `baru.add`, `domain._jenis`, `domain._node`, `domain.keluar.get`, `domain.masuk.get`, `len`, `list`, `range`, `set`
+- L2948–2964 **`Perencana.rencanakan_rencana`** · kontrol=0, assignment/delete=7, except=0 · Call: `round`, `self._buntu`, `self._kompleksitas`, `self.maju`, `self.rancang`, `uji.get`
+- L2967–2980 **`Perencana.rancang`** · kontrol=1, assignment/delete=5, except=0 · Call: `frozenset`, `len`, `self._kedalaman`, `self._mundur`, `self.jejak_rencana.append`, `str`
+- L2982–2985 **`Perencana._kedalaman`** · kontrol=2, assignment/delete=0, except=0 · Call: `max`, `node.get`, `self._kedalaman`
+- L2987–2993 **`Perencana._buntu`** · kontrol=2, assignment/delete=1, except=0 · Call: `keluar.append`, `keluar.extend`, `node.get`, `self._buntu`, `self._buntu_label`
+- L2996–2997 **`Perencana._buntu_label`** · kontrol=0, assignment/delete=0, except=0 · Call: `node.get`
+- L2999–3010 **`Perencana.langkah`** · kontrol=6, assignment/delete=2, except=0 · Call: `(self.rencana_aktif or {}).get`, `keluar.append`, `keluar.extend`, `node.get`, `self.langkah`
+- L3012–3038 **`Perencana.narasi`** · kontrol=8, assignment/delete=12, except=0 · Call: `' '.join`, `(self.rencana_aktif or {}).get`, `domain._narasi`, `node.get`, `self.narasi`
+- L3041–3047 **`Perencana.state`** · kontrol=1, assignment/delete=1, except=0 · Call: `aktif.get`, `len`, `self.langkah`
+- L3049–3051 **`Perencana.ringkas`** · kontrol=0, assignment/delete=0, except=0 · Call: `len`
+- L3053–3055 **`Perencana.to_dict`** · kontrol=0, assignment/delete=0, except=0 · Call: `list`
+- L3058–3065 **`Perencana.from_dict`** · kontrol=2, assignment/delete=4, except=0 · Call: `cls`, `d.get`, `int`, `list`
+- L3074–3095 **`Organik.__init__`** · kontrol=0, assignment/delete=17, except=0 · Call: `Apersepsi`, `BatasIdentitas`, `DetakInternal`, `Gejala`, `Intrusi`, `Invensi`, `LapisanParalel`, `LukaDomain`, `ModelKausal`, `PenolakanTutur`, `Perencana`, `Residu`, `TopologiSlot`, `TubuhSumber`, `Vacancy`, `WaktuHeterogen`, `int`, `random.Random`
+- L3098–3114 **`Organik.ringkas`** · kontrol=0, assignment/delete=0, except=0 · Call: `len`, `round`, `self.detak.state`, `self.gejala.state`, `self.identitas.state`, `self.intrusi.state`, `self.invensi.state`, `self.kausal.state`, `self.luka.ringkas`, `self.paralel.state`, `self.perencana.state`, `self.residu.state`, `self.topologi.kosong`, `self.topologi.semua`, `self.tutur.riwayat`, `self.vacancy.state`, `self.waktu.ringkas`
+- L3116–3134 **`Organik.to_dict`** · kontrol=1, assignment/delete=1, except=0 · Call: `int`, `self.apersepsi.to_dict`, `self.detak.to_dict`, `self.gejala.to_dict`, `self.identitas.to_dict`, `self.intrusi.to_dict`, `self.invensi.to_dict`, `self.kausal.to_dict`, `self.luka.to_dict`, `self.paralel.to_dict`, `self.perencana.to_dict`, `self.residu.to_dict`, `self.rng.getstate`, `self.topologi.to_dict`, `self.tubuh.to_dict`, `self.tutur.to_dict`, `self.vacancy.to_dict`, `self.waktu.to_dict`
+- L3137–3162 **`Organik.from_dict`** · kontrol=5, assignment/delete=18, except=1 · Call: `Apersepsi.from_dict`, `BatasIdentitas.from_dict`, `DetakInternal.from_dict`, `Gejala.from_dict`, `Intrusi.from_dict`, `Invensi.from_dict`, `LapisanParalel.from_dict`, `LukaDomain.from_dict`, `ModelKausal.from_dict`, `PenolakanTutur.from_dict`, `Perencana.from_dict`, `Residu.from_dict`, `TopologiSlot.from_dict`, `TubuhSumber.from_dict`, `Vacancy.from_dict`, `WaktuHeterogen.from_dict`, `cls`, `d.get`, `int`, `isinstance`, `len`, `o.rng.setstate`, `tuple`
 
 ## `pycos/memori/__init__.py`
 
@@ -2533,6 +2538,29 @@ Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from
 - L50–52 **`ChangelogTests.test_unreleased_boundaries`** · kontrol=0, assignment/delete=0, except=0 · Call: `self.assertEqual`, `unreleased`
 - L54–63 **`ChangelogTests.test_cli_and_invalid_base`** · kontrol=2, assignment/delete=1, except=0 · Call: `self.assertEqual`, `self.assertIn`, `self.assertNotEqual`, `subprocess.run`
 - L65–77 **`ChangelogTests.test_main_success_and_failure_in_process`** · kontrol=3, assignment/delete=1, except=0 · Call: `(root / 'CHANGELOG.md').write_text`, `(root / 'pycos').mkdir`, `(root / self.path).write_text`, `Path`, `TemporaryDirectory`, `patch`, `patch.object`, `periksa_changelog.main`, `self.assertEqual`
+
+## `tests/test_eskalasi_identitas.py`
+
+SHA-256: `8bc7e6f4f6f6530cfea7d464c3112bb8e1edc9f919803598914523da61c38603`
+
+123 baris; 2 kelas; 11 fungsi/metode termasuk nested.
+
+Kelas: `EskalasiVariasiTest` L33, `BatasIdentitasProporsionalTest` L77.
+Handler luas: tidak ada.
+
+Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from pycos.inti import Naluri`; `from pycos.inti.ekstensi.organik import _organik_konteks_tubuh`; `from pycos.inti.ekstensi.pelindung import _pelindung_init`; `from pycos.mandiri.organik import PenolakanTutur`; `import os`; `import sys`; `import unittest`.
+
+- L25–30 **`_npc`** · kontrol=0, assignment/delete=1, except=0 · Call: `Naluri`, `n.enable_kesadaran`, `n.enable_presentasi`, `n.set_personality_preset`
+- L36–46 **`EskalasiVariasiTest.test_tingkat_satu_memakai_kandidat_mesin_tutur`** · kontrol=0, assignment/delete=4, except=0 · Call: `_npc`, `_pelindung_init`, `info.get`, `p.eskalasi_variasi`, `self.assertEqual`, `self.assertIn`, `self.assertNotEqual`
+- L48–56 **`EskalasiVariasiTest.test_isi_asal_tidak_hilang`** · kontrol=1, assignment/delete=4, except=0 · Call: `'variasi kehilangan isi asal: {}'.format`, `_npc`, `_pelindung_init`, `info.get`, `p.eskalasi_variasi`, `self.assertIn`, `teks.lower`
+- L58–67 **`EskalasiVariasiTest.test_pengakuan_repetisi_hanya_langkah_terakhir`** · kontrol=1, assignment/delete=5, except=0 · Call: `_npc`, `_pelindung_init`, `info.get`, `p.eskalasi_variasi`, `self.assertEqual`, `self.assertTrue`
+- L69–74 **`EskalasiVariasiTest.test_bentuk_terpakai_dicatat_terbatas`** · kontrol=1, assignment/delete=1, except=0 · Call: `_npc`, `_pelindung_init`, `len`, `p.eskalasi_variasi`, `range`, `self.assertLessEqual`
+- L80–82 **`BatasIdentitasProporsionalTest.setUp`** · kontrol=0, assignment/delete=1, except=0 · Call: `PenolakanTutur`
+- L84–89 **`BatasIdentitasProporsionalTest.test_klaim_jauh_tidak_menekan_tutur`** · kontrol=0, assignment/delete=2, except=0 · Call: `self.assertGreater`, `self.assertLess`, `self.mekanisme.kelayakan`
+- L91–94 **`BatasIdentitasProporsionalTest.test_tanpa_klaim_tidak_ada_pinalti`** · kontrol=0, assignment/delete=1, except=0 · Call: `self.assertGreater`, `self.assertNotIn`, `self.mekanisme.kelayakan`
+- L96–99 **`BatasIdentitasProporsionalTest.test_kunci_lama_tetap_dihormati`** · kontrol=0, assignment/delete=1, except=0 · Call: `self.assertIn`, `self.assertLess`, `self.mekanisme.kelayakan`
+- L101–105 **`BatasIdentitasProporsionalTest.test_nilai_bukan_pinalti_tetap`** · kontrol=0, assignment/delete=2, except=0 · Call: `self.assertGreater`, `self.assertNotEqual`, `self.mekanisme.kelayakan`
+- L107–119 **`BatasIdentitasProporsionalTest.test_konteks_tubuh_membawa_kedekatan_dinamis`** · kontrol=0, assignment/delete=4, except=0 · Call: `_npc`, `_organik_konteks_tubuh`, `n.tetapkan_identitas`, `self.assertGreaterEqual`, `self.assertIn`, `self.assertLessEqual`, `self.assertNotIn`
 
 ## `tests/test_examples.py`
 
