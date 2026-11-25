@@ -733,6 +733,51 @@ def _kelas_dari(leksikon: Any, kata: str) -> List[str]:
     return []
 
 
+_AWALAN_VERBA = ("me", "mem", "men", "meng", "meny", "menge", "di", "ter",
+                 "ber", "be", "per", "ku", "kau")
+#: Kata yang kebetulan berawalan seperti verba tetapi bukan predikat.
+_BUKAN_VERBA_AWALAN = frozenset({
+    "melihat-lihat", "diam", "diameter", "terlalu", "tertawa", "ternyata",
+    "percaya", "percakapan", "pertanyaan", "kucing", "kue", "kursi", "kunci",
+    "kumpulan", "kualitas", "kantor", "kamar", "kawan", "berita", "bentuk",
+    "benda", "belakang", "bebas", "perasaan", "perang", "pena",
+})
+
+
+#: Verba dasar tanpa afiks yang lazim menjadi predikat ("api itu panas",
+#: "aku tahu", "dia pergi"). Terbatas & eksplisit — bukan semua nomina.
+_VERBA_DASAR_PREDIKAT = frozenset({
+    "ada", "adalah", "tahu", "mau", "ingin", "bisa", "harus", "perlu", "suka",
+    "benci", "pergi", "datang", "pulang", "diam", "tidur", "bangun", "duduk",
+    "berdiri", "hilang", "mati", "hidup", "sakit", "lelah", "lapar", "haus",
+    "panas", "dingin", "gelap", "terang", "besar", "kecil", "baru", "lama",
+    "salah", "benar", "baik", "buruk", "jauh", "dekat", "cepat", "lambat",
+    "tenang", "takut", "marah", "sedih", "senang", "malu", "ragu", "yakin",
+    "sunyi", "sepi", "ramai", "penuh", "kosong", "sulit", "mudah", "aneh",
+    "selalu", "pernah", "masih", "sudah", "belum", "akan",
+})
+
+
+def _predikat_tak_berafiks(kata: str) -> bool:
+    """Predikat verbal/adjektival dasar tanpa afiks (J2/G1)."""
+    return str(kata or "").lower() in _VERBA_DASAR_PREDIKAT
+
+
+def _tampak_verba(kata: str) -> bool:
+    """Ciri morfologis verba tanpa leksikon (J2/G1): awalan + panjang wajar."""
+    b = str(kata or "").lower()
+    if len(b) < 5 or b in _BUKAN_VERBA_AWALAN:
+        return False
+    if not b.startswith(_AWALAN_VERBA):
+        return False
+    # bentuk di- dan ter- sangat produktif; meN-/ber- perlu batang >= 3 huruf
+    for awalan in ("menge", "meng", "meny", "mem", "men", "me", "ber", "be",
+                   "ter", "per", "kau", "ku", "di"):
+        if b.startswith(awalan) and len(b) - len(awalan) >= 3:
+            return True
+    return False
+
+
 def _adalah_verba(leksikon: Any, kata: str) -> bool:
     if _kelas_dari(leksikon, kata):
         return "V" in _kelas_dari(leksikon, kata)
@@ -1193,11 +1238,25 @@ def periksa_gramatika(teks: str, leksikon: Any = None) -> List[str]:
                     r"love|hate|good|bad)$", b):
             masalah.append("afiks_tak_valid")
             break
-    # kalimat tanpa predikat (fragmen nomina tunggal)
-    ada_pred = False
+    # kalimat tanpa predikat (fragmen nomina tunggal).
+    #
+    # Kalimat INTEROGATIF tidak diuji di sini: "apa itu api?" adalah
+    # pertanyaan nomina yang sah (kata tanya + nomina), dan "api itu apa?"
+    # menaruh predikatnya di belakang. Pemeriksaan predikat diberlakukan pada
+    # kalimat deklaratif/imperatif, tempat fragmen benar-benar salah.
+    interogatif = (s.rstrip().endswith("?")
+                   or (kata and kata[0] in KATA_TANYA)
+                   or any(k.endswith("kah") for k in kata))
+    ada_pred = bool(interogatif)
     for b in kata:
         kelas = _kelas_dari(leksikon, b)
         if "V" in kelas or "ADJ" in kelas:
+            ada_pred = True
+            break
+        if _tampak_verba(b):
+            ada_pred = True
+            break
+        if _predikat_tak_berafiks(b):
             ada_pred = True
             break
         if b in VERBA_IMPERATIF_UMUM or b in EMOSI_ADJ:

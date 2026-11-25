@@ -20,6 +20,11 @@ Versi paket saat ini `0.1.0`; belum ada riwayat rilis terverifikasi di dokumen i
   agar entry point showcase dan nama modul data tidak bertabrakan.
 - Kebijakan ekspor pada `docs/API_PUBLIK.md` serta tes klasifikasi seluruh
   nama subpaket, identitas alias, star import, cache, dan impor malas.
+- J2 ANALISIS_LINGUISTIK: tes sifat generator (`tests/test_sifat_generator.py`)
+  untuk semua act × register × seed; G1 kini mengenali predikat berafiks
+  (meN-/di-/ter-/ku-/ber-) dan verba dasar tanpa afiks, serta tidak menuntut
+  predikat pada kalimat interogatif — sehingga keluaran sah tidak lagi
+  dituduh fragmen.
 - H7/H9 ANALISIS_LINGUISTIK: `eskalasi_variasi` tingkat pertama meminta
   kandidat baru dari mesin tutur dengan larangan bentuk yang baru dipakai
   (`cara: kandidat_baru_mesin_tutur`), isi asal tetap dipertahankan, dan

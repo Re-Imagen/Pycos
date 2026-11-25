@@ -7,7 +7,7 @@ Indikator kontrol/mutasi termasuk scope nested; bukan kompleksitas siklomatik fo
 Nama call bersifat sintaksis, bukan resolusi callback atau monkey patch runtime.
 Analisis semantik dan batas bukti: [audit lanjutan](AUDIT_PYTHON_LANJUTAN.md).
 
-Jumlah berkas: **88**.
+Jumlah berkas: **89**.
 
 ## `examples/dialog_hud.py`
 
@@ -126,12 +126,12 @@ Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from
 
 ## `pycos/bahasa/teks.py`
 
-SHA-256: `0deca7467a594b37be63d89365ffe6f12a7911fdeecb8fa5ae10bdde3f2d66f5`
+SHA-256: `4b0888df851aba240e028772075e2f806892c9f6c45a732468a7c26c09e29aa2`
 
-1376 baris; 3 kelas; 44 fungsi/metode termasuk nested.
+1435 baris; 3 kelas; 46 fungsi/metode termasuk nested.
 
-Kelas: `_IdiomSentimen` L195, `Token` L295, `JejakLinguistik` L1304.
-Handler luas: 158, 548, 725, 731, 162, 1279.
+Kelas: `_IdiomSentimen` L195, `Token` L295, `JejakLinguistik` L1363.
+Handler luas: 158, 548, 725, 731, 162, 1338.
 
 Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from collections import Counter`; `from dataclasses import dataclass, field`; `from functools import lru_cache`; `from pathlib import Path as _P`; `from pycos.dukungan import diagnostik as _diag`; `from pycos.dukungan.sumber import ada_sumber_daya, jalur_leksikon`; `from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple`; `import difflib`; `import json`; `import re`; `import unicodedata`.
 
@@ -160,25 +160,27 @@ Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from
 - L658–708 **`cakupan_negasi`** · kontrol=13, assignment/delete=15, except=0 · Call: `enumerate`, `len`
 - L714–715 **`_kata_tokens`** · kontrol=1, assignment/delete=0, except=0 · Call: tidak ada
 - L718–733 **`_kelas_dari`** · kontrol=7, assignment/delete=2, except=2 · Call: `callable`, `ent.get`, `fn`, `getattr`, `leksikon.ambil`, `list`
-- L736–739 **`_adalah_verba`** · kontrol=1, assignment/delete=0, except=0 · Call: `_kelas_dari`
-- L742–784 **`jenis_kalimat`** · kontrol=17, assignment/delete=7, except=0 · Call: `_adalah_verba`, `_kata_tokens`, `any`, `len`, `list`, `low.rstrip`, `low.rstrip().endswith`, `raw.lower`, `raw.rstrip`, `raw.rstrip().endswith`, `str`, `str(teks or '').strip`, `t.bentuk.endswith`, `tokenisasi`
-- L787–814 **`jenis_pertanyaan`** · kontrol=18, assignment/delete=4, except=0 · Call: `_kata_tokens`, `any`, `k.endswith`, `list`, `raw.rstrip`, `raw.rstrip().endswith`, `set`, `str`, `str(teks or '').strip`, `tokenisasi`
-- L820–834 **`_awalan_verba`** · kontrol=6, assignment/delete=1, except=0 · Call: `(bentuk or '').lower`, `b.startswith`, `len`
-- L837–921 **`urai_subjek_predikat`** · kontrol=43, assignment/delete=22, except=0 · Call: `'{} {}'.format`, `_adalah_verba`, `_awalan_verba`, `_kata_tokens`, `_kelas_dari`, `enumerate`, `len`, `range`
-- L927–1010 **`tindak_tutur_skor`** · kontrol=55, assignment/delete=34, except=0 · Call: `' '.join`, `_kata_tokens`, `any`, `dict`, `jenis_kalimat`, `len`, `list`, `low.startswith`, `max`, `sem.get`, `set`, `skor.values`, `stem`, `tokenisasi`
-- L1013–1044 **`ekstrak_entitas`** · kontrol=12, assignment/delete=9, except=0 · Call: `_adalah_verba`, `_kata_tokens`, `e['teks'].lower`, `enumerate`, `len`, `list`, `out.append`, `seen.add`, `set`, `t.asli[:1].isupper`, `tokenisasi`, `uniq.append`
-- L1047–1080 **`ekstrak_topik`** · kontrol=17, assignment/delete=2, except=0 · Call: `_kata_tokens`, `_kelas_dari`, `b.endswith`, `len`, `list`, `tokenisasi`
-- L1083–1097 **`deteksi_bahasa`** · kontrol=10, assignment/delete=4, except=0 · Call: `_kata_tokens`, `sum`, `tokenisasi`
-- L1103–1105 **`_ngram`** · kontrol=1, assignment/delete=1, except=0 · Call: `len`, `range`
-- L1108–1120 **`kemiripan`** · kontrol=4, assignment/delete=7, except=0 · Call: `_kata_tokens`, `_ngram`, `difflib.SequenceMatcher`, `difflib.SequenceMatcher(None, normalisasi_teks(a), normalisasi_teks(b)).ratio`, `float`, `len`, `normalisasi_teks`, `set`, `stem`, `tokenisasi`
-- L1123–1129 **`koreksi_ejaan`** · kontrol=2, assignment/delete=2, except=0 · Call: `difflib.get_close_matches`, `list`, `normalisasi_token`, `set`
-- L1143–1213 **`periksa_gramatika`** · kontrol=31, assignment/delete=9, except=0 · Call: `_kata_tokens`, `_kelas_dari`, `dict.fromkeys`, `enumerate`, `last.endswith`, `len`, `list`, `masalah.append`, `range`, `re.match`, `re.search`, `stem`, `str`, `str(teks or '').strip`, `tokenisasi`
-- L1229–1253 **`jejak_bentuk`** · kontrol=7, assignment/delete=5, except=0 · Call: `detail.items`, `dict`, `keluar.append`, `str`
-- L1256–1285 **`kata_isi`** · kontrol=8, assignment/delete=6, except=1 · Call: `_kata_tokens`, `keluar.append`, `leksikon.kelas_dari`, `len`, `str`, `str(kelas).upper`, `tokenisasi`, `w.lower`
-- L1288–1297 **`potong_batas_kata`** · kontrol=3, assignment/delete=4, except=0 · Call: `len`, `potong.rfind`, `potong.rstrip`, `str`
-- L1313–1317 **`JejakLinguistik.to_dict`** · kontrol=0, assignment/delete=0, except=0 · Call: `dict`
-- L1320–1345 **`jejak_pembentukan`** · kontrol=9, assignment/delete=1, except=0 · Call: `JejakLinguistik`, `JejakLinguistik(input_teks=input_teks, filter_keadaan=dict(keadaan or {}), formation_faktor=formation, output_teks=output_teks, act=act, alasan_act=alasan_act).to_dict`, `dict`
-- L1351–1376 **`analisis_ujaran`** · kontrol=4, assignment/delete=9, except=0 · Call: `_kata_tokens`, `cakupan_negasi`, `deteksi_bahasa`, `ekstrak_entitas`, `ekstrak_topik`, `jenis_kalimat`, `jenis_pertanyaan`, `max`, `periksa_gramatika`, `round`, `skor.items`, `stem`, `str`, `tindak_tutur_skor`, `tokenisasi`, `urai_subjek_predikat`
+- L761–763 **`_predikat_tak_berafiks`** · kontrol=1, assignment/delete=0, except=0 · Call: `str`, `str(kata or '').lower`
+- L766–778 **`_tampak_verba`** · kontrol=7, assignment/delete=1, except=0 · Call: `b.startswith`, `len`, `str`, `str(kata or '').lower`
+- L781–784 **`_adalah_verba`** · kontrol=1, assignment/delete=0, except=0 · Call: `_kelas_dari`
+- L787–829 **`jenis_kalimat`** · kontrol=17, assignment/delete=7, except=0 · Call: `_adalah_verba`, `_kata_tokens`, `any`, `len`, `list`, `low.rstrip`, `low.rstrip().endswith`, `raw.lower`, `raw.rstrip`, `raw.rstrip().endswith`, `str`, `str(teks or '').strip`, `t.bentuk.endswith`, `tokenisasi`
+- L832–859 **`jenis_pertanyaan`** · kontrol=18, assignment/delete=4, except=0 · Call: `_kata_tokens`, `any`, `k.endswith`, `list`, `raw.rstrip`, `raw.rstrip().endswith`, `set`, `str`, `str(teks or '').strip`, `tokenisasi`
+- L865–879 **`_awalan_verba`** · kontrol=6, assignment/delete=1, except=0 · Call: `(bentuk or '').lower`, `b.startswith`, `len`
+- L882–966 **`urai_subjek_predikat`** · kontrol=43, assignment/delete=22, except=0 · Call: `'{} {}'.format`, `_adalah_verba`, `_awalan_verba`, `_kata_tokens`, `_kelas_dari`, `enumerate`, `len`, `range`
+- L972–1055 **`tindak_tutur_skor`** · kontrol=55, assignment/delete=34, except=0 · Call: `' '.join`, `_kata_tokens`, `any`, `dict`, `jenis_kalimat`, `len`, `list`, `low.startswith`, `max`, `sem.get`, `set`, `skor.values`, `stem`, `tokenisasi`
+- L1058–1089 **`ekstrak_entitas`** · kontrol=12, assignment/delete=9, except=0 · Call: `_adalah_verba`, `_kata_tokens`, `e['teks'].lower`, `enumerate`, `len`, `list`, `out.append`, `seen.add`, `set`, `t.asli[:1].isupper`, `tokenisasi`, `uniq.append`
+- L1092–1125 **`ekstrak_topik`** · kontrol=17, assignment/delete=2, except=0 · Call: `_kata_tokens`, `_kelas_dari`, `b.endswith`, `len`, `list`, `tokenisasi`
+- L1128–1142 **`deteksi_bahasa`** · kontrol=10, assignment/delete=4, except=0 · Call: `_kata_tokens`, `sum`, `tokenisasi`
+- L1148–1150 **`_ngram`** · kontrol=1, assignment/delete=1, except=0 · Call: `len`, `range`
+- L1153–1165 **`kemiripan`** · kontrol=4, assignment/delete=7, except=0 · Call: `_kata_tokens`, `_ngram`, `difflib.SequenceMatcher`, `difflib.SequenceMatcher(None, normalisasi_teks(a), normalisasi_teks(b)).ratio`, `float`, `len`, `normalisasi_teks`, `set`, `stem`, `tokenisasi`
+- L1168–1174 **`koreksi_ejaan`** · kontrol=2, assignment/delete=2, except=0 · Call: `difflib.get_close_matches`, `list`, `normalisasi_token`, `set`
+- L1188–1272 **`periksa_gramatika`** · kontrol=36, assignment/delete=12, except=0 · Call: `_kata_tokens`, `_kelas_dari`, `_predikat_tak_berafiks`, `_tampak_verba`, `any`, `bool`, `dict.fromkeys`, `enumerate`, `k.endswith`, `last.endswith`, `len`, `list`, `masalah.append`, `range`, `re.match`, `re.search`, `s.rstrip`, `s.rstrip().endswith`, `stem`, `str`, `str(teks or '').strip`, `tokenisasi`
+- L1288–1312 **`jejak_bentuk`** · kontrol=7, assignment/delete=5, except=0 · Call: `detail.items`, `dict`, `keluar.append`, `str`
+- L1315–1344 **`kata_isi`** · kontrol=8, assignment/delete=6, except=1 · Call: `_kata_tokens`, `keluar.append`, `leksikon.kelas_dari`, `len`, `str`, `str(kelas).upper`, `tokenisasi`, `w.lower`
+- L1347–1356 **`potong_batas_kata`** · kontrol=3, assignment/delete=4, except=0 · Call: `len`, `potong.rfind`, `potong.rstrip`, `str`
+- L1372–1376 **`JejakLinguistik.to_dict`** · kontrol=0, assignment/delete=0, except=0 · Call: `dict`
+- L1379–1404 **`jejak_pembentukan`** · kontrol=9, assignment/delete=1, except=0 · Call: `JejakLinguistik`, `JejakLinguistik(input_teks=input_teks, filter_keadaan=dict(keadaan or {}), formation_faktor=formation, output_teks=output_teks, act=act, alasan_act=alasan_act).to_dict`, `dict`
+- L1410–1435 **`analisis_ujaran`** · kontrol=4, assignment/delete=9, except=0 · Call: `_kata_tokens`, `cakupan_negasi`, `deteksi_bahasa`, `ekstrak_entitas`, `ekstrak_topik`, `jenis_kalimat`, `jenis_pertanyaan`, `max`, `periksa_gramatika`, `round`, `skor.items`, `stem`, `str`, `tindak_tutur_skor`, `tokenisasi`, `urai_subjek_predikat`
 
 ## `pycos/bahasa/tutur.py`
 
@@ -3359,6 +3361,24 @@ Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from
 - L314–320 **`CliKalibrasiTest.test_korpus_rusak_kode_dua`** · kontrol=2, assignment/delete=2, except=0 · Call: `f.write`, `open`, `os.path.join`, `self._jalankan`, `self.assertEqual`, `tempfile.TemporaryDirectory`
 - L322–330 **`CliKalibrasiTest.test_leksikon_kustom_di_cli`** · kontrol=2, assignment/delete=2, except=0 · Call: `_leksikon_kosong`, `json.dump`, `json.loads`, `open`, `os.path.join`, `self._jalankan`, `self.assertIn`, `tempfile.TemporaryDirectory`
 - L332–334 **`CliKalibrasiTest.test_leksikon_tidak_ada_kode_dua`** · kontrol=0, assignment/delete=1, except=0 · Call: `self._jalankan`, `self.assertEqual`
+
+## `tests/test_sifat_generator.py`
+
+SHA-256: `897ed886013fec95652e3a07594ed27a0bc9584c4e60fe27c4a74793b8de7c18`
+
+114 baris; 1 kelas; 6 fungsi/metode termasuk nested.
+
+Kelas: `SifatGeneratorTest` L52.
+Handler luas: tidak ada.
+
+Impor (termasuk lazy/TYPE_CHECKING): `from __future__ import annotations`; `from pycos.bahasa.teks import G1_KERAS, periksa_gramatika`; `from pycos.bahasa.tutur import GenContext, TuturEngine`; `from pycos.dukungan.sumber import jalur_leksikon`; `from pycos.inti.presentasi import _ACT_FUNGSI`; `import os`; `import sys`; `import unittest`.
+
+- L40–49 **`_konteks`** · kontrol=0, assignment/delete=0, except=0 · Call: `GenContext`
+- L54–57 **`SifatGeneratorTest.setUpClass`** · kontrol=0, assignment/delete=2, except=0 · Call: `TuturEngine`, `cls.engine.tersedia`, `jalur_leksikon`, `sorted`
+- L59–69 **`SifatGeneratorTest.test_tidak_kosong_untuk_semua_act_dan_register`** · kontrol=4, assignment/delete=1, except=0 · Call: `'act {} di {} menghasilkan diam'.format`, `_konteks`, `range`, `self.assertIsNotNone`, `self.assertTrue`, `self.engine.ucap`, `self.subTest`, `ujaran.teks.strip`
+- L71–82 **`SifatGeneratorTest.test_lolos_g1_untuk_semua_act_dan_register`** · kontrol=5, assignment/delete=2, except=0 · Call: `'{} ({}): {}'.format`, `_konteks`, `periksa_gramatika`, `range`, `self.assertEqual`, `self.engine.ucap`, `self.subTest`
+- L84–97 **`SifatGeneratorTest.test_tanpa_istilah_internal`** · kontrol=4, assignment/delete=3, except=0 · Call: `'istilah internal bocor: {}'.format`, `_konteks`, `range`, `self.assertEqual`, `self.engine.ucap`, `self.engine.ucap(_konteks(act, register, seed)).teks.lower`, `self.subTest`, `set`, `sorted`, `teks.replace`, `teks.replace('.', ' ').replace`, `teks.replace('.', ' ').replace(',', ' ').replace`, `teks.replace('.', ' ').replace(',', ' ').replace('?', ' ').replace`, `teks.replace('.', ' ').replace(',', ' ').replace('?', ' ').replace('!', ' ').split`
+- L99–110 **`SifatGeneratorTest.test_lebih_dari_satu_varian_per_act`** · kontrol=4, assignment/delete=3, except=0 · Call: `'act dengan satu varian saja: {}'.format`, `_konteks`, `keluaran.add`, `len`, `range`, `self.assertEqual`, `self.engine.ucap`, `set`, `sorted`
 
 ## `tests/test_sst.py`
 
